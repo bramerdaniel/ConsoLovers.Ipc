@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc.Internals;
 
+using System.Text;
+
 using Microsoft.Extensions.DependencyInjection;
 
 internal class ClientFactory : IClientFactory
@@ -31,9 +33,33 @@ internal class ClientFactory : IClientFactory
    public T CreateClient<T>()
       where T : class, IConfigurableClient
    {
-      var client = ServiceProvider.GetService<T>() ?? ActivatorUtilities.CreateInstance<T>(ServiceProvider);
+      var client = ServiceProvider.GetService<T>() ?? CreateInstance<T>();
       client.Configure(new ClientConfiguration(ChannelFactory));
       return client;
+   }
+
+   private T CreateInstance<T>()
+      where T : class, IConfigurableClient
+   {
+      CheckForBuildInClients(typeof(T));
+
+      return ActivatorUtilities.CreateInstance<T>(ServiceProvider);
+   }
+
+   private static void CheckForBuildInClients(Type serviceType)
+   {
+      if (serviceType == typeof(IResultClient))
+         throw new InvalidOperationException(CreateMessage(serviceType, nameof(ClientExtensions.AddResultClient)));
+      if (serviceType == typeof(IProgressClient))
+         throw new InvalidOperationException(CreateMessage(serviceType, nameof(ClientExtensions.AddProgressClient)));
+   }
+
+   private static string CreateMessage(Type serviceType, string addMethod)
+   {
+      var builder = new StringBuilder();
+      builder.AppendLine($"The client {serviceType.Name} was not registered at the {nameof(IClientFactory)}.");
+      builder.AppendLine($"Call {addMethod}() on the factory builder to add the requested client.");
+      return builder.ToString();
    }
 
    #endregion

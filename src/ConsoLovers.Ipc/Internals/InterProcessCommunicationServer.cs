@@ -6,25 +6,11 @@
 
 namespace ConsoLovers.Ipc.Internals;
 
-using System.Net;
-using System.Net.Sockets;
-
-using ConsoLovers.Ipc.Services;
-
-using global::Grpc.Net.Client;
-
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Hosting.Server;
-using Microsoft.AspNetCore.Hosting.Server.Features;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.DependencyInjection;
 
-internal class InterProcessCommunicationServer : IInterProcessCommunicationServer
+internal sealed class InterProcessCommunicationServer : IInterProcessCommunicationServer
 {
    #region Constants and Fields
-
-   public static readonly string SocketPath = Path.Combine(Path.GetTempPath(), "socket.tmp");
 
    private readonly WebApplication webApplication;
 
@@ -32,6 +18,9 @@ internal class InterProcessCommunicationServer : IInterProcessCommunicationServe
 
    #region Constructors and Destructors
 
+   /// <summary>Initializes a new instance of the <see cref="InterProcessCommunicationServer"/> class.</summary>
+   /// <param name="webApplication">The web application.</param>
+   /// <exception cref="System.ArgumentNullException">webApplication</exception>
    internal InterProcessCommunicationServer(WebApplication webApplication)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));
@@ -51,48 +40,12 @@ internal class InterProcessCommunicationServer : IInterProcessCommunicationServe
 
    public void Dispose()
    {
-      webApplication.StopAsync();
       ((IDisposable)webApplication).Dispose();
    }
 
-   #endregion
-
-   #region Public Methods and Operators
-
-   public static GrpcChannel CreateChannel()
+   public async ValueTask DisposeAsync()
    {
-      var udsEndPoint = new UnixDomainSocketEndPoint(SocketPath);
-      var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-      var socketsHttpHandler = new SocketsHttpHandler { ConnectCallback = connectionFactory.ConnectAsync, Proxy = new WebProxy() };
-      return GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions { HttpHandler = socketsHttpHandler });
-   }
-
-   public static IProgressReporter CreateProgressServer(string address)
-   {
-      var builder = WebApplication.CreateBuilder(new WebApplicationOptions());
-      builder.WebHost.ConfigureKestrel(options =>
-      {
-         if (File.Exists(SocketPath))
-            File.Delete(SocketPath);
-
-         options.ListenUnixSocket(SocketPath, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
-      });
-      builder.Services.AddSingleton<ProgressService>();
-      builder.Services.AddGrpc();
-      builder.Services.AddSingleton<IProgressReporter, ProgressReporter>();
-      builder.Services.AddSingleton(s => (ProgressReporter)s.GetService<IProgressReporter>());
-      var application = builder.Build();
-      application.MapGrpcService<ProgressService>();
-      //application.RunAsync("http://[::1]:0");
-      application.RunAsync();
-
-      var server = application.Services.GetRequiredService<IServer>();
-
-      var addressesFeature = server.Features.Get<IServerAddressesFeature>();
-      foreach (var featureAddress in addressesFeature.Addresses)
-         Console.WriteLine(featureAddress);
-
-      return application.Services.GetRequiredService<IProgressReporter>();
+      await webApplication.DisposeAsync();
    }
 
    #endregion

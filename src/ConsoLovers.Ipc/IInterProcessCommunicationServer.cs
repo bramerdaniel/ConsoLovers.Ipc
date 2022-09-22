@@ -6,6 +6,6 @@
 
 namespace ConsoLovers.Ipc;
 
-public interface IInterProcessCommunicationServer : IServiceProvider, IDisposable
+public interface IInterProcessCommunicationServer : IServiceProvider, IDisposable, IAsyncDisposable
 {
 }
