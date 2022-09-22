@@ -17,6 +17,8 @@ internal class Program
 {
    #region Public Methods and Operators
 
+   static CancellationTokenSource tokenSource = new();
+
    public static void Main()
    {
       Console.Title = Process.GetCurrentProcess().GetCommunicationAddress();
@@ -32,7 +34,14 @@ internal class Program
             var progressTask = progressContext.AddTask("Setup Progress");
             for (var i = 0; i < 100; i++)
             {
-               Thread.Sleep(300);
+               if (tokenSource.Token.IsCancellationRequested)
+               {
+                  resultReporter.AddData("Cancellation", "Cancellation was accepted");
+                  break;
+               }
+
+               Task.Delay(300).Wait();
+
                progressServer.ReportProgress(i, $"Progress {i}");
                progressTask.Value = i;
                if (i == 55)
@@ -48,6 +57,12 @@ internal class Program
       AnsiConsole.WriteLine("Setup has finished");
    }
 
+   private static bool CancelExecution()
+   {
+      tokenSource.Cancel();
+      return tokenSource.IsCancellationRequested;
+   }
+
    #endregion
 
    #region Methods
@@ -57,9 +72,8 @@ internal class Program
       return InterProcessCommunication
          .CreateServer()
          .ForCurrentProcess()
-         .RemoveAspNetCoreLogging()
-         .UseProgressReporter()
-         .UseResultReporter()
+         .UseCancellationHandler(CancelExecution)
+         .UseDefaults()
          .Start();
    }
 

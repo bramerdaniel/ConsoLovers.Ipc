@@ -1,7 +1,7 @@
 <Project>
 
 	<PropertyGroup>
-		<ConsoLoversIpcPackageVersion>0.0.1</ConsoLoversIpcPackageVersion>
+		<NugetPackageVersion>0.0.1-pre3</NugetPackageVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>

@@ -44,6 +44,35 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutAddress
       return this;
    }
 
+   public IServerBuilder ConfigureService(Action<IServiceProvider> serviceConfig)
+   {
+      if (serviceConfig == null)
+         throw new ArgumentNullException(nameof(serviceConfig));
+      
+      applicationActions.Add(ConfigurationAction);
+      return this;
+
+      void ConfigurationAction(WebApplication app)
+      {
+         serviceConfig(app.Services);
+      }
+   }
+
+   public IServerBuilder ConfigureService<T>(Action<T> serviceConfig)
+      where T : class
+   {
+      if (serviceConfig == null)
+         throw new ArgumentNullException(nameof(serviceConfig));
+
+      applicationActions.Add(ConfigurationAction);
+      return this;
+
+      void ConfigurationAction(WebApplication app)
+      {
+         serviceConfig(app.Services.GetRequiredService<T>());
+      }
+   }
+
    public IServerBuilder AddGrpcService<T>()
       where T : class
    {

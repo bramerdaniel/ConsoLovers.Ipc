@@ -6,6 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
+using ConsoLovers.Ipc.Cancellation;
 using ConsoLovers.Ipc.Result;
 using ConsoLovers.Ipc.Services;
 
@@ -14,6 +15,15 @@ using Microsoft.Extensions.DependencyInjection;
 public static class ClientExtensions
 {
    #region Public Methods and Operators
+
+   public static IClientFactoryBuilder AddCancellationClient(this IClientFactoryBuilder clientFactoryBuilder)
+   {
+      if (clientFactoryBuilder == null)
+         throw new ArgumentNullException(nameof(clientFactoryBuilder));
+
+      clientFactoryBuilder.AddService(s => s.AddSingleton<ICancellationClient, CancellationClient>());
+      return clientFactoryBuilder;
+   }
 
    public static IClientFactoryBuilder AddProgressClient(this IClientFactoryBuilder clientFactoryBuilder)
    {

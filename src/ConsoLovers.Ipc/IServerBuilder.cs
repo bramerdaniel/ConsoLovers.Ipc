@@ -15,8 +15,23 @@ public interface IServerBuilder
    IServerBuilder AddGrpcService<T>()
       where T : class;
 
+   /// <summary>Adds the service to the internal <see cref="IServiceCollection"/>.</summary>
+   /// <param name="serviceSetup">The service setup.</param>
+   /// <returns>The server builder for more fluent configuration</returns>
    IServerBuilder AddService(Action<IServiceCollection> serviceSetup);
 
+   /// <summary>Configures one or more services after dependency injection is ready.</summary>
+   /// <param name="serviceConfig">The service configuration action.</param>
+   /// <returns>The server builder for more fluent configuration</returns>
+   IServerBuilder ConfigureService(Action<IServiceProvider> serviceConfig);
+
+   /// <summary>Configures the specified service of type T after dependency injection is ready.</summary>
+   /// <param name="serviceConfig">The service configuration action.</param>
+   /// <returns>The server builder for more fluent configuration</returns>
+   IServerBuilder ConfigureService<T>(Action<T> serviceConfig) where T : class;
+
+   /// <summary>Finishes the server setup and start it.</summary>
+   /// <returns>The <see cref="IInterProcessCommunicationServer"/></returns>
    IInterProcessCommunicationServer Start();
 
    #endregion

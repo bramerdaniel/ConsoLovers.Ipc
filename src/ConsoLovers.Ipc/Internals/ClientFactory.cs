@@ -52,6 +52,8 @@ internal class ClientFactory : IClientFactory
          throw new InvalidOperationException(CreateMessage(serviceType, nameof(ClientExtensions.AddResultClient)));
       if (serviceType == typeof(IProgressClient))
          throw new InvalidOperationException(CreateMessage(serviceType, nameof(ClientExtensions.AddProgressClient)));
+      if (serviceType == typeof(ICancellationClient))
+         throw new InvalidOperationException(CreateMessage(serviceType, nameof(ClientExtensions.AddCancellationClient)));
    }
 
    private static string CreateMessage(Type serviceType, string addMethod)

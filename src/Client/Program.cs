@@ -28,7 +28,7 @@ public static class Program
       await ConsoleApplication.WithArguments<ClientArgs>()
          .AddService(x => x.AddSingleton(CreateClientFactory))
          .UseExceptionHandler(typeof(SpectreHandler))
-         .UseApplicationLogic(typeof(ShowProgressLogic))
+         .UseApplicationLogic(typeof(CancelExecutionLogic))
          .RunAsync();
    }
 
@@ -46,6 +46,7 @@ public static class Program
          .ForProcess(process)
          .AddProgressClient()
          .AddResultClient()
+         .AddCancellationClient()
          .Build();
    }
 

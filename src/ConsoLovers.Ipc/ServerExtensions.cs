@@ -9,6 +9,7 @@ namespace ConsoLovers.Ipc;
 extern alias LoggingExtensions;
 using System.Diagnostics;
 
+using ConsoLovers.Ipc.Cancellation;
 using ConsoLovers.Ipc.Result;
 using ConsoLovers.Ipc.Services;
 
@@ -51,6 +52,18 @@ public static class ServerExtensions
       return builder.ForProcess(Process.GetCurrentProcess());
    }
 
+   /// <summary>Gets the <see cref="ICancellationHandler"/> that notifies the server to cancel.</summary>
+   /// <param name="server">The server.</param>
+   /// <returns>The <see cref="ICancellationHandler"/> service</returns>
+   /// <exception cref="System.ArgumentNullException">server</exception>
+   public static ICancellationHandler GetCancellationHandler(this IInterProcessCommunicationServer server)
+   {
+      if (server == null)
+         throw new ArgumentNullException(nameof(server));
+
+      return server.GetRequiredService<ICancellationHandler>();
+   }
+
    /// <summary>Gets the <see cref="IProgressReporter"/> service.</summary>
    /// <param name="server">The <see cref="IInterProcessCommunicationServer"/> that provided the service.</param>
    /// <returns>The <see cref="IProgressReporter"/> to use</returns>
@@ -77,7 +90,7 @@ public static class ServerExtensions
 
    /// <summary>Configures the web application before it is build.</summary>
    /// <param name="builder">The builder.</param>
-   /// <returns></returns>
+   /// <returns>The builder for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">configureWebApplication</exception>
    /// <exception cref="System.ArgumentException">The specified {nameof(builder)} must be of type {{typeof(ServerBuilder).Name}}</exception>
    public static IServerBuilder RemoveAspNetCoreLogging(this IServerBuilder builder)
@@ -85,6 +98,51 @@ public static class ServerExtensions
       builder.ConfigureWebApplication(webApp => { webApp.Logging.ClearProviders(); });
 
       return builder;
+   }
+
+   /// <summary>Adds the services required for cancellation.</summary>
+   /// <param name="builder">The builder.</param>
+   /// <returns>The builder for more fluent configuration</returns>
+   /// <exception cref="System.ArgumentNullException">builder</exception>
+   public static IServerBuilder UseCancellationHandler(this IServerBuilder builder)
+   {
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
+
+      builder.AddService(x => x.AddSingleton<CancellationHandler>());
+      builder.AddService(x => x.AddSingleton<ICancellationHandler>(s => s.GetRequiredService<CancellationHandler>()));
+      builder.AddGrpcService<CancellationService>();
+
+      return builder;
+   }
+
+   /// <summary>Adds the services required for cancellation.</summary>
+   /// <param name="builder">The builder.</param>
+   /// <param name="cancellationAction">The cancellation action.</param>
+   /// <returns>The builder for more fluent configuration</returns>
+   /// <exception cref="System.ArgumentNullException">builder</exception>
+   public static IServerBuilder UseCancellationHandler(this IServerBuilder builder, Func<bool> cancellationAction)
+   {
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
+      if (cancellationAction == null)
+         throw new ArgumentNullException(nameof(cancellationAction));
+
+      builder.UseCancellationHandler();
+      builder.ConfigureService<ICancellationHandler>(x => x.OnCancellationRequested(cancellationAction));
+
+      return builder;
+   }
+
+   public static IServerBuilder UseDefaults(this IServerBuilder builder)
+   {
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
+
+      return builder.RemoveAspNetCoreLogging()
+         .UseProgressReporter()
+         .UseResultReporter()
+         .UseCancellationHandler();
    }
 
    public static IServerBuilder UseProgressReporter(this IServerBuilder builder)

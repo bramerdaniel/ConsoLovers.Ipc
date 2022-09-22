@@ -5,12 +5,13 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Version>$(ConsoLoversIpcPackageVersion)-pre2</Version>
+		<Version>$(NugetPackageVersion)</Version>
 		<PackageTags>gRPC, inter, process, communication, ipc, intger-process, rpc </PackageTags>
 		
 	</PropertyGroup>
 
 	<ItemGroup>
+		<None Remove="Proto\CancellationService.proto" />
 		<None Remove="Proto\ProgressService.proto" />
 		<None Remove="Proto\ResultService.proto" />
 	</ItemGroup>
@@ -18,14 +19,15 @@
 	<ItemGroup>
 		<PackageReference Include="Google.Protobuf" />
 		<PackageReference Include="Grpc.AspNetCore.Server" />
-		<PackageReference Include="Grpc.Net.Client"  />
-		<PackageReference Include="Grpc.Tools" >
+		<PackageReference Include="Grpc.Net.Client" />
+		<PackageReference Include="Grpc.Tools">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
 	</ItemGroup>
 
 	<ItemGroup>
+		<Protobuf Include="Proto\CancellationService.proto" Access="Internal" GrpcServices="Both" />
 		<Protobuf Include="Proto\ResultService.proto" Access="Internal" GrpcServices="Both" />
 		<Protobuf Include="Proto\ProgressService.proto" Access="Internal" GrpcServices="Both" />
 	</ItemGroup>
