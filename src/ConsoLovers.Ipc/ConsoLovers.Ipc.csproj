@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Remove="Proto\ProgressService.proto"/>
+		<None Remove="Proto\ResultService.proto"/>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Google.Protobuf" Version="3.21.6"/>
+		<PackageReference Include="Grpc.AspNetCore.Server" Version="2.48.0"/>
+		<PackageReference Include="Grpc.Net.Client" Version="2.48.0"/>
+		<PackageReference Include="Grpc.Tools" Version="2.48.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<Protobuf Include="Proto\ResultService.proto" Access="Internal" GrpcServices="Both"/>
+		<Protobuf Include="Proto\ProgressService.proto" Access="Internal" GrpcServices="Both"/>
+	</ItemGroup>
+
+	<Target Name="ChangeAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
+		<ItemGroup>
+			<ReferencePath Condition="'%(FileName)' == 'Microsoft.Extensions.Logging'">
+				<Aliases>LoggingExtensions</Aliases>
+			</ReferencePath>
+		</ItemGroup>
+	</Target>
+
+</Project>

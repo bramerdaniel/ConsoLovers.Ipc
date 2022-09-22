@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
+		<AssemblyName>client</AssemblyName>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Spectre.Console" Version="0.45.0" />
+		<PackageReference Include="ConsoLovers.ConsoleToolkit.Core" Version="5.0.0-rc22" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ConsoLovers.Ipc\ConsoLovers.Ipc.csproj" />
+	</ItemGroup>
+
+</Project>
