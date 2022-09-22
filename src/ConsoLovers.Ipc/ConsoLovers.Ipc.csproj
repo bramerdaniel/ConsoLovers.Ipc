@@ -5,6 +5,9 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Version>$(ConsoLoversIpcPackageVersion)-pre1</Version>
+		<PackageTags>gRPC, inter, process, communication, ipc, intger-process, rpc </PackageTags>
+		
 	</PropertyGroup>
 
 	<ItemGroup>

@@ -1,4 +1,4 @@
-name: ConsoLovers.Toolkit.Core
+name: ConsoLovers.Ipc
 
 on:
   push:

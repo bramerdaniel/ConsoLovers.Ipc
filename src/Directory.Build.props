@@ -1,12 +1,17 @@
 <Project>
+
+	<PropertyGroup>
+		<ConsoLoversIpcPackageVersion>0.0.1</ConsoLoversIpcPackageVersion>
+	</PropertyGroup>
+
 	<PropertyGroup>
 		<OutputPath>$(SolutionDir)$(Configuration)</OutputPath>
 		<Company>ConsoLovers</Company>
-		<Product>ConsoLovers.ConsoleToolkit</Product>
+		<Product>ConsoLovers.Ipc</Product>
 		<Copyright>Copyright 2017 - 2022</Copyright>
 		<Authors>danielbramer</Authors>
-		<PackageIconUrl>https://raw.githubusercontent.com/bramerdaniel/ConsoLovers/master/src/ConsoLovers.ConsoleToolkit/Resources/Icon.ico</PackageIconUrl>
-		<PackageProjectUrl>https://github.com/bramerdaniel/ConsoLovers</PackageProjectUrl>
+		<!--<PackageIconUrl>https://raw.githubusercontent.com/bramerdaniel/ConsoLovers/master/src/ConsoLovers.ConsoleToolkit/Resources/Icon.ico</PackageIconUrl>-->
+		<PackageProjectUrl>https://github.com/bramerdaniel/ConsoLovers.Ipc</PackageProjectUrl>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 		<Description>Simple grpc based inter process communication library using unix domain sockets.</Description>
 	</PropertyGroup>
