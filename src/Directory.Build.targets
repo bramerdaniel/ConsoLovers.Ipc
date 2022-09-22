@@ -3,13 +3,17 @@
 	<ItemGroup>
 		<PackageReference Update="ConsoLovers.ConsoleToolkit.Core" Version="5.0.0-rc22"/>
 		<PackageReference Update="System.Threading.Tasks.Extensions" Version="4.4.0"/>
-		<PackageReference Update="Microsoft.NET.Test.Sdk" Version="16.0.1"/>
-		<PackageReference Update="MSTest.TestAdapter" Version="1.4.0"/>
-		<PackageReference Update="MSTest.TestFramework" Version="1.4.0"/>
+		<PackageReference Update="FluentSetups" Version="0.3.7" />
+		<PackageReference Update="FluentAssertions" Version="6.7.0" />
+		
+		<PackageReference Update="Microsoft.NET.Test.Sdk" Version="17.3.1" />
+		<PackageReference Update="MSTest.TestAdapter" Version="2.2.10" />
+		<PackageReference Update="MSTest.TestFramework" Version="2.2.10" />
 		<PackageReference Update="Spectre.Console" Version="0.45.0"/>
 		<PackageReference Update="Google.Protobuf" Version="3.21.6"/>
 		<PackageReference Update="Grpc.AspNetCore.Server" Version="2.48.0"/>
 		<PackageReference Update="Grpc.Net.Client" Version="2.48.0"/>
 		<PackageReference Update="Grpc.Tools" Version="2.48.1"/>
+		<PackageReference Update="Moq" Version="4.18.2" />
 	</ItemGroup>
 </Project>
