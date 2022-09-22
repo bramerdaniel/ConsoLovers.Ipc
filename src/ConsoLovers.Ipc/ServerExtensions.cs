@@ -109,10 +109,14 @@ public static class ServerExtensions
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
 
-      builder.AddService(x => x.AddSingleton<CancellationHandler>());
-      builder.AddService(x => x.AddSingleton<ICancellationHandler>(s => s.GetRequiredService<CancellationHandler>()));
-      builder.AddGrpcService<CancellationService>();
+      builder.AddService(AddRequiredServices);
 
+      void AddRequiredServices(IServiceCollection serviceCollection)
+      {
+         if (EnsureSingleton<ICancellationHandler, CancellationHandler>(serviceCollection))
+            builder.AddGrpcService<CancellationService>();
+      }
+      
       return builder;
    }
 
@@ -150,9 +154,13 @@ public static class ServerExtensions
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
 
-      builder.AddService(x => x.AddSingleton<ProgressReporter>());
-      builder.AddService(x => x.AddSingleton<IProgressReporter>(s => s.GetRequiredService<ProgressReporter>()));
-      builder.AddGrpcService<ProgressService>();
+      builder.AddService(AddRequiredServices);
+
+      void AddRequiredServices(IServiceCollection serviceCollection)
+      {
+         if (EnsureSingleton<IProgressReporter, ProgressReporter>(serviceCollection))
+            builder.AddGrpcService<ProgressService>();
+      }
 
       return builder;
    }
@@ -162,11 +170,37 @@ public static class ServerExtensions
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
 
-      builder.AddService(x => x.AddSingleton<ResultReporter>());
-      builder.AddService(x => x.AddSingleton<IResultReporter>(s => s.GetRequiredService<ResultReporter>()));
-      builder.AddGrpcService<ResultService>();
+      builder.AddService(AddRequiredServices);
+
+      void AddRequiredServices(IServiceCollection serviceCollection)
+      {
+         if (EnsureSingleton<IResultReporter, ResultReporter>(serviceCollection))
+            builder.AddGrpcService<ResultService>();
+      }
 
       return builder;
+   }
+
+   internal static bool EnsureSingleton<TService, TImplementation>(this IServiceCollection serviceCollection)
+      where TImplementation : TService where TService : class
+   {
+      if (TryAddSingleton<TImplementation>(serviceCollection))
+      {
+         serviceCollection.AddSingleton<TService>(x => x.GetRequiredService<TImplementation>());
+         return true;
+      }
+
+      return false;
+   }
+
+   private static bool TryAddSingleton<T>(IServiceCollection serviceCollection)
+   {
+      var implementationType = typeof(T);
+      if (serviceCollection.Any(x => x.ServiceType == implementationType))
+         return false;
+
+      serviceCollection.AddSingleton(implementationType);
+      return true;
    }
 
    #endregion

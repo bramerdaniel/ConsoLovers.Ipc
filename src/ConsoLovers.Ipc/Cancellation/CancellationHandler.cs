@@ -8,7 +8,16 @@ namespace ConsoLovers.Ipc.Cancellation;
 
 internal class CancellationHandler : ICancellationHandler
 {
+   #region Constants and Fields
+
+   private readonly CancellationTokenSource handlerTokenSource = new();
+
+   #endregion
+
    #region ICancellationHandler Members
+
+   /// <summary>Gets the cancellation token of the <see cref="ICancellationHandler"/>.</summary>
+   public CancellationToken CancellationToken => handlerTokenSource.Token;
 
    public void OnCancellationRequested(Func<bool> action)
    {
@@ -29,10 +38,9 @@ internal class CancellationHandler : ICancellationHandler
 
    public bool RequestCancel()
    {
-      if (CancellationAction == null)
-         return false;
+      handlerTokenSource.Cancel();
 
-      return CancellationAction();
+      return CancellationAction != null && CancellationAction();
    }
 
    #endregion

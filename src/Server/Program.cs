@@ -72,8 +72,8 @@ internal class Program
       return InterProcessCommunication
          .CreateServer()
          .ForCurrentProcess()
-         .UseCancellationHandler(CancelExecution)
          .UseDefaults()
+         .UseCancellationHandler(CancelExecution)
          .Start();
    }
 
