@@ -17,5 +17,7 @@ message ResultChangedResponse
 	int32 exit_code= 1;
 	
 	string message = 2;
+
+	map<string, string> data = 3;
 }
 

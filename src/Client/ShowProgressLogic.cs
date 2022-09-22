@@ -45,8 +45,11 @@ internal class ShowProgressLogic : IApplicationLogic<ClientArgs>
          .StartAsync(Update);
 
       Console.Clear();
+
       var resultInfo = await resultClient.WaitForResultAsync();
       Console.WriteLine($"{clientFactory.ChannelFactory.Address} exited with code {resultInfo.ExitCode}");
+      foreach (var pair in resultInfo.Data)
+         AnsiConsole.MarkupLine($"[blue]{pair.Key}[/] = [green]{pair.Value}[/]");
 
       Console.ReadLine();
    }

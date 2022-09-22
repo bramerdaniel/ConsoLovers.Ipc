@@ -16,6 +16,11 @@ public interface IResultReporter
    /// <param name="message">The message.</param>
    void ReportResult(int exitCode, string message);
 
+   /// <summary>Adds the data to the result.</summary>
+   /// <param name="key">The key of the data.</param>
+   /// <param name="value">The value.</param>
+   void AddData(string key, string value);
+
    /// <summary>The server process finished successfully.</summary>
    void Success();
 

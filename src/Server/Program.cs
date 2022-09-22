@@ -32,12 +32,15 @@ internal class Program
             var progressTask = progressContext.AddTask("Setup Progress");
             for (var i = 0; i < 100; i++)
             {
-               Thread.Sleep(400);
+               Thread.Sleep(300);
                progressServer.ReportProgress(i, $"Progress {i}");
                progressTask.Value = i;
+               if (i == 55)
+                  resultReporter.AddData("FirstError", "Verbogener index auf nummer 55");
             }
          });
 
+         resultReporter.AddData("CustomData", "This went wrong");
          resultReporter.ReportResult(4, "Something went wrong");
          AnsiConsole.WriteLine("shutting down communication server");
       }

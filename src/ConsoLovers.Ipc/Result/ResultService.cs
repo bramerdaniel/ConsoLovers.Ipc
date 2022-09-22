@@ -33,7 +33,16 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
       ServerCallContext context)
    {
       var resultInfo = await resultReporter.GetResultAsync();
-      await responseStream.WriteAsync(new ResultChangedResponse { ExitCode = resultInfo.ExitCode, Message = resultInfo.Message });
+      var response = CreateResponse(resultInfo);
+      await responseStream.WriteAsync(response);
+   }
+
+   private static ResultChangedResponse CreateResponse(ResultInfo resultInfo)
+   {
+      var response = new ResultChangedResponse { ExitCode = resultInfo.ExitCode, Message = resultInfo.Message };
+      if (resultInfo.Data.Count > 0)
+         response.Data.Add(resultInfo.Data);
+      return response;
    }
 
    #endregion

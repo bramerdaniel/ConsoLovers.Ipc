@@ -49,13 +49,13 @@ public class ResultClient : IResultClient
       if (result != null)
          return result;
 
-      return await GetOreCreateWaitingTask();
+      return await GetOrCreateWaitingTask();
    }
 
    public void Configure(IClientConfiguration configuration)
    {
       serviceClient = new Grpc.ResultService.ResultServiceClient(configuration.Channel);
-      GetOreCreateWaitingTask();
+      GetOrCreateWaitingTask();
    }
 
    public void Dispose()
@@ -82,7 +82,7 @@ public class ResultClient : IResultClient
 
    #region Methods
 
-   private Task<ResultInfo> GetOreCreateWaitingTask()
+   private Task<ResultInfo> GetOrCreateWaitingTask()
    {
       if (waitingTask == null)
       {
@@ -106,7 +106,12 @@ public class ResultClient : IResultClient
       if (await changed.ResponseStream.MoveNext(CancellationToken.None))
       {
          var response = changed.ResponseStream.Current;
-         Result = new ResultInfo { ExitCode = response.ExitCode, Message = response.Message };
+         Result = new ResultInfo
+         {
+            ExitCode = response.ExitCode, 
+            Message = response.Message,
+            Data = response.Data
+         };
       }
 
       return Result;

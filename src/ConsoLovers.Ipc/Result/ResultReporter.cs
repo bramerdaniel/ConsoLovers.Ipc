@@ -21,6 +21,7 @@ public class ResultReporter : IResultReporter
    public ResultReporter()
    {
       resetEvent = new ManualResetEventSlim();
+      resultInfo = new ResultInfo { ExitCode = -1, Message = "NotExecuted", Data = new Dictionary<string, string>() };
    }
 
    #endregion
@@ -29,8 +30,20 @@ public class ResultReporter : IResultReporter
 
    public void ReportResult(int exitCode, string message)
    {
-      resultInfo = new ResultInfo { ExitCode = exitCode, Message = message };
+      resultInfo.ExitCode = exitCode;
+      resultInfo.Message = message;
+
       resetEvent.Set();
+   }
+
+   public void AddData(string key, string value)
+   {
+      if (key == null)
+         throw new ArgumentNullException(nameof(key));
+      if (value == null)
+         throw new ArgumentNullException(nameof(value));
+
+      resultInfo.Data.Add(key, value);
    }
 
    public void Success()
