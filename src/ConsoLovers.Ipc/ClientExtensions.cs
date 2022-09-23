@@ -32,7 +32,7 @@ public static class ClientExtensions
    /// <summary>Adds the default services that are build in .</summary>
    /// <param name="clientFactoryBuilder">The client factory builder.</param>
    /// <returns>The <see cref="IClientFactoryBuilder"/> for more fluent setup</returns>
-   public static IClientFactoryBuilder AddDefaultServices(this IClientFactoryBuilder clientFactoryBuilder)
+   public static IClientFactoryBuilder AddDefaultClients(this IClientFactoryBuilder clientFactoryBuilder)
    {
       return clientFactoryBuilder.AddProgressClient()
          .AddResultClient()
