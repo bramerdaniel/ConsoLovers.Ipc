@@ -36,7 +36,7 @@ internal class ShowProgressLogic : IApplicationLogic<ClientArgs>
 
    public async Task ExecuteAsync(ClientArgs arguments, CancellationToken cancellationToken)
    {
-      Console.Title = $"client [{clientFactory.ChannelFactory.Address}]";
+      Console.Title = $"client [{clientFactory.ChannelFactory.ServerName}]";
       progressClient = clientFactory.CreateClient<IProgressClient>();
       resultClient = clientFactory.CreateClient<IResultClient>();
 
@@ -47,7 +47,7 @@ internal class ShowProgressLogic : IApplicationLogic<ClientArgs>
       Console.Clear();
 
       var resultInfo = await resultClient.WaitForResultAsync();
-      Console.WriteLine($"{clientFactory.ChannelFactory.Address} exited with code {resultInfo.ExitCode}");
+      Console.WriteLine($"{clientFactory.ChannelFactory.ServerName} exited with code {resultInfo.ExitCode}");
       foreach (var pair in resultInfo.Data)
          AnsiConsole.MarkupLine($"[blue]{pair.Key}[/] = [green]{pair.Value}[/]");
 
@@ -60,7 +60,7 @@ internal class ShowProgressLogic : IApplicationLogic<ClientArgs>
 
    private async Task Update(ProgressContext progressContext)
    {
-      var progress = progressContext.AddTask(clientFactory.ChannelFactory.Address);
+      var progress = progressContext.AddTask(clientFactory.ChannelFactory.ServerName);
       progressClient.ProgressChanged += OnProgressChanged;
 
       void OnProgressChanged(object? sender, ProgressEventArgs e)

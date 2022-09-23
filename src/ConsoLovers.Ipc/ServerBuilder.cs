@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 
-internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutAddress
+internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 {
    #region Constants and Fields
 
@@ -48,7 +48,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutAddress
    {
       if (serviceConfig == null)
          throw new ArgumentNullException(nameof(serviceConfig));
-      
+
       applicationActions.Add(ConfigurationAction);
       return this;
 
@@ -92,25 +92,19 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutAddress
          action(application);
 
       application.RunAsync();
-
-      //// var server = application.Services.GetRequiredService<IServer>();
-      //// var addressesFeature = server.Features.Get<IServerAddressesFeature>();
-      //// foreach (var featureAddress in addressesFeature.Addresses)
-      ////   Console.WriteLine(featureAddress);
-
       return new InterProcessCommunicationServer(application);
    }
 
    #endregion
 
-   #region IServerBuilderWithoutAddress Members
+   #region IServerBuilderWithoutName Members
 
-   public IServerBuilder ForAddress(string address)
+   public IServerBuilder ForName(string name)
    {
-      if (address == null)
-         throw new ArgumentNullException(nameof(address));
+      if (name == null)
+         throw new ArgumentNullException(nameof(name));
 
-      return InitializeWithAddress(address);
+      return InitializeWithName(name);
    }
 
    public IServerBuilder ForProcess(Process process)
@@ -118,7 +112,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutAddress
       if (process == null)
          throw new ArgumentNullException(nameof(process));
 
-      return ForAddress(process.GetCommunicationAddress());
+      return ForName(process.GetServerName());
    }
 
    #endregion
@@ -133,9 +127,11 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutAddress
 
    #region Methods
 
-   private IServerBuilder InitializeWithAddress(string address)
+   private IServerBuilder InitializeWithName(string name)
    {
-      var socketPath = Path.Combine(Path.GetTempPath(), $"{address}.uds");
+      Validation.EnsureValidFileName(name);
+
+      var socketPath = Path.Combine(Path.GetTempPath(), $"{name}.uds");
 
       WebApplicationBuilder.WebHost.ConfigureKestrel(options =>
       {

@@ -41,10 +41,10 @@ public static class ServerExtensions
    }
 
    /// <summary>Gets a <see cref="IServerBuilder"/> for the current process.</summary>
-   /// <param name="builder">The builder without the address specified.</param>
+   /// <param name="builder">The builder without the server name specified.</param>
    /// <returns>The <see cref="IServerBuilder"/></returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IServerBuilder ForCurrentProcess(this IServerBuilderWithoutAddress builder)
+   public static IServerBuilder ForCurrentProcess(this IServerBuilderWithoutName builder)
    {
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));

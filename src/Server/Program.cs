@@ -21,7 +21,7 @@ internal class Program
 
    public static void Main()
    {
-      Console.Title = Process.GetCurrentProcess().GetCommunicationAddress();
+      Console.Title = Process.GetCurrentProcess().GetServerName();
       AnsiConsole.WriteLine("starting communication server");
 
       using (var communicationServer = CreateCommunicationServer())

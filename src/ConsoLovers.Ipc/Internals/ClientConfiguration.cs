@@ -27,15 +27,9 @@ internal class ClientConfiguration : IClientConfiguration
 
    #region IClientConfiguration Members
 
-   public string Address => channelFactory.Address;
+   public string ServerName => channelFactory.ServerName;
 
-   public GrpcChannel Channel
-   {
-      get
-      {
-         return channelFactory.Channel;
-      }
-   }
+   public GrpcChannel Channel => channelFactory.Channel;
 
    #endregion
 }

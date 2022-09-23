@@ -15,14 +15,14 @@ public static class InterProcessCommunication
 
    /// <summary>Creates a <see cref="IClientFactoryBuilder"/> for configuring the required <see cref="IClientFactory"/>.</summary>
    /// <returns>A <see cref="IClientFactoryBuilder"/></returns>
-   public static IClientFactoryBuilderWithoutAddress CreateClientFactory()
+   public static IClientFactoryBuilderWithoutName CreateClientFactory()
    {
       return new ClientFactoryBuilder();
    }
 
    /// <summary>Creates a <see cref="IServerBuilder"/> for configuring the required <see cref="IInterProcessCommunicationServer"/>.</summary>
-   /// <returns>A <see cref="IServerBuilderWithoutAddress"/></returns>
-   public static IServerBuilderWithoutAddress CreateServer()
+   /// <returns>A <see cref="IServerBuilderWithoutName"/></returns>
+   public static IServerBuilderWithoutName CreateServer()
    {
       return new ServerBuilder();
    }

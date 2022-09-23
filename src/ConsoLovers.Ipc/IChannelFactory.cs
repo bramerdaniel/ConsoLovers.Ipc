@@ -12,11 +12,11 @@ public interface IChannelFactory
 {
    #region Public Properties
 
-   /// <summary>Gets the address.</summary>
-   string Address { get; }
-
    /// <summary>Gets the channel.</summary>
    public GrpcChannel Channel { get; }
+
+   /// <summary>Gets the server name.</summary>
+   string ServerName { get; }
 
    #endregion
 }

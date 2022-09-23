@@ -12,11 +12,11 @@ public static class ProcessExtensions
 {
    #region Public Methods and Operators
 
-   /// <summary>Gets the address that a <see cref="IInterProcessCommunicationServer"/> of the passed process would use.</summary>
+   /// <summary>Gets the name that a <see cref="IInterProcessCommunicationServer"/> of the passed process would use.</summary>
    /// <param name="process">The process.</param>
-   /// <returns>The used address</returns>
+   /// <returns>The used server name</returns>
    /// <exception cref="System.ArgumentNullException">process</exception>
-   public static string GetCommunicationAddress(this Process process)
+   public static string GetServerName(this Process process)
    {
       if (process == null)
          throw new ArgumentNullException(nameof(process));

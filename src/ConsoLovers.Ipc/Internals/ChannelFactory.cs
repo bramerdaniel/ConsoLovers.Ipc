@@ -23,19 +23,19 @@ internal class ChannelFactory : IChannelFactory
    #region Constructors and Destructors
 
    /// <summary>Initializes a new instance of the <see cref="ChannelFactory"/> class.</summary>
-   /// <param name="address">The address.</param>
-   /// <exception cref="System.ArgumentNullException">address</exception>
-   internal ChannelFactory(string address)
+   /// <param name="serverName">The serverName.</param>
+   /// <exception cref="System.ArgumentNullException">serverName</exception>
+   internal ChannelFactory(string serverName)
    {
-      Address = address ?? throw new ArgumentNullException(nameof(address));
+      ServerName = serverName ?? throw new ArgumentNullException(nameof(serverName));
    }
 
    #endregion
 
    #region IChannelFactory Members
 
-   /// <summary>Gets the address.</summary>
-   public string Address { get; }
+   /// <summary>Gets the serverName.</summary>
+   public string ServerName { get; }
 
    /// <summary>Gets the channel.</summary>
    public GrpcChannel Channel => channel ??= CreateChannel();
@@ -46,7 +46,7 @@ internal class ChannelFactory : IChannelFactory
 
    private GrpcChannel CreateChannel()
    {
-      var socketPath = Path.Combine(Path.GetTempPath(), $"{Address}.uds");
+      var socketPath = Path.Combine(Path.GetTempPath(), $"{ServerName}.uds");
       return CreateChannelFromPath(socketPath);
    }
 

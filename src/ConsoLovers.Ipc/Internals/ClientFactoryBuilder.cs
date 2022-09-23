@@ -10,7 +10,7 @@ using System.Diagnostics;
 
 using Microsoft.Extensions.DependencyInjection;
 
-internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuilderWithoutAddress
+internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuilderWithoutName
 {
    #region Constants and Fields
 
@@ -54,14 +54,14 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    #endregion
 
-   #region IClientFactoryBuilderWithoutAddress Members
+   #region IClientFactoryBuilderWithoutName Members
 
-   public IClientFactoryBuilder ForAddress(string address)
+   public IClientFactoryBuilder ForName(string name)
    {
-      if (address == null)
-         throw new ArgumentNullException(nameof(address));
+      if (name == null)
+         throw new ArgumentNullException(nameof(name));
 
-      return InitializeWithAddress(address);
+      return InitializeWithName(name);
    }
 
    public IClientFactoryBuilder ForProcess(Process process)
@@ -69,16 +69,18 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       if (process == null)
          throw new ArgumentNullException(nameof(process));
 
-      return ForAddress(process.GetCommunicationAddress());
+      return ForName(process.GetServerName());
    }
 
    #endregion
 
    #region Methods
 
-   private IClientFactoryBuilder InitializeWithAddress(string address)
+   private IClientFactoryBuilder InitializeWithName(string name)
    {
-      channelFactory = new ChannelFactory(address);
+      Validation.EnsureValidFileName(name);
+
+      channelFactory = new ChannelFactory(name);
       serviceCollection.AddSingleton(channelFactory);
       return this;
    }
