@@ -16,6 +16,10 @@ public static class ClientExtensions
 {
    #region Public Methods and Operators
 
+   /// <summary>Adds the <see cref="ICancellationClient"/>.</summary>
+   /// <param name="clientFactoryBuilder">The client factory builder.</param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> for more fluent setup</returns>
+   /// <exception cref="System.ArgumentNullException">clientFactoryBuilder</exception>
    public static IClientFactoryBuilder AddCancellationClient(this IClientFactoryBuilder clientFactoryBuilder)
    {
       if (clientFactoryBuilder == null)
@@ -25,6 +29,20 @@ public static class ClientExtensions
       return clientFactoryBuilder;
    }
 
+   /// <summary>Adds the default services that are build in .</summary>
+   /// <param name="clientFactoryBuilder">The client factory builder.</param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> for more fluent setup</returns>
+   public static IClientFactoryBuilder AddDefaultServices(this IClientFactoryBuilder clientFactoryBuilder)
+   {
+      return clientFactoryBuilder.AddProgressClient()
+         .AddResultClient()
+         .AddCancellationClient();
+   }
+
+   /// <summary>Adds the <see cref="IProgressClient"/>.</summary>
+   /// <param name="clientFactoryBuilder">The client factory builder.</param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> for more fluent setup</returns>
+   /// <exception cref="System.ArgumentNullException">clientFactoryBuilder</exception>
    public static IClientFactoryBuilder AddProgressClient(this IClientFactoryBuilder clientFactoryBuilder)
    {
       if (clientFactoryBuilder == null)
@@ -34,6 +52,10 @@ public static class ClientExtensions
       return clientFactoryBuilder;
    }
 
+   /// <summary>Adds the <see cref="IResultClient"/>.</summary>
+   /// <param name="clientFactoryBuilder">The client factory builder.</param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> for more fluent setup</returns>
+   /// <exception cref="System.ArgumentNullException">clientFactoryBuilder</exception>
    public static IClientFactoryBuilder AddResultClient(this IClientFactoryBuilder clientFactoryBuilder)
    {
       if (clientFactoryBuilder == null)

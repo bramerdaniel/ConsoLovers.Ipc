@@ -1,6 +1,7 @@
 # ConsoLovers.Ipc
 
-Usage on server side
+This is how you set it up on the server side 
+(The process that hosts the gRPC server)
 
 ```C#
 
