@@ -45,7 +45,14 @@ internal class Program
                progressServer.ReportProgress(i, $"Progress {i}");
                progressTask.Value = i;
                if (i == 55)
+               {
                   resultReporter.AddData("FirstError", "Verbogener index auf nummer 55");
+               }
+
+               if (i == 15)
+               {
+                  Environment.Exit(123);
+               }
             }
          });
 

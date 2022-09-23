@@ -3,4 +3,5 @@
 	<s:String x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=BBB1B6877F47984B9FEAAA1A3F97ED97/RelativePath/@EntryValue">..\Resharper.DotSettings</s:String>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/FileInjectedLayer/=BBB1B6877F47984B9FEAAA1A3F97ED97/@KeyIndexDefined">True</s:Boolean>
 	<s:Boolean x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileBBB1B6877F47984B9FEAAA1A3F97ED97/@KeyIndexDefined">True</s:Boolean>
-	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileBBB1B6877F47984B9FEAAA1A3F97ED97/RelativePriority/@EntryValue">1</s:Double></wpf:ResourceDictionary>
+	<s:Double x:Key="/Default/Environment/InjectedLayers/InjectedLayerCustomization/=FileBBB1B6877F47984B9FEAAA1A3F97ED97/RelativePriority/@EntryValue">1</s:Double>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=Conso/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

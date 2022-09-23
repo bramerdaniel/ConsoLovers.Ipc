@@ -23,6 +23,8 @@ public class ResultClient : IResultClient
 
    private Grpc.ResultService.ResultServiceClient? serviceClient;
 
+   private ClientState state = ClientState.Uninitialized;
+
    private Task<ResultInfo>? waitingTask;
 
    #endregion
@@ -40,22 +42,49 @@ public class ResultClient : IResultClient
 
    public event EventHandler<ResultEventArgs>? ResultChanged;
 
+   /// <summary>Occurs when <see cref="State"/> property has changed.</summary>
+   public event EventHandler<StateChangedEventArgs>? StateChanged;
+
    #endregion
 
    #region IResultClient Members
 
-   public async Task<ResultInfo> WaitForResultAsync()
+   /// <summary>Gets the <see cref="Exception"/> that occurred when the state goes to <see cref="ClientState.Failed"/>.</summary>
+   public Exception? Exception { get; private set; }
+
+   /// <summary>Gets the state state of the client.</summary>
+   public ClientState State
+   {
+      get => state;
+      private set
+      {
+         var oldState = state;
+         if (state == value)
+            return;
+
+         state = value;
+         StateChanged?.Invoke(this, new StateChangedEventArgs(oldState, state));
+      }
+   }
+
+   public async Task<ResultInfo> WaitForResultAsync(CancellationToken cancellationToken)
    {
       if (result != null)
          return result;
 
-      return await GetOrCreateWaitingTask();
+      await Task.Run(() => WaitForFinished(cancellationToken));
+      return Result;
+   }
+
+   public Task<ResultInfo> WaitForResultAsync()
+   {
+      return WaitForResultAsync(CancellationToken.None);
    }
 
    public void Configure(IClientConfiguration configuration)
    {
       serviceClient = new Grpc.ResultService.ResultServiceClient(configuration.Channel);
-      GetOrCreateWaitingTask();
+      CreateWaitingTask();
    }
 
    public void Dispose()
@@ -69,7 +98,7 @@ public class ResultClient : IResultClient
 
    private ResultInfo Result
    {
-      get => result;
+      get => result ??= new ResultInfo { ExitCode = int.MaxValue, Message = "Result not computed yet", Data = new Dictionary<string, string>() };
       set
       {
          result = value;
@@ -82,15 +111,13 @@ public class ResultClient : IResultClient
 
    #region Methods
 
-   private Task<ResultInfo> GetOrCreateWaitingTask()
+   private void CreateWaitingTask()
    {
       if (waitingTask == null)
       {
          var streamingCall = GetServiceClient().ResultChanged(new ResultChangedRequest());
          waitingTask = Task.Run(() => WaitForResult(streamingCall));
       }
-
-      return waitingTask;
    }
 
    private Grpc.ResultService.ResultServiceClient GetServiceClient()
@@ -101,17 +128,58 @@ public class ResultClient : IResultClient
       return serviceClient;
    }
 
+   private void WaitForFinished(CancellationToken cancellationToken)
+   {
+      var resetEventSlim = new ManualResetEventSlim();
+
+      try
+      {
+         StateChanged += OnStateChanged;
+
+         CheckForFinished(State);
+         resetEventSlim.Wait(cancellationToken);
+      }
+      catch (OperationCanceledException)
+      {
+         // Waiting was canceled
+      }
+      finally
+      {
+         StateChanged -= OnStateChanged;
+      }
+
+      void OnStateChanged(object? sender, StateChangedEventArgs e)
+      {
+         CheckForFinished(e.NewState);
+      }
+
+      void CheckForFinished(ClientState stateToCheck)
+      {
+         if (stateToCheck == ClientState.Closed || stateToCheck == ClientState.Failed)
+         {
+            resetEventSlim.Set();
+            resetEventSlim.Dispose();
+         }
+      }
+   }
+
    private async Task<ResultInfo> WaitForResult(AsyncServerStreamingCall<ResultChangedResponse> changed)
    {
-      if (await changed.ResponseStream.MoveNext(CancellationToken.None))
+      try
       {
-         var response = changed.ResponseStream.Current;
-         Result = new ResultInfo
+         if (await changed.ResponseStream.MoveNext(CancellationToken.None))
          {
-            ExitCode = response.ExitCode, 
-            Message = response.Message,
-            Data = response.Data
-         };
+            var response = changed.ResponseStream.Current;
+            Result = new ResultInfo { ExitCode = response.ExitCode, Message = response.Message, Data = response.Data };
+         }
+
+         State = ClientState.Closed;
+      }
+      catch (Exception ex)
+      {
+         State = ClientState.Failed;
+         Exception = ex;
+         result = new ResultInfo { ExitCode = int.MaxValue, Message = ex.Message, Data = new Dictionary<string, string>() };
       }
 
       return Result;

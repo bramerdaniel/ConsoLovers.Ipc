@@ -17,7 +17,7 @@ internal class ShowProgressLogic : IApplicationLogic<ClientArgs>
 
    private readonly IClientFactory clientFactory;
 
-   private IProgressClient? progressClient;
+   private IProgressClient progressClient = null!;
 
    private IResultClient? resultClient;
 
@@ -38,20 +38,34 @@ internal class ShowProgressLogic : IApplicationLogic<ClientArgs>
    {
       Console.Title = $"client [{clientFactory.ChannelFactory.ServerName}]";
       progressClient = clientFactory.CreateProgressClient();
+      progressClient.StateChanged += OnStateChanged;
       resultClient = clientFactory.CreateResultClient();
 
-      await AnsiConsole.Progress()
-         .Columns(new ProgressColumn[] { new SpinnerColumn(), new PercentageColumn(), new ProgressBarColumn(), new TaskDescriptionColumn() })
-         .StartAsync(Update);
+      try
+      {
+         await AnsiConsole.Progress()
+            .Columns(new ProgressColumn[] { new SpinnerColumn(), new PercentageColumn(), new ProgressBarColumn(), new TaskDescriptionColumn() })
+            .StartAsync(Update);
+      }
+      catch (Exception e)
+      {
+         Console.WriteLine(e);
+         Console.ReadLine();
+      }
 
       Console.Clear();
 
-      var resultInfo = await resultClient.WaitForResultAsync();
+      var resultInfo = await resultClient.WaitForResultAsync(cancellationToken);
       Console.WriteLine($"{clientFactory.ChannelFactory.ServerName} exited with code {resultInfo.ExitCode}");
       foreach (var pair in resultInfo.Data)
          AnsiConsole.MarkupLine($"[blue]{pair.Key}[/] = [green]{pair.Value}[/]");
 
       Console.ReadLine();
+   }
+
+   private void OnStateChanged(object? sender, StateChangedEventArgs e)
+   {
+      AnsiConsole.MarkupLine($"OldState=[red]{e.OldState}[/] => NewState=[green]{e.NewState}[/]");
    }
 
    #endregion
@@ -69,7 +83,7 @@ internal class ShowProgressLogic : IApplicationLogic<ClientArgs>
          progress.Description = e.Message;
       }
 
-      await resultClient.WaitForResultAsync();
+      await progressClient.WaitForCompletedAsync();
    }
 
    #endregion
