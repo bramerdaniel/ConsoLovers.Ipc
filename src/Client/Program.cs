@@ -23,7 +23,7 @@ public static class Program
 
    public static async Task Main()
    {
-      Initialize(500);
+      Initialize(1000);
 
       await ConsoleApplication.WithArguments<ClientArgs>()
          .AddService(x => x.AddSingleton(CreateClientFactory))

@@ -24,6 +24,7 @@ internal sealed class InterProcessCommunicationServer : IInterProcessCommunicati
    internal InterProcessCommunicationServer(WebApplication webApplication)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));
+      ServerTask = webApplication.RunAsync();
    }
 
    #endregion
@@ -40,13 +41,24 @@ internal sealed class InterProcessCommunicationServer : IInterProcessCommunicati
 
    public void Dispose()
    {
-      ((IDisposable)webApplication).Dispose();
+      DisposeAsync()
+         .GetAwaiter()
+         .GetResult();
    }
 
    public async ValueTask DisposeAsync()
    {
+      await webApplication.StopAsync();
       await webApplication.DisposeAsync();
+      await ServerTask;
    }
+
+   #endregion
+
+   #region Properties
+
+   /// <summary>Gets the server task.</summary>
+   internal Task ServerTask { get; }
 
    #endregion
 }

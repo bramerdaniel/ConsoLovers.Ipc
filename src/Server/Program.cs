@@ -26,7 +26,7 @@ internal class Program
 
       using (var communicationServer = CreateCommunicationServer())
       {
-         var progressServer = communicationServer.GetProgressReporter();
+         var progressReporter = communicationServer.GetProgressReporter();
          var resultReporter = communicationServer.GetResultReporter();
 
          AnsiConsole.Progress().Start(progressContext =>
@@ -40,27 +40,22 @@ internal class Program
                   break;
                }
 
-               Task.Delay(300).Wait();
+               Task.Delay(30).Wait();
 
-               progressServer.ReportProgress(i, $"Progress {i}");
+               progressReporter.ReportProgress(i, $"Progress {i}");
                progressTask.Value = i;
                if (i == 55)
                {
                   resultReporter.AddData("FirstError", "Verbogener index auf nummer 55");
                }
-
-               if (i == 15)
-               {
-                  Environment.Exit(123);
-               }
             }
          });
 
-         resultReporter.AddData("CustomData", "This went wrong");
-         resultReporter.ReportResult(4, "Something went wrong");
+         resultReporter.AddData("MoreAdditionalData", "This is additional data");
+         resultReporter.Success();
          AnsiConsole.WriteLine("shutting down communication server");
       }
-
+      
       AnsiConsole.WriteLine("Setup has finished");
    }
 

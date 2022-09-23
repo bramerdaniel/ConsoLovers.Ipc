@@ -90,11 +90,10 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
       foreach (var action in applicationActions)
          action(application);
-
-      application.RunAsync();
+      
       return new InterProcessCommunicationServer(application);
    }
-
+   
    #endregion
 
    #region IServerBuilderWithoutName Members
