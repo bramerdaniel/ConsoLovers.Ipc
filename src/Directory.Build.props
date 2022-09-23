@@ -1,7 +1,7 @@
 <Project>
 
 	<PropertyGroup>
-		<NugetPackageVersion>0.0.1-pre3</NugetPackageVersion>
+		<NugetPackageVersion>0.0.1-pre4</NugetPackageVersion>
 	</PropertyGroup>
 
 	<PropertyGroup>
