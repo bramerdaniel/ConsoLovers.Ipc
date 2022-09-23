@@ -32,7 +32,7 @@ internal class Program
          AnsiConsole.Progress().Start(progressContext =>
          {
             var progressTask = progressContext.AddTask("Setup Progress");
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i <= 100; i++)
             {
                if (tokenSource.Token.IsCancellationRequested)
                {

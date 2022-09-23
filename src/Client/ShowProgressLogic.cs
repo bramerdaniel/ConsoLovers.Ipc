@@ -37,8 +37,8 @@ internal class ShowProgressLogic : IApplicationLogic<ClientArgs>
    public async Task ExecuteAsync(ClientArgs arguments, CancellationToken cancellationToken)
    {
       Console.Title = $"client [{clientFactory.ChannelFactory.ServerName}]";
-      progressClient = clientFactory.CreateClient<IProgressClient>();
-      resultClient = clientFactory.CreateClient<IResultClient>();
+      progressClient = clientFactory.CreateProgressClient();
+      resultClient = clientFactory.CreateResultClient();
 
       await AnsiConsole.Progress()
          .Columns(new ProgressColumn[] { new SpinnerColumn(), new PercentageColumn(), new ProgressBarColumn(), new TaskDescriptionColumn() })

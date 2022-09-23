@@ -32,7 +32,7 @@ internal class CancelExecutionLogic : IApplicationLogic<ClientArgs>
 
    public async Task ExecuteAsync(ClientArgs arguments, CancellationToken cancellationToken)
    {
-      var cancellationClient = clientFactory.CreateClient<ICancellationClient>();
+      var cancellationClient = clientFactory.CreateCancellationClient();
 
       await AnsiConsole.Progress()
          .Columns(new SpinnerColumn(), new PercentageColumn(), new ProgressBarColumn(), new TaskDescriptionColumn())
