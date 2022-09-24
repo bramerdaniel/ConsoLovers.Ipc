@@ -1,8 +1,7 @@
 # ConsoLovers.Ipc
 
 [![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
-
-[![NuGet version (ConsoLovers.Ipc)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.svg?style=flat-square)](https://www.nuget.org/packages/ConsoLovers.Ipc/)
+[![NuGet version (ConsoLovers.Ipc)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc/)
 
 ## What is it ?
 It is a small library for inter-process communication on a single machine,
