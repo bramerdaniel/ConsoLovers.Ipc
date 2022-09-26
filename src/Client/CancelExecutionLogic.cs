@@ -8,7 +8,6 @@ namespace Client;
 
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.Ipc;
-using ConsoLovers.Ipc.Client;
 
 using Spectre.Console;
 

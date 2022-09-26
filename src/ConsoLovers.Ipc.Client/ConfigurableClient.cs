@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Client;
+namespace ConsoLovers.Ipc;
 
 public class ConfigurableClient<T> : IConfigurableClient
 {

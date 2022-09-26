@@ -6,8 +6,6 @@
 
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Client;
-
 public class StateChangedEventArgs : EventArgs
 {
    #region Constructors and Destructors

@@ -12,7 +12,6 @@ using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.ConsoleToolkit.Core.Builders;
 using ConsoLovers.ConsoleToolkit.Core.Exceptions;
 using ConsoLovers.Ipc;
-using ConsoLovers.Ipc.Client;
 
 using Microsoft.Extensions.DependencyInjection;
 

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Server;
+namespace ConsoLovers.Ipc;
 
 using Microsoft.Extensions.DependencyInjection;
 

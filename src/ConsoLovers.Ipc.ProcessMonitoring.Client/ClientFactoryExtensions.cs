@@ -6,8 +6,6 @@
 
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Client;
-
 /// <summary>Extension methods for the <see cref="IClientFactory"/> interface</summary>
 public static class ClientFactoryExtensions
 {

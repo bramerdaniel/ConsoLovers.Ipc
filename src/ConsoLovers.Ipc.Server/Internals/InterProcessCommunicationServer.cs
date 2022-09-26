@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Server.Internals;
+namespace ConsoLovers.Ipc.Internals;
 
 using Microsoft.AspNetCore.Builder;
 

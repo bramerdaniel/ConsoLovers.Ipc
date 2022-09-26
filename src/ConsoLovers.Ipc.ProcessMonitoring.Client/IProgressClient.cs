@@ -6,8 +6,8 @@
 
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Client;
 using ConsoLovers.Ipc.Grpc;
+using ConsoLovers.Ipc.ProcessMonitoring.Client.Progress;
 
 /// <summary>Service client for the <see cref="ProgressService"/></summary>
 /// <seealso cref="IConfigurableClient"/>

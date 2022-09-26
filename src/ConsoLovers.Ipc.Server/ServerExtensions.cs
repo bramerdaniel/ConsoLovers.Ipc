@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Server;
+namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;

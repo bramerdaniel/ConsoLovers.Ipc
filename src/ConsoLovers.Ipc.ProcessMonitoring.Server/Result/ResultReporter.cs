@@ -6,8 +6,6 @@
 
 namespace ConsoLovers.Ipc.Result;
 
-using ConsoLovers.Ipc.Server;
-
 public class ResultReporter : IResultReporter
 {
    #region Constants and Fields

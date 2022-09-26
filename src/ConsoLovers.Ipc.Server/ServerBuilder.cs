@@ -4,12 +4,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Server;
+namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
 
-using ConsoLovers.Ipc.Server.Internals;
+using ConsoLovers.Ipc.Internals;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

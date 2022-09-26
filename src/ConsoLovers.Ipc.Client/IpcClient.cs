@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Client;
+namespace ConsoLovers.Ipc;
 
 /// <summary>Entry point for the client side of the inter-process communication setup</summary>
 public static class IpcClient

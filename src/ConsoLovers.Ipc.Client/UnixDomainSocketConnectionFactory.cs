@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Client;
+namespace ConsoLovers.Ipc;
 
 using System.Net;
 using System.Net.Sockets;

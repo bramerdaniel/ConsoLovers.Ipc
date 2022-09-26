@@ -6,8 +6,6 @@
 
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Client;
-
 public interface ICancellationClient : IConfigurableClient
 {
    bool RequestCancel();

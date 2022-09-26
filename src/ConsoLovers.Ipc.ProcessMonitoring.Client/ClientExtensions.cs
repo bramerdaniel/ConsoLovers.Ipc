@@ -7,7 +7,6 @@
 namespace ConsoLovers.Ipc;
 
 using ConsoLovers.Ipc.Cancellation;
-using ConsoLovers.Ipc.Client;
 using ConsoLovers.Ipc.Result;
 using ConsoLovers.Ipc.Services;
 

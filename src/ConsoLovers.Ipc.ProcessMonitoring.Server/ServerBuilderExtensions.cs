@@ -8,7 +8,6 @@ namespace ConsoLovers.Ipc;
 
 using ConsoLovers.Ipc.Cancellation;
 using ConsoLovers.Ipc.Result;
-using ConsoLovers.Ipc.Server;
 using ConsoLovers.Ipc.Services;
 
 using Microsoft.Extensions.DependencyInjection;

@@ -8,8 +8,8 @@ namespace ConsoLovers.Ipc.Services;
 
 using System.Diagnostics.CodeAnalysis;
 
-using ConsoLovers.Ipc.Client;
 using ConsoLovers.Ipc.Grpc;
+using ConsoLovers.Ipc.ProcessMonitoring.Client.Progress;
 
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public sealed class ProgressClient : IProgressClient
