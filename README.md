@@ -81,3 +81,6 @@ that will give you the information provided by the server.
       foreach (var keyPair in result.Data)
          Console.WriteLine("{0} {1}", keyPair.Key, keyPair.Value);
 ```
+
+## Add a custom gRPC service
+DOCUMENTATION IS COMMING SOON
