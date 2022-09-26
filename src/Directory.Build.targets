@@ -15,5 +15,7 @@
 		<PackageReference Update="Grpc.Net.Client" Version="2.48.0"/>
 		<PackageReference Update="Grpc.Tools" Version="2.48.1"/>
 		<PackageReference Update="Moq" Version="4.18.2" />
+		<PackageReference Update="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Update="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 	</ItemGroup>
 </Project>

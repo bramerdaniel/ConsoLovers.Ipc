@@ -8,9 +8,9 @@ namespace ConsoLovers.Ipc.Client;
 
 using ConsoLovers.Ipc.Internals;
 
+/// <summary>Entry point for the client side of the inter-process communication setup</summary>
 public static class IpcClient
 {
-
    /// <summary>Creates a <see cref="IClientFactoryBuilder"/> for configuring the required <see cref="IClientFactory"/>.</summary>
    /// <returns>A <see cref="IClientFactoryBuilder"/></returns>
    public static IClientFactoryBuilderWithoutName CreateClientFactory()

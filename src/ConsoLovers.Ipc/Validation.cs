@@ -8,7 +8,7 @@ namespace ConsoLovers.Ipc;
 
 using System.Runtime.CompilerServices;
 
-internal static class Validation
+public static class Validation
 {
    #region Public Methods and Operators
 
