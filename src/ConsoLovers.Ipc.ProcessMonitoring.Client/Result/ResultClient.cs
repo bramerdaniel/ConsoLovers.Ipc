@@ -21,7 +21,7 @@ public class ResultClient : IResultClient
 
    private ResultInfo? result;
 
-   private Grpc.ResultService.ResultServiceClient? serviceClient;
+   private ResultService.ResultServiceClient? serviceClient;
 
    private ClientState state = ClientState.Uninitialized;
 
@@ -83,7 +83,7 @@ public class ResultClient : IResultClient
 
    public void Configure(IClientConfiguration configuration)
    {
-      serviceClient = new Grpc.ResultService.ResultServiceClient(configuration.Channel);
+      serviceClient = new ResultService.ResultServiceClient(configuration.Channel);
       CreateWaitingTask();
    }
 
@@ -98,7 +98,7 @@ public class ResultClient : IResultClient
 
    private ResultInfo Result
    {
-      get => result ??= new ResultInfo { ExitCode = int.MaxValue, Message = "Result not computed yet", Data = new Dictionary<string, string>() };
+      get => result ??= new ResultInfo(ExitCode: int.MaxValue, Message: "Result not computed yet", Data: new Dictionary<string, string>());
       set
       {
          result = value;
@@ -120,7 +120,7 @@ public class ResultClient : IResultClient
       }
    }
 
-   private Grpc.ResultService.ResultServiceClient GetServiceClient()
+   private ResultService.ResultServiceClient GetServiceClient()
    {
       if (serviceClient == null)
          throw new InvalidOperationException("Not initialized yet");
@@ -170,7 +170,7 @@ public class ResultClient : IResultClient
          if (await changed.ResponseStream.MoveNext(CancellationToken.None))
          {
             var response = changed.ResponseStream.Current;
-            Result = new ResultInfo { ExitCode = response.ExitCode, Message = response.Message, Data = response.Data };
+            Result = new ResultInfo(ExitCode: response.ExitCode, Message: response.Message, Data: response.Data);
          }
 
          State = ClientState.Closed;
@@ -179,7 +179,7 @@ public class ResultClient : IResultClient
       {
          State = ClientState.Failed;
          Exception = ex;
-         result = new ResultInfo { ExitCode = int.MaxValue, Message = ex.Message, Data = new Dictionary<string, string>() };
+         result = new ResultInfo(ExitCode: int.MaxValue, Message: ex.Message, Data: new Dictionary<string, string>());
       }
 
       return Result;
