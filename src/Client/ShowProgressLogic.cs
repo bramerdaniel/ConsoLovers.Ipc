@@ -8,7 +8,9 @@ namespace Client;
 
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.Ipc;
-using ConsoLovers.Ipc.ProcessMonitoring.Client.Progress;
+using ConsoLovers.Ipc.ProcessMonitoring;
+using ConsoLovers.Ipc.ProcessMonitoring.Progress;
+
 using Spectre.Console;
 
 internal class ShowProgressLogic : IApplicationLogic<ClientArgs>

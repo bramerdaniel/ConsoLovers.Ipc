@@ -4,12 +4,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Services;
+namespace ConsoLovers.Ipc.ProcessMonitoring.Progress;
 
 using System.Diagnostics.CodeAnalysis;
 
 using ConsoLovers.Ipc.Grpc;
-using ConsoLovers.Ipc.ProcessMonitoring.Client.Progress;
 
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public sealed class ProgressClient : IProgressClient

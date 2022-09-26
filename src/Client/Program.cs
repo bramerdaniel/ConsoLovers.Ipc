@@ -44,9 +44,7 @@ public static class Program
 
       return IpcClient.CreateClientFactory()
          .ForProcess(process)
-         .AddProgressClient()
-         .AddResultClient()
-         .AddCancellationClient()
+         .AddProcessMonitoringClients()
          .Build();
    }
 

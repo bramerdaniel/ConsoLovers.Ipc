@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Cancellation;
+namespace ConsoLovers.Ipc.ProcessMonitoring.Cancellation;
 
 using ConsoLovers.Ipc;
 using ConsoLovers.Ipc.Grpc;

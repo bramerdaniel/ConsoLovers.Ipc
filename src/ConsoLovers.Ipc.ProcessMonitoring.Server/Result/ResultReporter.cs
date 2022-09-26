@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Result;
+namespace ConsoLovers.Ipc.ProcessMonitoring.Result;
 
 public class ResultReporter : IResultReporter
 {

@@ -6,9 +6,10 @@
 
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Cancellation;
-using ConsoLovers.Ipc.Result;
-using ConsoLovers.Ipc.Services;
+using ConsoLovers.Ipc.ProcessMonitoring;
+using ConsoLovers.Ipc.ProcessMonitoring.Cancellation;
+using ConsoLovers.Ipc.ProcessMonitoring.Progress;
+using ConsoLovers.Ipc.ProcessMonitoring.Result;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,9 +33,13 @@ public static class ClientExtensions
    /// <summary>Adds the default services that are build in .</summary>
    /// <param name="clientFactoryBuilder">The client factory builder.</param>
    /// <returns>The <see cref="IClientFactoryBuilder"/> for more fluent setup</returns>
-   public static IClientFactoryBuilder AddDefaultClients(this IClientFactoryBuilder clientFactoryBuilder)
+   public static IClientFactoryBuilder AddProcessMonitoringClients(this IClientFactoryBuilder clientFactoryBuilder)
    {
-      return clientFactoryBuilder.AddProgressClient()
+      if (clientFactoryBuilder == null)
+         throw new ArgumentNullException(nameof(clientFactoryBuilder));
+
+      return clientFactoryBuilder
+         .AddProgressClient()
          .AddResultClient()
          .AddCancellationClient();
    }

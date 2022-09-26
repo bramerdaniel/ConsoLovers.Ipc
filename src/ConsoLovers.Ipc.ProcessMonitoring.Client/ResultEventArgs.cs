@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc;
+namespace ConsoLovers.Ipc.ProcessMonitoring;
 
 public class ResultEventArgs : EventArgs
 {

@@ -4,10 +4,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc;
+namespace ConsoLovers.Ipc.ProcessMonitoring;
 
 using ConsoLovers.Ipc.Grpc;
-using ConsoLovers.Ipc.ProcessMonitoring.Client.Progress;
+using ConsoLovers.Ipc.ProcessMonitoring.Progress;
 
 /// <summary>Service client for the <see cref="ProgressService"/></summary>
 /// <seealso cref="IConfigurableClient"/>

@@ -7,6 +7,7 @@
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Version>$(NugetPackageVersion)</Version>
 		<PackageTags>gRPC, inter, process, communication, ipc, intger-process, rpc </PackageTags>
+		<RootNamespace>ConsoLovers.Ipc.ProcessMonitoring</RootNamespace>
 		
 	</PropertyGroup>
 

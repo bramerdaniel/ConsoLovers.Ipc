@@ -4,16 +4,20 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable once CheckNamespace
+
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Cancellation;
-using ConsoLovers.Ipc.Result;
-using ConsoLovers.Ipc.Services;
+using ConsoLovers.Ipc.ProcessMonitoring.Cancellation;
+using ConsoLovers.Ipc.ProcessMonitoring.Result;
+using ConsoLovers.Ipc.ProcessMonitoring.Services;
 
 using Microsoft.Extensions.DependencyInjection;
 
 public static class ServerBuilderExtensions
 {
+   #region Public Methods and Operators
+
    /// <summary>Adds the services required for cancellation.</summary>
    /// <param name="builder">The builder.</param>
    /// <returns>The builder for more fluent configuration</returns>
@@ -29,22 +33,6 @@ public static class ServerBuilderExtensions
       {
          if (serviceCollection.EnsureSingleton<ICancellationHandler, CancellationHandler>())
             builder.AddGrpcService<CancellationService>();
-      }
-
-      return builder;
-   }
-
-   public static IServerBuilder UseResultReporter(this IServerBuilder builder)
-   {
-      if (builder == null)
-         throw new ArgumentNullException(nameof(builder));
-
-      builder.AddService(AddRequiredServices);
-
-      void AddRequiredServices(IServiceCollection serviceCollection)
-      {
-         if (serviceCollection.EnsureSingleton<IResultReporter, ResultReporter>())
-            builder.AddGrpcService<ResultService>();
       }
 
       return builder;
@@ -68,6 +56,25 @@ public static class ServerBuilderExtensions
       return builder;
    }
 
+   /// <summary>Adds all services required for the process monitoring.</summary>
+   /// <param name="builder">The builder.</param>
+   /// <returns>The builder for more fluent configuration</returns>
+   /// <exception cref="System.ArgumentNullException">builder</exception>
+   public static IServerBuilder UseProcessMonitoring(this IServerBuilder builder)
+   {
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
+
+      return builder.RemoveAspNetCoreLogging()
+         .UseProgressReporter()
+         .UseResultReporter()
+         .UseCancellationHandler();
+   }
+
+   /// <summary>Adds the services required for reporting progress to a client.</summary>
+   /// <param name="builder">The builder.</param>
+   /// <returns>The builder for more fluent configuration</returns>
+   /// <exception cref="System.ArgumentNullException">builder</exception>
    public static IServerBuilder UseProgressReporter(this IServerBuilder builder)
    {
       if (builder == null)
@@ -84,14 +91,25 @@ public static class ServerBuilderExtensions
       return builder;
    }
 
-   public static IServerBuilder UseProcessMonitoring(this IServerBuilder builder)
+   /// <summary>Adds the services required for reporting the detailed execution result to a client.</summary>
+   /// <param name="builder">The builder.</param>
+   /// <returns>The builder for more fluent configuration</returns>
+   /// <exception cref="System.ArgumentNullException">builder</exception>
+   public static IServerBuilder UseResultReporter(this IServerBuilder builder)
    {
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
 
-      return builder.RemoveAspNetCoreLogging()
-         .UseProgressReporter()
-         .UseResultReporter()
-         .UseCancellationHandler();
+      builder.AddService(AddRequiredServices);
+
+      void AddRequiredServices(IServiceCollection serviceCollection)
+      {
+         if (serviceCollection.EnsureSingleton<IResultReporter, ResultReporter>())
+            builder.AddGrpcService<ResultService>();
+      }
+
+      return builder;
    }
+
+   #endregion
 }

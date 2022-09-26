@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Services;
+namespace ConsoLovers.Ipc.ProcessMonitoring.Services;
 
 using ConsoLovers.Ipc.Grpc;
 

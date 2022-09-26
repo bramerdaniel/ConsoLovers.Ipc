@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.ProcessMonitoring.Client.Progress;
+namespace ConsoLovers.Ipc.ProcessMonitoring.Progress;
 
 public class ProgressEventArgs
 {
