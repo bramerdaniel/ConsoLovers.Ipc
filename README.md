@@ -22,14 +22,13 @@ and the [ConsoLovers.Ipc package](https://www.nuget.org/packages/ConsoLovers.Ipc
 without having to care about all the infratructure setup, that needs to be done.
 
 ## Usage on server side
-This is how you set it up on the server side 
-(The process that hosts the gRPC server)
+This is how you set it up on the server side with the example of the ProcessMonitoring package
 
 ```C#
-      using var server = InterProcessCommunication.CreateServer()
-         .ForCurrentProcess()
-         .UseDefaults()
-         .Start();
+      using var server = IpcServer.CreateServer()
+                            .ForCurrentProcess()
+                            .AddProcessMonitoring()
+                            .Start();
 ```
 
 When the server is up and running, you can get your added services from the servers
