@@ -4,28 +4,33 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.UnitTests;
+namespace ConsoLovers.Ipc.ProcessMonitoring.Client.UnitTests;
 
 using System.Diagnostics.CodeAnalysis;
+
+using FluentAssertions;
+
+using global::Grpc.Core;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 [TestClass]
 [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
-public class SimpleTest
+public class CancellationTests
 {
    #region Public Methods and Operators
 
    [TestMethod]
-   public void EnsureCustomHandlerIsInvoked()
+   public void EnsureCorrectExceptionWhenServerIsNotAvailable()
    {
-   }
+      var factory = IpcClient.CreateClientFactory()
+         .ForName("DoesNotExist")
+         .AddCancellationClient()
+         .Build();
 
-   [TestMethod]
-   public void EnsureUseExceptionHandlerWithTypeWorksCorrectly()
-   {
-      // Assert.Fail("This was a test only");
+      var client = factory.CreateCancellationClient();
+      client.Invoking(x => x.RequestCancel()).Should().Throw<RpcException>().Where(ex => ex.StatusCode == StatusCode.Unavailable);
    }
-
+   
    #endregion
 }

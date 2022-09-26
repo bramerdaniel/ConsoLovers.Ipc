@@ -29,4 +29,10 @@
 		</AssemblyAttribute>
 	</ItemGroup>
 
+
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ConsoLovers.Ipc.ProcessMonitoring.Client\ConsoLovers.Ipc.ProcessMonitoring.Client.csproj" />
+	</ItemGroup>
+
 </Project>
