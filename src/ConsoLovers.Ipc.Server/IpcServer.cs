@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc;
+namespace ConsoLovers.Ipc.Server;
 
 /// <summary>Entry point for creating client or server classes for the inter process communication</summary>
 public static class IpcServer

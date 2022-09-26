@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc;
+namespace ConsoLovers.Ipc.Client;
 
 /// <summary>Interface every client must implement to be able to be created by the <see cref="IClientFactory"/></summary>
 public interface IConfigurableClient

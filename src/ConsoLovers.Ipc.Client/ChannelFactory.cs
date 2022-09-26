@@ -4,12 +4,12 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Internals;
+namespace ConsoLovers.Ipc.Client;
 
 using System.Net;
 using System.Net.Sockets;
 
-using global::Grpc.Net.Client;
+using Grpc.Net.Client;
 
 /// <summary>Helper factory for creating <see cref="GrpcChannel"/>s</summary>
 internal class ChannelFactory : IChannelFactory

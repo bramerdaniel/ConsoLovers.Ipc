@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc;
+namespace ConsoLovers.Ipc.Server;
 
 /// <summary>Service interface that is used on the <see cref="IInterProcessCommunicationServer"/> side to report progress for the current process"/></summary>
 public interface IProgressReporter

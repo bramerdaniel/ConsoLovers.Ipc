@@ -8,6 +8,7 @@ namespace ConsoLovers.Ipc.Services;
 
 using System.Diagnostics.CodeAnalysis;
 
+using ConsoLovers.Ipc.Client;
 using ConsoLovers.Ipc.Grpc;
 
 [SuppressMessage("ReSharper", "UnusedType.Global")]

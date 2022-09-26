@@ -8,6 +8,7 @@ namespace ConsoLovers.Ipc.Result;
 
 using System.Diagnostics.CodeAnalysis;
 
+using ConsoLovers.Ipc.Client;
 using ConsoLovers.Ipc.Grpc;
 
 using global::Grpc.Core;

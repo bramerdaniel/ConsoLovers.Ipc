@@ -9,6 +9,7 @@ namespace ConsoLovers.Ipc.Services;
 using System.Threading.Channels;
 
 using ConsoLovers.Ipc.Grpc;
+using ConsoLovers.Ipc.Server;
 
 internal class ProgressReporter : IProgressReporter
 {

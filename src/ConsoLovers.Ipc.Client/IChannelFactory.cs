@@ -4,10 +4,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc;
+namespace ConsoLovers.Ipc.Client;
 
-using global::Grpc.Net.Client;
+using Grpc.Net.Client;
 
+// TODO this should be named channel info?
 public interface IChannelFactory
 {
    #region Public Properties

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Internals;
+namespace ConsoLovers.Ipc.Client;
 
 using System.Diagnostics;
 

@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc.Cancellation;
 
+using ConsoLovers.Ipc.Server;
+
 internal class CancellationHandler : ICancellationHandler
 {
    #region Constants and Fields

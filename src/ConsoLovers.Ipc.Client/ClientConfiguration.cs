@@ -4,9 +4,9 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Internals;
+namespace ConsoLovers.Ipc.Client;
 
-using global::Grpc.Net.Client;
+using Grpc.Net.Client;
 
 internal class ClientConfiguration : IClientConfiguration
 {

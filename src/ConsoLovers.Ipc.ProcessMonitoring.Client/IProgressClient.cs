@@ -6,10 +6,11 @@
 
 namespace ConsoLovers.Ipc;
 
+using ConsoLovers.Ipc.Client;
 using ConsoLovers.Ipc.Grpc;
 
 /// <summary>Service client for the <see cref="ProgressService"/></summary>
-/// <seealso cref="ConsoLovers.Ipc.IConfigurableClient"/>
+/// <seealso cref="IConfigurableClient"/>
 /// <seealso cref="System.IDisposable"/>
 public interface IProgressClient : IConfigurableClient, IDisposable
 {

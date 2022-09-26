@@ -9,7 +9,7 @@ namespace Server;
 using System.Diagnostics;
 
 using ConsoLovers.Ipc;
-
+using ConsoLovers.Ipc.Server;
 
 using Spectre.Console;
 

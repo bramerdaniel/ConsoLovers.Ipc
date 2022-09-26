@@ -8,6 +8,7 @@ namespace ConsoLovers.Ipc.Cancellation;
 
 using System.Reflection;
 using ConsoLovers.Ipc;
+using ConsoLovers.Ipc.Client;
 using ConsoLovers.Ipc.Grpc;
 
 internal class CancellationClient : ConfigurableClient<Grpc.CancellationService.CancellationServiceClient>, ICancellationClient
