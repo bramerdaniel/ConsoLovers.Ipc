@@ -1,6 +1,11 @@
-# ConsoLovers.Ipc
+# ConsoLovers.Ipc [![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
 
-[![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
+## What is it ?
+It is a small library for inter-process communication on a single machine,
+using [gRPC](https://grpc.io/) with [Unix Domain Sockets](https://de.wikipedia.org/wiki/Unix_Domain_Socket).
+Microsoft has an article called [Inter-process communication with gRPC](https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess?view=aspnetcore-6.0#configure-unix-domain-sockets),
+and the [ConsoLovers.Ipc package](https://www.nuget.org/packages/ConsoLovers.Ipc) provides an easy and flexible implementation, 
+without having to care about all the infratructure setup, that needs to be done.
 
 Package  | Version | Description
 -------- | -------- | --------
@@ -14,12 +19,6 @@ ConsoLovers.Ipc.ProcessMonitoring.Client   | [![NuGet version (ConsoLovers.Ipc.P
 
 
 
-## What is it ?
-It is a small library for inter-process communication on a single machine,
-using [gRPC](https://grpc.io/) with [Unix Domain Sockets](https://de.wikipedia.org/wiki/Unix_Domain_Socket).
-Microsoft has an article called [Inter-process communication with gRPC](https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess?view=aspnetcore-6.0#configure-unix-domain-sockets),
-and the [ConsoLovers.Ipc package](https://www.nuget.org/packages/ConsoLovers.Ipc) provides an easy and flexible implementation, 
-without having to care about all the infratructure setup, that needs to be done.
 
 ## Usage on server side
 This is how you set it up on the server side with the example of the ProcessMonitoring package
