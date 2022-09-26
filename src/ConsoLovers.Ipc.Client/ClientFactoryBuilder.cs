@@ -7,6 +7,7 @@
 namespace ConsoLovers.Ipc;
 
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -69,16 +70,35 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       if (process == null)
          throw new ArgumentNullException(nameof(process));
 
-      return ForName(process.GetServerName());
+      return ForName(GetServerName(process));
+
+      string GetServerName(Process process)
+      {
+         if (process == null)
+            throw new ArgumentNullException(nameof(process));
+         return $"{process.ProcessName}.{process.Id}";
+      }
    }
 
    #endregion
 
    #region Methods
 
+   private static void EnsureValidFileName(string fileName, [CallerArgumentExpression("fileName")] string? callerExpression = null)
+   {
+      if (fileName is null)
+         throw new ArgumentNullException(callerExpression);
+
+      if (string.IsNullOrWhiteSpace(fileName))
+         throw new ArgumentException(callerExpression, $"{callerExpression} must not be empty.");
+
+      if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+         throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
+   }
+
    private IClientFactoryBuilder InitializeWithName(string name)
    {
-      Validation.EnsureValidFileName(name);
+      EnsureValidFileName(name);
 
       channelFactory = new ChannelFactory(name);
       serviceCollection.AddSingleton(channelFactory);

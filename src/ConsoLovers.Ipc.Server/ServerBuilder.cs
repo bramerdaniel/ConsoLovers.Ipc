@@ -8,6 +8,7 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 using ConsoLovers.Ipc.Internals;
 
@@ -111,7 +112,12 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       if (process == null)
          throw new ArgumentNullException(nameof(process));
 
-      return ForName(process.GetServerName());
+      return ForName(GetServerName());
+
+      string GetServerName()
+      {
+         return $"{process.ProcessName}.{process.Id}";
+      }
    }
 
    #endregion
@@ -126,9 +132,21 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    #region Methods
 
+   private static void EnsureValidFileName(string fileName, [CallerArgumentExpression("fileName")] string? callerExpression = null)
+   {
+      if (fileName is null)
+         throw new ArgumentNullException(callerExpression);
+
+      if (string.IsNullOrWhiteSpace(fileName))
+         throw new ArgumentException(callerExpression, $"{callerExpression} must not be empty.");
+
+      if (fileName.IndexOfAny(Path.GetInvalidFileNameChars()) >= 0)
+         throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
+   }
+
    private IServerBuilder InitializeWithName(string name)
    {
-      Validation.EnsureValidFileName(name);
+      EnsureValidFileName(name);
 
       var socketPath = Path.Combine(Path.GetTempPath(), $"{name}.uds");
 

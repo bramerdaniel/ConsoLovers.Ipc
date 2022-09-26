@@ -18,9 +18,16 @@ internal class Program
 
    static CancellationTokenSource tokenSource = new();
 
+   private static string GetServerName(Process process)
+   {
+      if (process == null)
+         throw new ArgumentNullException(nameof(process));
+      return $"{process.ProcessName}.{process.Id}";
+   }
+
    public static void Main()
    {
-      Console.Title = Process.GetCurrentProcess().GetServerName();
+      Console.Title = GetServerName(Process.GetCurrentProcess());
       AnsiConsole.WriteLine("starting communication server");
 
       using (var communicationServer = CreateCommunicationServer())

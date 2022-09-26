@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<Version>$(NugetPackageVersion)</Version>
-		<PackageTags>gRPC, inter, process, communication, ipc, intger-process, rpc </PackageTags>
+		<PackageTags>gRPC, inter, process, communication, ipc, intger-process, rpc, client </PackageTags>
 		<RootNamespace>ConsoLovers.Ipc</RootNamespace>
 		
 	</PropertyGroup>
@@ -20,10 +20,6 @@
 		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\ConsoLovers.Ipc\ConsoLovers.Ipc.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
