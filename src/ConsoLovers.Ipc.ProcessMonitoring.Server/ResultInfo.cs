@@ -10,7 +10,7 @@ internal record ResultInfo
 {
    #region Public Properties
 
-   public IDictionary<string, string> Data { get; internal set; }
+   public IDictionary<string, string> Data { get; } = new Dictionary<string, string>();
 
    /// <summary>Gets or sets the exit code.</summary>
    public int ExitCode { get; internal set; }

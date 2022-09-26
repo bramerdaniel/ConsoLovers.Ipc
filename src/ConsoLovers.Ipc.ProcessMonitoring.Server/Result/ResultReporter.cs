@@ -6,7 +6,9 @@
 
 namespace ConsoLovers.Ipc.ProcessMonitoring.Result;
 
-public class ResultReporter : IResultReporter
+/// <summary>The default implementation of the <see cref="IResultReporter"/> service</summary>
+/// <seealso cref="ConsoLovers.Ipc.IResultReporter"/>
+internal class ResultReporter : IResultReporter
 {
    #region Constants and Fields
 
@@ -21,7 +23,7 @@ public class ResultReporter : IResultReporter
    public ResultReporter()
    {
       resetEvent = new ManualResetEventSlim();
-      resultInfo = new ResultInfo { ExitCode = -1, Message = "NotExecuted", Data = new Dictionary<string, string>() };
+      resultInfo = new ResultInfo { ExitCode = -1, Message = "NotExecuted" };
    }
 
    #endregion
@@ -38,8 +40,11 @@ public class ResultReporter : IResultReporter
 
    public void ReportResult(int exitCode, string message)
    {
+      if (message == null)
+         throw new ArgumentNullException(nameof(message));
+
       resultInfo.ExitCode = exitCode;
-      resultInfo.Message = message ?? string.Empty;
+      resultInfo.Message = message;
       resetEvent.Set();
    }
 
