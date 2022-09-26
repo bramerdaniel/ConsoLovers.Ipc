@@ -2,12 +2,12 @@
 
 [![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
 
-Package  | Version 
--------- | -------- 
-ConsoLovers.Ipc.Server   | [![NuGet version (ConsoLovers.Ipc.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Server/)   
-ConsoLovers.Ipc.Client   | [![NuGet version (ConsoLovers.Ipc.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Client/)   
-ConsoLovers.Ipc.ProcessMonitoring.Server   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Server/) 
-ConsoLovers.Ipc.ProcessMonitoring.Client   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Client/)   
+Package  | Version | Description
+-------- | -------- | --------
+ConsoLovers.Ipc.Server   | [![NuGet version (ConsoLovers.Ipc.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Server/) | Package for the process that hosts the gRPC server
+ConsoLovers.Ipc.Client   | [![NuGet version (ConsoLovers.Ipc.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Client/)  | Package for a client process that wants to communicate with a server 
+ConsoLovers.Ipc.ProcessMonitoring.Server   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Server/) | Server package for a process that should be monitored
+ConsoLovers.Ipc.ProcessMonitoring.Client   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Client/)  | Client package for applications that want to monitor processes hosting the ConsoLovers.Ipc.ProcessMonitoring.Server package services
 
 
 
