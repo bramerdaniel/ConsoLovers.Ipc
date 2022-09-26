@@ -1,6 +1,8 @@
 # ConsoLovers.Ipc
 
-[![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
+[![ConsoLovers.Ipc.Server](https://github.com/bramerdaniel/ConsoLovers.Ipc.Server/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
+[![ConsoLovers.Ipc.Client](https://github.com/bramerdaniel/ConsoLovers.Ipc.Client/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
+
 [![NuGet version (ConsoLovers.Ipc)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc/)
 
 ## What is it ?
