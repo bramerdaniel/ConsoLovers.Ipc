@@ -28,6 +28,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Ipc.ProcessMoni
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Ipc.ProcessMonitoring.Server", "..\ConsoLovers.Ipc.ProcessMonitoring.Server\ConsoLovers.Ipc.ProcessMonitoring.Server.csproj", "{8E6B5510-AC53-44E1-996C-59FE7D1A5A8C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{706A1372-2B78-4E86-8CD7-A1BC7CF76B84}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7A986E39-821E-49B3-AB03-C51BF0B94719}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,11 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{458E2DC2-F48F-40E3-9096-55FE974D3B1F} = {706A1372-2B78-4E86-8CD7-A1BC7CF76B84}
+		{03436778-753E-44AF-B0ED-D498C8CA86FE} = {706A1372-2B78-4E86-8CD7-A1BC7CF76B84}
+		{DB62D209-ACF5-444A-87F3-C7C268289210} = {7A986E39-821E-49B3-AB03-C51BF0B94719}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08AF8FBA-696A-4E00-BAFC-F1A170E7E5A6}

@@ -12,7 +12,6 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\ConsoLovers.Ipc.ProcessMonitoring.Server\ConsoLovers.Ipc.ProcessMonitoring.Server.csproj" />
-	  <ProjectReference Include="..\ConsoLovers.Ipc.Server\ConsoLovers.Ipc.Server.csproj" />
 	</ItemGroup>
 
 </Project>

@@ -1,15 +1,13 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="InterProcessCommunication.cs" company="ConsoLovers">
+// <copyright file="IpcServer.cs" company="ConsoLovers">
 //    Copyright (c) ConsoLovers  2015 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Internals;
-
 /// <summary>Entry point for creating client or server classes for the inter process communication</summary>
-public static class InterProcessCommunication
+public static class IpcServer
 {
    #region Public Methods and Operators
 

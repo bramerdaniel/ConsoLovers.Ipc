@@ -11,19 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Google.Protobuf" />
-		<PackageReference Include="Grpc.AspNetCore.Server" />
-		<PackageReference Include="Grpc.Net.Client" />
-		<PackageReference Include="Grpc.Tools">
-			<PrivateAssets>all</PrivateAssets>
-			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-		</PackageReference>
-	</ItemGroup>
-
-	<ItemGroup>
-	  <Protobuf Include="Proto\CancellationService.proto" Access="Internal" GrpcServices="Both" />
-	  <Protobuf Include="Proto\ProgressService.proto" Access="Internal" GrpcServices="Both" />
-	  <Protobuf Include="Proto\ResultService.proto" Access="Internal" GrpcServices="Both" />
+	  <Folder Include="Proto\" />
 	</ItemGroup>
 
 	<Target Name="ChangeAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">

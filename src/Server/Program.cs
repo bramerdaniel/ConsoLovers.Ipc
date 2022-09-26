@@ -71,7 +71,7 @@ internal class Program
 
    private static IInterProcessCommunicationServer CreateCommunicationServer()
    {
-      return InterProcessCommunication
+      return IpcServer
          .CreateServer()
          .ForCurrentProcess()
          .UseProcessMonitoring()
