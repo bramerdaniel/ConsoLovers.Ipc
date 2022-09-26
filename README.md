@@ -59,10 +59,11 @@ that is able to create the service clients you want to use.
 
 ```C#
     var serverProcess = Process.GetProcessesByName("Server").FirstOrDefault();
-    var clientFactory = InterProcessCommunication.CreateClientFactory()
-       .ForProcess(serverProcess))
-       .AddDefaultClients()
-       .Build();
+    
+    var clientFactory = IpcClient.CreateClientFactory()
+         .ForProcess(process)
+         .AddProcessMonitoringClients()
+         .Build();
 ```
 
 Once created, the factory can create the required clients,
