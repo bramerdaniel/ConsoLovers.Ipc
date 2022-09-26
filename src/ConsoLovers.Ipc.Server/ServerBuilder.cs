@@ -34,7 +34,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    internal ServerBuilder()
    {
       WebApplicationBuilder = WebApplication.CreateBuilder(new WebApplicationOptions());
-      AddGrpcService<ConnectionService>();
+      AddGrpcService<SynchronizationService>();
    }
 
    #endregion

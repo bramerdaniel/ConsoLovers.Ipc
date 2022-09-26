@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="Program.cs" company="ConsoLovers">
+// <copyright file="ServerArgs.cs" company="ConsoLovers">
 //    Copyright (c) ConsoLovers  2015 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,15 +8,19 @@ namespace Server;
 
 using ConsoLovers.ConsoleToolkit.Core;
 
-internal class Program
-{
-   #region Public Methods and Operators
+using Server.Annotations;
+using Server.Commands;
 
-   public static async Task Main()
-   {
-      await ConsoleApplication.WithArguments<ServerArgs>()
-         .RunAsync();
-   }
+[UsedImplicitly]
+internal class ServerArgs
+{
+   #region Public Properties
+
+   [Command("run", "r", IsDefaultCommand = true)]
+   public RunCommand Run { get; set; } = null!;
+
+   [Command("help", "?")]
+   public HelpCommand Help { get; set; } = null!;
 
    #endregion
 }

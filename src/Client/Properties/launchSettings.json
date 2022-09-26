@@ -7,9 +7,9 @@
       "commandName": "Project",
       "commandLineArgs": "start serverPath=server.exe "
     },
-    "wait for server": {
+    "wait for Peter": {
       "commandName": "Project",
-      "commandLineArgs": "wait name=chrome"
+      "commandLineArgs": "wait name=Peter"
     }
   }
 }

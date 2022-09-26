@@ -15,7 +15,7 @@ public class ConfigurableClient<T> : IConfigurableClient
 {
    #region Constants and Fields
 
-   private IConnectionClient? connectionClient;
+   private ISynchronizationClient? connectionClient;
 
    #endregion
 
@@ -30,7 +30,7 @@ public class ConfigurableClient<T> : IConfigurableClient
 
    public async Task ConnectAsync(CancellationToken cancellationToken)
    {
-      await ConnectionClient.ConnectAsync(cancellationToken);
+      await SynchronizationClient.WaitForServerAsync(cancellationToken);
    }
 
    #endregion
@@ -40,7 +40,7 @@ public class ConfigurableClient<T> : IConfigurableClient
    /// <summary>Gets the configuration.</summary>
    protected IClientConfiguration Configuration { get; private set; } = null!;
 
-   protected IConnectionClient ConnectionClient => connectionClient ??= new ConnectionClient(Configuration.Channel);
+   protected ISynchronizationClient SynchronizationClient => connectionClient ??= new SynchronizationClient(Configuration.Channel);
 
    /// <summary>Gets the service client.</summary>
    protected T ServiceClient { get; private set; } = default!;

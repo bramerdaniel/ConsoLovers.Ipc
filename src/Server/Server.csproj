@@ -9,6 +9,7 @@
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Spectre.Console" />
+		<PackageReference Include="ConsoLovers.ConsoleToolkit.Core" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\ConsoLovers.Ipc.ProcessMonitoring.Server\ConsoLovers.Ipc.ProcessMonitoring.Server.csproj" />

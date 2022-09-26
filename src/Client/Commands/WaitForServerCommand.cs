@@ -13,43 +13,61 @@ using ConsoLovers.ConsoleToolkit.Core.Exceptions;
 using ConsoLovers.Ipc;
 using ConsoLovers.Ipc.Clients;
 
+using Spectre.Console;
+
 internal class WaitForServerCommand : IAsyncCommand<WaitForServerCommand.WaitArgs>
 {
    #region IAsyncCommand<WaitArgs> Members
 
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
-      Console.WriteLine($"Waiting for server {Arguments.Name}");
-
-      var process = Process.GetProcessesByName(Arguments.Name).FirstOrDefault();
-      if (process == null)
-         throw new CommandLineArgumentException($"The process {Arguments.Name} could not be found");
-
-      var clientFactory = IpcClient.CreateClientFactory()
-         .ForProcess(process)
-         .AddProgressClient()
-         .Build();
+      Console.WriteLine($"Waiting for server {Arguments.Name} for {Arguments.Timeout}s");
+      var clientFactory = CreateClientFactory();
 
       try
       {
-         var timeoutTokenSource = new CancellationTokenSource();
-         timeoutTokenSource.CancelAfter(TimeSpan.FromSeconds(Arguments.Timeout));
+         var connectionClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
+         await connectionClient.WaitForServerAsync(TimeSpan.FromSeconds(Arguments.Timeout), cancellationToken);
 
-         var linkedTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, timeoutTokenSource.Token);
-
-         var connectionClient = new ConnectionClient(clientFactory.ChannelFactory.Channel);
-         await connectionClient.WaitForConnectedAsync(linkedTokenSource.Token);
-         Console.WriteLine("Connected");
-         Console.ReadLine();
+         AnsiConsole.MarkupLine($"[green]Connected to server {clientFactory.ChannelFactory.ServerName} successfully[/]");
       }
       catch (OperationCanceledException)
       {
-         Console.WriteLine($"Could not connect to process {process.ProcessName} after {Arguments.Timeout}");
-         Console.ReadLine();
+         AnsiConsole.MarkupLine($"[red]Could not connect to server {clientFactory.ChannelFactory.ServerName} after {Arguments.Timeout}[/]");
       }
    }
 
    public WaitArgs Arguments { get; set; } = null!;
+
+   #endregion
+
+   #region Methods
+
+   private IClientFactory CreateClientFactory()
+   {
+      var builder = IpcClient.CreateClientFactory();
+      if (!string.IsNullOrWhiteSpace(Arguments.Name))
+      {
+         return builder.ForName(Arguments.Name)
+            .AddProgressClient()
+            .Build();
+      }
+
+      Process process = FindServerProcess();
+      return builder.ForProcess(process)
+         .AddProgressClient()
+         .Build();
+   }
+
+   private Process FindServerProcess()
+   {
+      var process = Process.GetProcessesByName("server")
+         .FirstOrDefault();
+      if (process == null)
+         throw new CommandLineArgumentException("Server could not be found");
+
+      return process;
+   }
 
    #endregion
 
@@ -61,9 +79,9 @@ internal class WaitForServerCommand : IAsyncCommand<WaitForServerCommand.WaitArg
       [HelpText("The name of the process to wait for")]
       public string Name { get; set; } = null!;
 
-      [Argument("timeout")]
-      [HelpText("The timeout to wait for the server")]
-      public int Timeout { get; set; } = 5;
+      [Argument("timeout", "t")]
+      [HelpText("The timeout to wait for the server. The default value is 10s.")]
+      public int Timeout { get; set; } = 10;
 
       #endregion
    }

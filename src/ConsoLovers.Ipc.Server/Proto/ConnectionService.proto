@@ -3,7 +3,7 @@
 package ConsoLovers.Ipc;
 option csharp_namespace = "ConsoLovers.Ipc.Grpc";
 
-service ConnectionService
+service SynchronizatioService
 {
 	rpc Connect(ConnectRequest) returns (ConnectResponse);
 }

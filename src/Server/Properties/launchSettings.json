@@ -1,0 +1,11 @@
+{
+  "profiles": {
+    "Server": {
+      "commandName": "Project"
+    },
+    "Run As Peter": {
+      "commandName": "Project",
+      "commandLineArgs": "run name=Peter time=60 -waitForStartup"
+    }
+  }
+}
