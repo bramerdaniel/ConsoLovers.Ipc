@@ -1,7 +1,10 @@
 # ConsoLovers.Ipc
 
+[![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
+[![NuGet version (ConsoLovers.Ipc)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc/)
+
 ## What is it ?
-Is is a small library for inter-process communication on a single machine,
+It is a small library for inter-process communication on a single machine,
 using [gRPC](https://grpc.io/) with [Unix Domain Sockets](https://de.wikipedia.org/wiki/Unix_Domain_Socket).
 Microsoft has an article called [Inter-process communication with gRPC](https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess?view=aspnetcore-6.0#configure-unix-domain-sockets),
 and the [ConsoLovers.Ipc package](https://www.nuget.org/packages/ConsoLovers.Ipc) provides an easy and flexible implementation, 
