@@ -1,6 +1,15 @@
-# ConsoLovers.Ipc
+# ConsoLovers.Ipc [![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
 
-[![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
+## What is it ?
+It is a small library for inter-process communication on a single machine,
+using [gRPC](https://grpc.io/) with [Unix Domain Sockets](https://de.wikipedia.org/wiki/Unix_Domain_Socket).
+Microsoft has an article called [Inter-process communication with gRPC](https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess?view=aspnetcore-6.0#configure-unix-domain-sockets),
+and the [ConsoLovers.Ipc package](https://www.nuget.org/packages/ConsoLovers.Ipc) provides an easy and flexible implementation, 
+without having to care about all the infratructure setup, that needs to be done.
+
+## The available packages
+
+The library is splitt into serverside and client side packages 
 
 Package  | Version | Description
 -------- | -------- | --------
@@ -10,26 +19,14 @@ ConsoLovers.Ipc.ProcessMonitoring.Server   | [![NuGet version (ConsoLovers.Ipc.P
 ConsoLovers.Ipc.ProcessMonitoring.Client   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Client/)  | Client package for applications that want to monitor processes hosting the ConsoLovers.Ipc.ProcessMonitoring.Server package services
 
 
-
-
-
-
-## What is it ?
-It is a small library for inter-process communication on a single machine,
-using [gRPC](https://grpc.io/) with [Unix Domain Sockets](https://de.wikipedia.org/wiki/Unix_Domain_Socket).
-Microsoft has an article called [Inter-process communication with gRPC](https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess?view=aspnetcore-6.0#configure-unix-domain-sockets),
-and the [ConsoLovers.Ipc package](https://www.nuget.org/packages/ConsoLovers.Ipc) provides an easy and flexible implementation, 
-without having to care about all the infratructure setup, that needs to be done.
-
 ## Usage on server side
-This is how you set it up on the server side 
-(The process that hosts the gRPC server)
+This is how you set it up on the server side with the example of the ProcessMonitoring package
 
 ```C#
-      using var server = InterProcessCommunication.CreateServer()
-         .ForCurrentProcess()
-         .UseDefaults()
-         .Start();
+      using var server = IpcServer.CreateServer()
+                            .ForCurrentProcess()
+                            .AddProcessMonitoring()
+                            .Start();
 ```
 
 When the server is up and running, you can get your added services from the servers
@@ -82,3 +79,6 @@ that will give you the information provided by the server.
       foreach (var keyPair in result.Data)
          Console.WriteLine("{0} {1}", keyPair.Key, keyPair.Value);
 ```
+
+## Add a custom gRPC service
+DOCUMENTATION IS COMMING SOON
