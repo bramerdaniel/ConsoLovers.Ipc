@@ -7,9 +7,6 @@
 namespace ConsoLovers.Ipc;
 
 using ConsoLovers.Ipc.ProcessMonitoring;
-using ConsoLovers.Ipc.ProcessMonitoring.Cancellation;
-using ConsoLovers.Ipc.ProcessMonitoring.Progress;
-using ConsoLovers.Ipc.ProcessMonitoring.Result;
 
 using Microsoft.Extensions.DependencyInjection;
 

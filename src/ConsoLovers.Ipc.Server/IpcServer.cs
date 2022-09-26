@@ -11,7 +11,7 @@ public static class IpcServer
 {
    #region Public Methods and Operators
 
-   /// <summary>Creates a <see cref="IServerBuilder"/> for configuring the required <see cref="IInterProcessCommunicationServer"/>.</summary>
+   /// <summary>Creates a <see cref="IServerBuilder"/> for configuring the required <see cref="IIpcServer"/>.</summary>
    /// <returns>A <see cref="IServerBuilderWithoutName"/></returns>
    public static IServerBuilderWithoutName CreateServer()
    {

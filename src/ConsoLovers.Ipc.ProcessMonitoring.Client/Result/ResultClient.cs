@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.ProcessMonitoring.Result;
+namespace ConsoLovers.Ipc.ProcessMonitoring;
 
 using System.Diagnostics.CodeAnalysis;
 

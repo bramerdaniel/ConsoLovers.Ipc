@@ -9,7 +9,6 @@ namespace Client;
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.Ipc;
 using ConsoLovers.Ipc.ProcessMonitoring;
-using ConsoLovers.Ipc.ProcessMonitoring.Progress;
 
 using Spectre.Console;
 

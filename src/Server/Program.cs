@@ -58,7 +58,7 @@ internal class Program
          });
 
          resultReporter.AddData("MoreAdditionalData", "This is additional data");
-         resultReporter.Success();
+         resultReporter.ReportSuccess();
          AnsiConsole.WriteLine("shutting down communication server");
       }
       
@@ -75,7 +75,7 @@ internal class Program
 
    #region Methods
 
-   private static IInterProcessCommunicationServer CreateCommunicationServer()
+   private static IIpcServer CreateCommunicationServer()
    {
       return IpcServer
          .CreateServer()

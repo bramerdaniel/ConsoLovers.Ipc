@@ -36,6 +36,23 @@ public static class ServerExtensions
       return builder;
    }
 
+   /// <summary>Adds a service as singleton only if it was not already added.</summary>
+   /// <typeparam name="TService">The type of the service.</typeparam>
+   /// <typeparam name="TImplementation">The type of the implementation.</typeparam>
+   /// <param name="serviceCollection">The service collection.</param>
+   /// <returns></returns>
+   public static bool EnsureSingleton<TService, TImplementation>(this IServiceCollection serviceCollection)
+      where TImplementation : TService where TService : class
+   {
+      if (TryAddSingleton<TImplementation>(serviceCollection))
+      {
+         serviceCollection.AddSingleton<TService>(x => x.GetRequiredService<TImplementation>());
+         return true;
+      }
+
+      return false;
+   }
+
    /// <summary>Gets a <see cref="IServerBuilder"/> for the current process.</summary>
    /// <param name="builder">The builder without the server name specified.</param>
    /// <returns>The <see cref="IServerBuilder"/></returns>
@@ -46,42 +63,6 @@ public static class ServerExtensions
          throw new ArgumentNullException(nameof(builder));
 
       return builder.ForProcess(Process.GetCurrentProcess());
-   }
-
-   /// <summary>Gets the <see cref="ICancellationHandler"/> that notifies the server to cancel.</summary>
-   /// <param name="server">The server.</param>
-   /// <returns>The <see cref="ICancellationHandler"/> service</returns>
-   /// <exception cref="System.ArgumentNullException">server</exception>
-   public static ICancellationHandler GetCancellationHandler(this IInterProcessCommunicationServer server)
-   {
-      if (server == null)
-         throw new ArgumentNullException(nameof(server));
-
-      return server.GetRequiredService<ICancellationHandler>();
-   }
-
-   /// <summary>Gets the <see cref="IProgressReporter"/> service.</summary>
-   /// <param name="server">The <see cref="IInterProcessCommunicationServer"/> that provided the service.</param>
-   /// <returns>The <see cref="IProgressReporter"/> to use</returns>
-   /// <exception cref="System.ArgumentNullException">server</exception>
-   public static IProgressReporter GetProgressReporter(this IInterProcessCommunicationServer server)
-   {
-      if (server == null)
-         throw new ArgumentNullException(nameof(server));
-
-      return server.GetRequiredService<IProgressReporter>();
-   }
-
-   /// <summary>Gets the result reporter service.</summary>
-   /// <param name="server">The server.</param>
-   /// <returns>The result reporter service</returns>
-   /// <exception cref="System.ArgumentNullException">server</exception>
-   public static IResultReporter GetResultReporter(this IInterProcessCommunicationServer server)
-   {
-      if (server == null)
-         throw new ArgumentNullException(nameof(server));
-
-      return server.GetRequiredService<IResultReporter>();
    }
 
    /// <summary>Configures the web application before it is build.</summary>
@@ -96,27 +77,9 @@ public static class ServerExtensions
       return builder;
    }
 
+   #endregion
 
-
-
-
-
-
-
-
-
-
-   public static bool EnsureSingleton<TService, TImplementation>(this IServiceCollection serviceCollection)
-      where TImplementation : TService where TService : class
-   {
-      if (TryAddSingleton<TImplementation>(serviceCollection))
-      {
-         serviceCollection.AddSingleton<TService>(x => x.GetRequiredService<TImplementation>());
-         return true;
-      }
-
-      return false;
-   }
+   #region Methods
 
    private static bool TryAddSingleton<T>(IServiceCollection serviceCollection)
    {

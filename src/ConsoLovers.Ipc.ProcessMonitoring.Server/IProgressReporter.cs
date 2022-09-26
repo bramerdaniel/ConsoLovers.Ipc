@@ -6,7 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
-/// <summary>Service interface that is used on the <see cref="IInterProcessCommunicationServer"/> side to report progress for the current process"/></summary>
+/// <summary>Service interface that is used on the <see cref="IIpcServer"/> side to report progress for the current process"/></summary>
 public interface IProgressReporter
 {
    #region Public Methods and Operators

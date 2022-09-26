@@ -12,7 +12,7 @@ public class ResultReporter : IResultReporter
 
    private readonly ManualResetEventSlim resetEvent;
 
-   private ResultInfo resultInfo;
+   private readonly ResultInfo resultInfo;
 
    #endregion
 
@@ -28,11 +28,18 @@ public class ResultReporter : IResultReporter
 
    #region IResultReporter Members
 
+   /// <summary>The server process had errors while executing.</summary>
+   /// <param name="exitCode">The exit code.</param>
+   /// <param name="message">The message.</param>
+   public void ReportError(int exitCode, string message)
+   {
+      ReportResult(exitCode, message);
+   }
+
    public void ReportResult(int exitCode, string message)
    {
       resultInfo.ExitCode = exitCode;
-      resultInfo.Message = message;
-
+      resultInfo.Message = message ?? string.Empty;
       resetEvent.Set();
    }
 
@@ -46,14 +53,14 @@ public class ResultReporter : IResultReporter
       resultInfo.Data.Add(key, value);
    }
 
-   public void Success()
+   public void ReportSuccess()
    {
       ReportResult(0, string.Empty);
    }
 
    #endregion
 
-   #region Public Methods and Operators
+   #region Methods
 
    internal Task<ResultInfo> GetResultAsync()
    {

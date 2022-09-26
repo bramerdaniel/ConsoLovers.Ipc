@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="InterProcessCommunicationServer.cs" company="ConsoLovers">
+// <copyright file="IpcServerImpl.cs" company="ConsoLovers">
 //    Copyright (c) ConsoLovers  2015 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -8,7 +8,7 @@ namespace ConsoLovers.Ipc.Internals;
 
 using Microsoft.AspNetCore.Builder;
 
-internal sealed class InterProcessCommunicationServer : IInterProcessCommunicationServer
+internal sealed class IpcServerImpl : IIpcServer
 {
    #region Constants and Fields
 
@@ -18,10 +18,10 @@ internal sealed class InterProcessCommunicationServer : IInterProcessCommunicati
 
    #region Constructors and Destructors
 
-   /// <summary>Initializes a new instance of the <see cref="InterProcessCommunicationServer"/> class.</summary>
+   /// <summary>Initializes a new instance of the <see cref="IpcServerImpl"/> class.</summary>
    /// <param name="webApplication">The web application.</param>
    /// <exception cref="System.ArgumentNullException">webApplication</exception>
-   internal InterProcessCommunicationServer(WebApplication webApplication)
+   internal IpcServerImpl(WebApplication webApplication)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));
       ServerTask = webApplication.RunAsync();
@@ -29,7 +29,7 @@ internal sealed class InterProcessCommunicationServer : IInterProcessCommunicati
 
    #endregion
 
-   #region IInterProcessCommunicationServer Members
+   #region IIpcServer Members
 
    public object? GetService(Type serviceType)
    {

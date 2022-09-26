@@ -21,10 +21,6 @@
 		</PackageReference>
 	</ItemGroup>
 
-	<ItemGroup>
-	  <Folder Include="Proto\" />
-	</ItemGroup>
-
 	<Target Name="ChangeAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">
 		<ItemGroup>
 			<ReferencePath Condition="'%(FileName)' == 'Microsoft.Extensions.Logging'">

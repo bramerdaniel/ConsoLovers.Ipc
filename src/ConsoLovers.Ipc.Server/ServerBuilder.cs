@@ -82,9 +82,10 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       return this;
    }
 
-   public IInterProcessCommunicationServer Start()
+   public IIpcServer Start()
    {
       WebApplicationBuilder.Services.AddGrpc();
+      
       // TODO Map GrpcReflection
 
       var application = WebApplicationBuilder.Build();
@@ -92,7 +93,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       foreach (var action in applicationActions)
          action(application);
 
-      return new InterProcessCommunicationServer(application);
+      return new IpcServerImpl(application);
    }
 
    #endregion
