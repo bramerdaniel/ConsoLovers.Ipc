@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+
+package ConsoLovers.Ipc;
+option csharp_namespace = "ConsoLovers.Ipc.Grpc";
+
+service ConnectionService
+{
+	rpc Connect(ConnectRequest) returns (ConnectResponse);
+}
+
+message ConnectRequest 
+{    
+}
+
+message ConnectResponse 
+{    
+}
+

@@ -11,13 +11,11 @@ using System.Diagnostics.CodeAnalysis;
 using ConsoLovers.Ipc.Grpc;
 
 [SuppressMessage("ReSharper", "UnusedType.Global")]
-public sealed class ProgressClient : IProgressClient
+public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.ProgressServiceClient>, IProgressClient
 {
    #region Constants and Fields
 
    private Task? progressTask;
-
-   private Grpc.ProgressService.ProgressServiceClient? serviceClient;
 
    private ClientState state = ClientState.Uninitialized;
 
@@ -48,12 +46,12 @@ public sealed class ProgressClient : IProgressClient
       }
    }
 
-   public void Configure(IClientConfiguration configuration)
+   protected override void OnConfigured()
    {
-      serviceClient = new Grpc.ProgressService.ProgressServiceClient(configuration.Channel);
       State = ClientState.Connecting;
       progressTask = Task.Run(ReadProgress);
    }
+
 
    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
    public void Dispose()
@@ -68,13 +66,6 @@ public sealed class ProgressClient : IProgressClient
 
    /// <summary>Gets the exception that occurred when the state is failed.</summary>
    public Exception? Exception { get; private set; }
-
-   #endregion
-
-   #region Properties
-
-   private Grpc.ProgressService.ProgressServiceClient ServiceClient =>
-      serviceClient ?? throw new InvalidOperationException("Service client is not initialized");
 
    #endregion
 
@@ -94,6 +85,7 @@ public sealed class ProgressClient : IProgressClient
       try
       {
          var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest());
+         
          State = ClientState.Active;
 
          while (await streamingCall.ResponseStream.MoveNext(CancellationToken.None))

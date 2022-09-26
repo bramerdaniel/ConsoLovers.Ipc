@@ -2,6 +2,14 @@
   "profiles": {
     "Client": {
       "commandName": "Project"
+    },
+    "start server": {
+      "commandName": "Project",
+      "commandLineArgs": "start serverPath=server.exe "
+    },
+    "wait for server": {
+      "commandName": "Project",
+      "commandLineArgs": "wait name=chrome"
     }
   }
 }

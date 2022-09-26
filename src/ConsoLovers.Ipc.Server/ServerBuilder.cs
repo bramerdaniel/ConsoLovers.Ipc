@@ -10,6 +10,8 @@ extern alias LoggingExtensions;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
+using ConsoLovers.Ipc.Grpc;
+
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -32,6 +34,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    internal ServerBuilder()
    {
       WebApplicationBuilder = WebApplication.CreateBuilder(new WebApplicationOptions());
+      AddGrpcService<ConnectionService>();
    }
 
    #endregion

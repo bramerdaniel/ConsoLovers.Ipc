@@ -13,15 +13,13 @@ using ConsoLovers.Ipc.Grpc;
 using global::Grpc.Core;
 
 [SuppressMessage("ReSharper", "UnusedType.Global")]
-public class ResultClient : IResultClient
+public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient>, IResultClient
 {
    #region Constants and Fields
 
    private readonly ManualResetEventSlim resultWaitHandle;
 
    private ResultInfo? result;
-
-   private ResultService.ResultServiceClient? serviceClient;
 
    private ClientState state = ClientState.Uninitialized;
 
@@ -81,11 +79,11 @@ public class ResultClient : IResultClient
       return WaitForResultAsync(CancellationToken.None);
    }
 
-   public void Configure(IClientConfiguration configuration)
+   protected override void OnConfigured()
    {
-      serviceClient = new ResultService.ResultServiceClient(configuration.Channel);
       CreateWaitingTask();
    }
+
 
    public void Dispose()
    {
@@ -115,17 +113,9 @@ public class ResultClient : IResultClient
    {
       if (waitingTask == null)
       {
-         var streamingCall = GetServiceClient().ResultChanged(new ResultChangedRequest());
+         var streamingCall = ServiceClient.ResultChanged(new ResultChangedRequest());
          waitingTask = Task.Run(() => WaitForResult(streamingCall));
       }
-   }
-
-   private ResultService.ResultServiceClient GetServiceClient()
-   {
-      if (serviceClient == null)
-         throw new InvalidOperationException("Not initialized yet");
-
-      return serviceClient;
    }
 
    private void WaitForFinished(CancellationToken cancellationToken)

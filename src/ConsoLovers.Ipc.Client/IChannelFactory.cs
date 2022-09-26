@@ -6,7 +6,8 @@
 
 namespace ConsoLovers.Ipc;
 
-using Grpc.Net.Client;
+using global::Grpc.Net.Client;
+
 
 // TODO this should be named channel info?
 public interface IChannelFactory

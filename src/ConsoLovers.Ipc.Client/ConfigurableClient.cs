@@ -6,17 +6,53 @@
 
 namespace ConsoLovers.Ipc;
 
+using ConsoLovers.Ipc.Clients;
+
 /// <summary>Base class for gRPC clients that should be configured</summary>
 /// <typeparam name="T"></typeparam>
-/// <seealso cref="ConsoLovers.Ipc.IConfigurableClient" />
+/// <seealso cref="ConsoLovers.Ipc.IConfigurableClient"/>
 public class ConfigurableClient<T> : IConfigurableClient
 {
-   /// <summary>Gets the service client.</summary>
-   protected T ServiceClient { get; private set; }
+   #region Constants and Fields
+
+   private IConnectionClient? connectionClient;
+
+   #endregion
+
+   #region IConfigurableClient Members
 
    public void Configure(IClientConfiguration configuration)
    {
+      Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
       ServiceClient = (T)Activator.CreateInstance(typeof(T), configuration.Channel);
-
+      OnConfigured();
    }
+
+   public async Task ConnectAsync(CancellationToken cancellationToken)
+   {
+      await ConnectionClient.ConnectAsync(cancellationToken);
+   }
+
+   #endregion
+
+   #region Properties
+
+   /// <summary>Gets the configuration.</summary>
+   protected IClientConfiguration Configuration { get; private set; } = null!;
+
+   protected IConnectionClient ConnectionClient => connectionClient ??= new ConnectionClient(Configuration.Channel);
+
+   /// <summary>Gets the service client.</summary>
+   protected T ServiceClient { get; private set; } = default!;
+
+   #endregion
+
+   #region Methods
+
+   /// <summary>Called after the client was configured with the specified channel.</summary>
+   protected virtual void OnConfigured()
+   {
+   }
+
+   #endregion
 }

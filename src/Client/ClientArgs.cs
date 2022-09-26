@@ -6,11 +6,20 @@
 
 namespace Client;
 
+using Client.Commands;
 using ConsoLovers.ConsoleToolkit.Core;
 
 internal class ClientArgs
 {
    #region Public Properties
+
+   [Command("start", "s")]
+   [HelpText("Start a server")]
+   public StartServerCommand StartServer{ get; set; } = null!;
+
+   [Command("wait", "w")]
+   [HelpText("Wait for a server to be connected")]
+   public WaitForServerCommand WaitForServer { get; set; } = null!;
 
    [Command("help", "?")]
    [HelpText("Displays this help")]

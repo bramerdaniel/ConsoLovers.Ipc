@@ -17,6 +17,7 @@ public class SpectreHandler : IExceptionHandler
    public bool Handle(Exception exception)
    {
       AnsiConsole.WriteException(exception, ExceptionFormats.ShortenTypes);
+      Console.ReadLine();
       return true;
    }
 

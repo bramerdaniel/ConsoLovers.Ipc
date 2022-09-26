@@ -6,7 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
-using Grpc.Net.Client;
+using global::Grpc.Net.Client;
 
 public interface IClientConfiguration
 {

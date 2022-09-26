@@ -21,10 +21,6 @@ public interface IProgressClient : IConfigurableClient, IDisposable
    /// <summary>Occurs when <see cref="State"/> property has changed.</summary>
    event EventHandler<StateChangedEventArgs> StateChanged;
 
-   /// <summary>Waits for the progress to be completed .</summary>
-   /// <returns>The waiting <see cref="Task"/></returns>
-   Task WaitForCompletedAsync();
-
    #endregion
 
    #region Public Properties
@@ -34,6 +30,19 @@ public interface IProgressClient : IConfigurableClient, IDisposable
 
    /// <summary>Gets the state state of the client.</summary>
    ClientState State { get; }
+
+   #endregion
+
+   #region Public Methods and Operators
+
+   /// <summary>Waits for the progress to be completed .</summary>
+   /// <returns>The waiting <see cref="Task"/></returns>
+   Task WaitForCompletedAsync();
+
+   /// <summary>Waits for the progress to be completed .</summary>
+   /// <param name="cancellationToken">The cancellation token.</param>
+   /// <returns>The waiting <see cref="Task"/></returns>
+   Task WaitForCompletedAsync(CancellationToken cancellationToken);
 
    #endregion
 }

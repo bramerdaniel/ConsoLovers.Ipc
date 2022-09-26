@@ -23,7 +23,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Folder Include="Clients\" />
 	  <Folder Include="Proto\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Protobuf Include="..\ConsoLovers.Ipc.Server\Proto\ConnectionService.proto" GrpcServices="Client" Access="Internal">
+	    <Link>Proto\ConnectionService.proto</Link>
+	  </Protobuf>
 	</ItemGroup>
 
 

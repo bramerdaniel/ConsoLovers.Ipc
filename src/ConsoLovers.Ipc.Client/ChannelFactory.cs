@@ -9,7 +9,8 @@ namespace ConsoLovers.Ipc;
 using System.Net;
 using System.Net.Sockets;
 
-using Grpc.Net.Client;
+using global::Grpc.Net.Client;
+
 
 /// <summary>Helper factory for creating <see cref="GrpcChannel"/>s</summary>
 internal class ChannelFactory : IChannelFactory
