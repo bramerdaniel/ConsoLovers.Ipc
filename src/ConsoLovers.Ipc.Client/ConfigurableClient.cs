@@ -6,6 +6,9 @@
 
 namespace ConsoLovers.Ipc;
 
+/// <summary>Base class for gRPC clients that should be configured</summary>
+/// <typeparam name="T"></typeparam>
+/// <seealso cref="ConsoLovers.Ipc.IConfigurableClient" />
 public class ConfigurableClient<T> : IConfigurableClient
 {
    /// <summary>Gets the service client.</summary>
