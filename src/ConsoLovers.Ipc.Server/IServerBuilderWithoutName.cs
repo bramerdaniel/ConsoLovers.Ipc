@@ -19,6 +19,11 @@ public interface IServerBuilderWithoutName
    /// <returns>The server builder</returns>
    IServerBuilder ForName(string name);
 
+   /// <summary>The function that computes the path to the socket file the server will use.</summary>
+   /// <param name="computeSocketFile">The compute socket file.</param>
+   /// <returns>The server builder</returns>
+   IServerBuilder WithSocketFile(Func<string> computeSocketFile);
+
    /// <summary>Creates the <see cref="IServerBuilder"/> for the specified <see cref="Process"/>.</summary>
    /// <param name="process">The process to create an <see cref="IServerBuilder"/> for.</param>
    /// <returns>The server builder</returns>

@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.Internals;
+namespace ConsoLovers.Ipc;
 
 using Microsoft.AspNetCore.Builder;
 
@@ -20,7 +20,7 @@ internal sealed class IpcServerImpl : IIpcServer
 
    /// <summary>Initializes a new instance of the <see cref="IpcServerImpl"/> class.</summary>
    /// <param name="webApplication">The web application.</param>
-   /// <exception cref="System.ArgumentNullException">webApplication</exception>
+   /// <exception cref="ArgumentNullException">webApplication</exception>
    internal IpcServerImpl(WebApplication webApplication)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));

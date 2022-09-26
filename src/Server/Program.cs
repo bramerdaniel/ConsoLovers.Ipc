@@ -80,8 +80,9 @@ internal class Program
       return IpcServer
          .CreateServer()
          .ForCurrentProcess()
-         .UseProcessMonitoring()
-         .UseCancellationHandler(CancelExecution)
+         .AddGrpcReflection()
+         .AddProcessMonitoring()
+         .AddCancellationHandler(CancelExecution)
          .Start();
    }
 

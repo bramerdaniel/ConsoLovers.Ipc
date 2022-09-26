@@ -10,8 +10,6 @@ extern alias LoggingExtensions;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-using ConsoLovers.Ipc.Internals;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -85,8 +83,6 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    public IIpcServer Start()
    {
       WebApplicationBuilder.Services.AddGrpc();
-      
-      // TODO Map GrpcReflection
 
       var application = WebApplicationBuilder.Build();
 
@@ -104,8 +100,25 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    {
       if (name == null)
          throw new ArgumentNullException(nameof(name));
+      EnsureValidFileName(name);
 
-      return InitializeWithName(name);
+      return WithSocketFile(() => Path.Combine(Path.GetTempPath(), $"{name}.uds"));
+   }
+
+   public IServerBuilder WithSocketFile(Func<string> computeSocketFile)
+   {
+      var socketFile = computeSocketFile();
+      EnsureValidFilePath(socketFile);
+
+      WebApplicationBuilder.WebHost.ConfigureKestrel(options =>
+      {
+         if (File.Exists(socketFile))
+            File.Delete(socketFile);
+
+         options.ListenUnixSocket(socketFile, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
+      });
+
+      return this;
    }
 
    public IServerBuilder ForProcess(Process process)
@@ -145,21 +158,16 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
          throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
    }
 
-   private IServerBuilder InitializeWithName(string name)
+   private static void EnsureValidFilePath(string filePath, [CallerArgumentExpression("filePath")] string? callerExpression = null)
    {
-      EnsureValidFileName(name);
+      if (filePath is null)
+         throw new ArgumentNullException(callerExpression);
 
-      var socketPath = Path.Combine(Path.GetTempPath(), $"{name}.uds");
+      if (string.IsNullOrWhiteSpace(filePath))
+         throw new ArgumentException(callerExpression, $"{callerExpression} must not be empty.");
 
-      WebApplicationBuilder.WebHost.ConfigureKestrel(options =>
-      {
-         if (File.Exists(socketPath))
-            File.Delete(socketPath);
-
-         options.ListenUnixSocket(socketPath, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
-      });
-
-      return this;
+      if (filePath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+         throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
    }
 
    #endregion

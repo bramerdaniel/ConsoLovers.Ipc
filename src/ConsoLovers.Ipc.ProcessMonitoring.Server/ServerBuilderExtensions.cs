@@ -22,7 +22,7 @@ public static class ServerBuilderExtensions
    /// <param name="builder">The builder.</param>
    /// <returns>The builder for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IServerBuilder UseCancellationHandler(this IServerBuilder builder)
+   public static IServerBuilder AddCancellationHandler(this IServerBuilder builder)
    {
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
@@ -43,14 +43,14 @@ public static class ServerBuilderExtensions
    /// <param name="cancellationAction">The cancellation action.</param>
    /// <returns>The builder for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IServerBuilder UseCancellationHandler(this IServerBuilder builder, Func<bool> cancellationAction)
+   public static IServerBuilder AddCancellationHandler(this IServerBuilder builder, Func<bool> cancellationAction)
    {
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
       if (cancellationAction == null)
          throw new ArgumentNullException(nameof(cancellationAction));
 
-      builder.UseCancellationHandler();
+      builder.AddCancellationHandler();
       builder.ConfigureService<ICancellationHandler>(x => x.OnCancellationRequested(cancellationAction));
 
       return builder;
@@ -60,22 +60,22 @@ public static class ServerBuilderExtensions
    /// <param name="builder">The builder.</param>
    /// <returns>The builder for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IServerBuilder UseProcessMonitoring(this IServerBuilder builder)
+   public static IServerBuilder AddProcessMonitoring(this IServerBuilder builder)
    {
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
 
       return builder.RemoveAspNetCoreLogging()
-         .UseProgressReporter()
-         .UseResultReporter()
-         .UseCancellationHandler();
+         .AddProgressReporter()
+         .AddResultReporter()
+         .AddCancellationHandler();
    }
 
    /// <summary>Adds the services required for reporting progress to a client.</summary>
    /// <param name="builder">The builder.</param>
    /// <returns>The builder for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IServerBuilder UseProgressReporter(this IServerBuilder builder)
+   public static IServerBuilder AddProgressReporter(this IServerBuilder builder)
    {
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
@@ -95,7 +95,7 @@ public static class ServerBuilderExtensions
    /// <param name="builder">The builder.</param>
    /// <returns>The builder for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IServerBuilder UseResultReporter(this IServerBuilder builder)
+   public static IServerBuilder AddResultReporter(this IServerBuilder builder)
    {
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));

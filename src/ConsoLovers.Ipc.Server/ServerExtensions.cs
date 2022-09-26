@@ -21,7 +21,7 @@ public static class ServerExtensions
    /// <summary>Configures the web application before it is build.</summary>
    /// <param name="builder">The builder.</param>
    /// <param name="configureWebApplication">The configure web application.</param>
-   /// <returns></returns>
+   /// <returns>The builder for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">configureWebApplication</exception>
    /// <exception cref="System.ArgumentException">The specified {nameof(builder)} must be of type {{typeof(ServerBuilder).Name}}</exception>
    public static IServerBuilder ConfigureWebApplication(this IServerBuilder builder, Action<WebApplicationBuilder> configureWebApplication)
@@ -36,11 +36,19 @@ public static class ServerExtensions
       return builder;
    }
 
+   /// <summary>Adds gRPC reflection to the server services.</summary>
+   /// <param name="builder">The builder.</param>
+   /// <returns>The builder for more fluent configuration</returns>
+   public static IServerBuilder AddGrpcReflection(this IServerBuilder builder)
+   {
+      return builder.ConfigureWebApplication(app => app.Services.AddGrpcReflection());
+   }
+
    /// <summary>Adds a service as singleton only if it was not already added.</summary>
    /// <typeparam name="TService">The type of the service.</typeparam>
    /// <typeparam name="TImplementation">The type of the implementation.</typeparam>
    /// <param name="serviceCollection">The service collection.</param>
-   /// <returns></returns>
+   /// <returns>True if the service was added</returns>
    public static bool EnsureSingleton<TService, TImplementation>(this IServiceCollection serviceCollection)
       where TImplementation : TService where TService : class
    {
