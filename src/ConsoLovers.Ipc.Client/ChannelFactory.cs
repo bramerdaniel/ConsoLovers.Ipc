@@ -14,6 +14,8 @@ using Grpc.Net.Client;
 /// <summary>Helper factory for creating <see cref="GrpcChannel"/>s</summary>
 internal class ChannelFactory : IChannelFactory
 {
+   private readonly string socketPath;
+
    #region Constants and Fields
 
    private GrpcChannel? channel;
@@ -23,11 +25,11 @@ internal class ChannelFactory : IChannelFactory
    #region Constructors and Destructors
 
    /// <summary>Initializes a new instance of the <see cref="ChannelFactory"/> class.</summary>
-   /// <param name="serverName">The serverName.</param>
    /// <exception cref="System.ArgumentNullException">serverName</exception>
-   internal ChannelFactory(string serverName)
+   internal ChannelFactory(string socketPath)
    {
-      ServerName = serverName ?? throw new ArgumentNullException(nameof(serverName));
+      this.socketPath = socketPath ?? throw new ArgumentNullException(nameof(socketPath));
+      ServerName = Path.GetFileNameWithoutExtension(socketPath);
    }
 
    #endregion
@@ -38,19 +40,13 @@ internal class ChannelFactory : IChannelFactory
    public string ServerName { get; }
 
    /// <summary>Gets the channel.</summary>
-   public GrpcChannel Channel => channel ??= CreateChannel();
+   public GrpcChannel Channel => channel ??= CreateChannelFromPath();
 
    #endregion
 
    #region Methods
 
-   private GrpcChannel CreateChannel()
-   {
-      var socketPath = Path.Combine(Path.GetTempPath(), $"{ServerName}.uds");
-      return CreateChannelFromPath(socketPath);
-   }
-
-   private GrpcChannel CreateChannelFromPath(string socketPath)
+   private GrpcChannel CreateChannelFromPath()
    {
       var udsEndPoint = new UnixDomainSocketEndPoint(socketPath);
       var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);

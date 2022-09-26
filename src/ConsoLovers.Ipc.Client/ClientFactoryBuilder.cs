@@ -62,22 +62,29 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       if (name == null)
          throw new ArgumentNullException(nameof(name));
 
-      return InitializeWithName(name);
+      EnsureValidFileName(name);
+      return WithSocketFile(() => Path.Combine(Path.GetTempPath(), $"{name}.uds"));
    }
 
    public IClientFactoryBuilder ForProcess(Process process)
    {
       if (process == null)
          throw new ArgumentNullException(nameof(process));
+      
+      return ForName($"{process.ProcessName}.{process.Id}");
+   }
 
-      return ForName(GetServerName(process));
+   public IClientFactoryBuilder WithSocketFile(Func<string> computeSocketFile)
+   {
+      if (computeSocketFile == null)
+         throw new ArgumentNullException(nameof(computeSocketFile));
 
-      string GetServerName(Process process)
-      {
-         if (process == null)
-            throw new ArgumentNullException(nameof(process));
-         return $"{process.ProcessName}.{process.Id}";
-      }
+      var socketFile = computeSocketFile();
+      EnsureValidFilePath(socketFile);
+
+      channelFactory = new ChannelFactory(socketFile);
+      serviceCollection.AddSingleton(channelFactory);
+      return this;
    }
 
    #endregion
@@ -96,13 +103,16 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
          throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
    }
 
-   private IClientFactoryBuilder InitializeWithName(string name)
+   private static void EnsureValidFilePath(string fileName, [CallerArgumentExpression("fileName")] string? callerExpression = null)
    {
-      EnsureValidFileName(name);
+      if (fileName is null)
+         throw new ArgumentNullException(callerExpression);
 
-      channelFactory = new ChannelFactory(name);
-      serviceCollection.AddSingleton(channelFactory);
-      return this;
+      if (string.IsNullOrWhiteSpace(fileName))
+         throw new ArgumentException(callerExpression, $"{callerExpression} must not be empty.");
+
+      if (fileName.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
+         throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
    }
 
    #endregion
