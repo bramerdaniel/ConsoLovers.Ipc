@@ -21,9 +21,24 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Protobuf Include="Proto\CancellationService.proto" Access="Internal" GrpcServices="Both" />
-	  <Protobuf Include="Proto\ProgressService.proto" Access="Internal" GrpcServices="Both" />
-	  <Protobuf Include="Proto\ResultService.proto" Access="Internal" GrpcServices="Both" />
+	  <ProjectReference Include="..\ConsoLovers.Ipc.Client\ConsoLovers.Ipc.Client.csproj" />
+	  <ProjectReference Include="..\ConsoLovers.Ipc\ConsoLovers.Ipc.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Folder Include="Proto\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Protobuf Include="..\ConsoLovers.Ipc.ProcessMonitoring.Server\Proto\CancellationService.proto">
+	    <Link>Proto\CancellationService.proto</Link>
+	  </Protobuf>
+	  <Protobuf Include="..\ConsoLovers.Ipc.ProcessMonitoring.Server\Proto\ProgressService.proto">
+	    <Link>Proto\ProgressService.proto</Link>
+	  </Protobuf>
+	  <Protobuf Include="..\ConsoLovers.Ipc.ProcessMonitoring.Server\Proto\ResultService.proto">
+	    <Link>Proto\ResultService.proto</Link>
+	  </Protobuf>
 	</ItemGroup>
 
 	<Target Name="ChangeAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">

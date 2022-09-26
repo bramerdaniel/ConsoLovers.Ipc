@@ -55,7 +55,7 @@ public class ResultReporter : IResultReporter
 
    #region Public Methods and Operators
 
-   public Task<ResultInfo> GetResultAsync()
+   internal Task<ResultInfo> GetResultAsync()
    {
       resetEvent.Wait();
       return Task.FromResult(resultInfo);

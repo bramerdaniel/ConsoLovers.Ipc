@@ -8,11 +8,6 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
-
-using ConsoLovers.Ipc.Cancellation;
-using ConsoLovers.Ipc.Result;
-using ConsoLovers.Ipc.Services;
-
 using LoggingExtensions::Microsoft.Extensions.Logging;
 
 using Microsoft.AspNetCore.Builder;
@@ -100,88 +95,17 @@ public static class ServerExtensions
       return builder;
    }
 
-   /// <summary>Adds the services required for cancellation.</summary>
-   /// <param name="builder">The builder.</param>
-   /// <returns>The builder for more fluent configuration</returns>
-   /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IServerBuilder UseCancellationHandler(this IServerBuilder builder)
-   {
-      if (builder == null)
-         throw new ArgumentNullException(nameof(builder));
 
-      builder.AddService(AddRequiredServices);
 
-      void AddRequiredServices(IServiceCollection serviceCollection)
-      {
-         if (EnsureSingleton<ICancellationHandler, CancellationHandler>(serviceCollection))
-            builder.AddGrpcService<CancellationService>();
-      }
-      
-      return builder;
-   }
 
-   /// <summary>Adds the services required for cancellation.</summary>
-   /// <param name="builder">The builder.</param>
-   /// <param name="cancellationAction">The cancellation action.</param>
-   /// <returns>The builder for more fluent configuration</returns>
-   /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IServerBuilder UseCancellationHandler(this IServerBuilder builder, Func<bool> cancellationAction)
-   {
-      if (builder == null)
-         throw new ArgumentNullException(nameof(builder));
-      if (cancellationAction == null)
-         throw new ArgumentNullException(nameof(cancellationAction));
 
-      builder.UseCancellationHandler();
-      builder.ConfigureService<ICancellationHandler>(x => x.OnCancellationRequested(cancellationAction));
 
-      return builder;
-   }
 
-   public static IServerBuilder UseDefaults(this IServerBuilder builder)
-   {
-      if (builder == null)
-         throw new ArgumentNullException(nameof(builder));
 
-      return builder.RemoveAspNetCoreLogging()
-         .UseProgressReporter()
-         .UseResultReporter()
-         .UseCancellationHandler();
-   }
 
-   public static IServerBuilder UseProgressReporter(this IServerBuilder builder)
-   {
-      if (builder == null)
-         throw new ArgumentNullException(nameof(builder));
 
-      builder.AddService(AddRequiredServices);
 
-      void AddRequiredServices(IServiceCollection serviceCollection)
-      {
-         if (EnsureSingleton<IProgressReporter, ProgressReporter>(serviceCollection))
-            builder.AddGrpcService<ProgressService>();
-      }
-
-      return builder;
-   }
-
-   public static IServerBuilder UseResultReporter(this IServerBuilder builder)
-   {
-      if (builder == null)
-         throw new ArgumentNullException(nameof(builder));
-
-      builder.AddService(AddRequiredServices);
-
-      void AddRequiredServices(IServiceCollection serviceCollection)
-      {
-         if (EnsureSingleton<IResultReporter, ResultReporter>(serviceCollection))
-            builder.AddGrpcService<ResultService>();
-      }
-
-      return builder;
-   }
-
-   internal static bool EnsureSingleton<TService, TImplementation>(this IServiceCollection serviceCollection)
+   public static bool EnsureSingleton<TService, TImplementation>(this IServiceCollection serviceCollection)
       where TImplementation : TService where TService : class
    {
       if (TryAddSingleton<TImplementation>(serviceCollection))

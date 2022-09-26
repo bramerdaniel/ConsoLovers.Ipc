@@ -48,12 +48,14 @@ internal class ClientFactory : IClientFactory
 
    private static void CheckForBuildInClients(Type serviceType)
    {
-      if (serviceType == typeof(IResultClient))
-         throw new InvalidOperationException(CreateMessage(serviceType, nameof(ClientExtensions.AddResultClient)));
-      if (serviceType == typeof(IProgressClient))
-         throw new InvalidOperationException(CreateMessage(serviceType, nameof(ClientExtensions.AddProgressClient)));
-      if (serviceType == typeof(ICancellationClient))
-         throw new InvalidOperationException(CreateMessage(serviceType, nameof(ClientExtensions.AddCancellationClient)));
+      // TODO : move this logic to process monitoring
+      if (serviceType.Name == "IResultClient")
+         throw new InvalidOperationException(CreateMessage(serviceType, "AddResultClient"));
+      if (serviceType.Name == "IProgressClient")
+         throw new InvalidOperationException(CreateMessage(serviceType, "AddProgressClient"));
+      if (serviceType.Name == "ICancellationClient")
+         throw new InvalidOperationException(CreateMessage(serviceType, "AddCancellationClient"));
+
    }
 
    private static string CreateMessage(Type serviceType, string addMethod)

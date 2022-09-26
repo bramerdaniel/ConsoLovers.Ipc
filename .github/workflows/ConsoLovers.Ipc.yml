@@ -62,7 +62,7 @@ jobs:
         path: ${{ env.OUTPUT_DIRECTORY }}\*.nupkg
         retention-days: 8
     
-    - name: push to nuget.org
-      if: ${{ github.ref == 'refs/heads/master' }}
-      #NOTE paths to nuget.exe only allow backslashes :-(
-      run: nuget push ${{ env.OUTPUT_DIRECTORY }}\*.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}} -SkipDuplicate
+#    - name: push to nuget.org
+#      if: ${{ github.ref == 'refs/heads/master' }}
+#      #NOTE paths to nuget.exe only allow backslashes :-(
+#      run: nuget push ${{ env.OUTPUT_DIRECTORY }}\*.nupkg -src https://api.nuget.org/v3/index.json -ApiKey ${{secrets.NUGET_API_KEY}} -SkipDuplicate

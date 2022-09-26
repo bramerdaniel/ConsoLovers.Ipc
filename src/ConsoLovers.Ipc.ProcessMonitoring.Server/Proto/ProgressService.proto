@@ -1,0 +1,25 @@
+﻿syntax = "proto3";
+
+package ConsoLovers.Ipc;
+option csharp_namespace = "ConsoLovers.Ipc.Grpc";
+
+service ProgressService
+{
+	rpc ProgressChanged(ProgressChangedRequest) returns (stream ProgressChangedResponse);
+}
+
+message ProgressChangedRequest 
+{    
+}
+
+message ProgressChangedResponse 
+{    
+	ProgressInfo progress = 1;
+}
+
+message ProgressInfo 
+{   
+	int32 percentage = 1;
+
+	string message = 2;
+}
