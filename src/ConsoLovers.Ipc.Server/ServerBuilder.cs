@@ -15,6 +15,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
 
+/// <summary>The default implementation of the <see cref="IServerBuilder"/> interface</summary>
+/// <seealso cref="ConsoLovers.Ipc.IServerBuilder"/>
+/// <seealso cref="ConsoLovers.Ipc.IServerBuilderWithoutName"/>
 internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 {
    #region Constants and Fields
@@ -25,6 +28,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    #region Constructors and Destructors
 
+   /// <summary>Initializes a new instance of the <see cref="ServerBuilder"/> class.</summary>
    internal ServerBuilder()
    {
       WebApplicationBuilder = WebApplication.CreateBuilder(new WebApplicationOptions());

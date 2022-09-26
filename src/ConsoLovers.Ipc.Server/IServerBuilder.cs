@@ -12,6 +12,9 @@ public interface IServerBuilder
 {
    #region Public Methods and Operators
 
+   /// <summary>Adds the specified service as gRPC service to the server.</summary>
+   /// <typeparam name="T">The gRPC service type</typeparam>
+   /// <returns>The server builder for more fluent configuration</returns>
    IServerBuilder AddGrpcService<T>()
       where T : class;
 

@@ -31,6 +31,10 @@ internal sealed class IpcServerImpl : IIpcServer
 
    #region IIpcServer Members
 
+   /// <summary>Gets the service.</summary>
+   /// <param name="serviceType">Type of the service.</param>
+   /// <returns></returns>
+   /// <exception cref="System.ArgumentNullException">serviceType</exception>
    public object? GetService(Type serviceType)
    {
       if (serviceType == null)
@@ -39,6 +43,7 @@ internal sealed class IpcServerImpl : IIpcServer
       return webApplication.Services.GetService(serviceType);
    }
 
+   /// <summary>Releases unmanaged and - optionally - managed resources.</summary>
    public void Dispose()
    {
       DisposeAsync()
@@ -46,6 +51,8 @@ internal sealed class IpcServerImpl : IIpcServer
          .GetResult();
    }
 
+   /// <summary>Disposes the asynchronous.</summary>
+   /// <returns></returns>
    public async ValueTask DisposeAsync()
    {
       await webApplication.StopAsync();
