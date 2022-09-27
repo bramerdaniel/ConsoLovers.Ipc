@@ -75,7 +75,7 @@ that will give you the information provided by the server.
 
       var resultClient = clientFactory.CreateResultClient();
       var result = await resultClient.WaitForResultAsync();
-      Console.WriteLine("{0} {1}", result.Message, result.ExitCode);
+      Console.WriteLine("ExitCode={0}, Message={1}", result.Message, result.ExitCode);
 
       foreach (var keyPair in result.Data)
          Console.WriteLine("{0} {1}", keyPair.Key, keyPair.Value);
