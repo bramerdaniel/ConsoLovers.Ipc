@@ -6,6 +6,10 @@
     "Run As Peter": {
       "commandName": "Project",
       "commandLineArgs": "run name=Peter time=60 -waitForStartup"
+    },
+    "wait for cancel": {
+      "commandName": "Project",
+      "commandLineArgs": "waitForCancel name=Peter timeout=2"
     }
   }
 }

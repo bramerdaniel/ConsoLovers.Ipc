@@ -29,7 +29,7 @@ public class CancellationTests
          .Build();
 
       var client = factory.CreateCancellationClient();
-      client.Invoking(x => x.RequestCancel()).Should().Throw<RpcException>().Where(ex => ex.StatusCode == StatusCode.Unavailable);
+      client.Invoking(x => x.Cancel()).Should().Throw<RpcException>().Where(ex => ex.StatusCode == StatusCode.Unavailable);
    }
    
    #endregion

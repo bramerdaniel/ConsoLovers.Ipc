@@ -28,7 +28,11 @@ public static class Program
       await ConsoleApplication.WithArguments<ClientArgs>()
          .AddService(x => x.AddSingleton(CreateClientFactory))
          .UseExceptionHandler(typeof(SpectreHandler))
-         // .UseApplicationLogic(typeof(ShowProgressLogic))
+         .UseMenuWithoutArguments(c =>
+         {
+            c.MenuOptions.CloseKeys = new[] { ConsoleKey.Escape };
+            c.MenuOptions.Header = new ClientArgs();
+         })
          .RunAsync();
    }
 

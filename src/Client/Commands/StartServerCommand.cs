@@ -74,7 +74,7 @@ internal class StartServerCommand : IAsyncCommand<StartServerCommand.StartServer
    {
       #region Public Properties
 
-      [Argument("serverPath")]
+      [Argument("serverPath", Index = 0)]
       [HelpText("The path to the server executable")]
       public string ServerPath { get; set; } = null!;
 

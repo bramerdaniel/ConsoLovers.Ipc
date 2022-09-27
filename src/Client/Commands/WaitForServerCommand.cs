@@ -17,7 +17,7 @@ using Spectre.Console;
 
 internal class WaitForServerCommand : IAsyncCommand<WaitForServerCommand.WaitArgs>
 {
-   #region IAsyncCommand<WaitArgs> Members
+   #region IAsyncCommand<Args> Members
 
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {

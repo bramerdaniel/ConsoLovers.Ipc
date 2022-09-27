@@ -9,6 +9,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ConsoLovers.ConsoleToolkit" Version="6.0.0-rc22" />
 		<PackageReference Include="Spectre.Console" />
 		<PackageReference Include="ConsoLovers.ConsoleToolkit.Core" />
 	</ItemGroup>

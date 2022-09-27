@@ -38,7 +38,7 @@ internal class CancelExecutionLogic : IApplicationLogic<ClientArgs>
          .Columns(new SpinnerColumn(), new PercentageColumn(), new ProgressBarColumn(), new TaskDescriptionColumn())
          .StartAsync(Cancel);
 
-      if (cancellationClient.RequestCancel())
+      if (cancellationClient.Cancel())
       {
          Console.WriteLine("Cancellation executed successfully");
       }
