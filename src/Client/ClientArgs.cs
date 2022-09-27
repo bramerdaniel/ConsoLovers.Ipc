@@ -17,11 +17,17 @@ internal class ClientArgs : ICustomizedHeader, IMenuHeader
 
    [Command("start", "s")]
    [HelpText("Start a server")]
+   [MenuCommand("Start new server")]
    public StartServerCommand StartServer{ get; set; } = null!;
 
    [Command("wait", "w")]
    [HelpText("Wait for a server to be connected")]
    public WaitForServerCommand WaitForServer { get; set; } = null!;
+
+   [Command("awaitResult", "result")]
+   [HelpText("Connects to the server and awaits the execution result")]
+   [MenuCommand("Await result")]
+   public AwaitResultCommand AwaitResult { get; set; } = null!;
 
    [Command("cancel", "c")]
    [HelpText("Sends a cancel request to the specified server ")]
@@ -30,6 +36,7 @@ internal class ClientArgs : ICustomizedHeader, IMenuHeader
 
    [Command("help", "?")]
    [HelpText("Displays this help")]
+   [MenuCommand(Visibility = CommandVisibility.Hidden)]
    public HelpCommand Help { get; set; } = null!;
 
    [Argument("process", "p", Index = 0)]

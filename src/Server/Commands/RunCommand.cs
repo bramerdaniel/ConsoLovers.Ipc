@@ -37,16 +37,13 @@ internal class RunCommand : ServerCommand, IAsyncCommand<RunCommand.RunArgs>
 
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
-      var serverName = GetServerName();
-      AnsiConsole.WriteLine($"Starting server with name {serverName}");
-
       if (Arguments.WaitForKey)
       {
          AnsiConsole.MarkupLine("[blue]Waiting for ENTER to startup the server[/]");
          Console.ReadLine();
       }
 
-      await using var communicationServer = StartServer(serverName, c => c.AddProcessMonitoring().AddCancellationHandler(CancelExecution));
+      await using var communicationServer = StartServer(Arguments.ServerName, c => c.AddProcessMonitoring().AddCancellationHandler(CancelExecution));
 
       var progressReporter = communicationServer.GetProgressReporter();
       var resultReporter = communicationServer.GetResultReporter();
@@ -96,15 +93,6 @@ internal class RunCommand : ServerCommand, IAsyncCommand<RunCommand.RunArgs>
       return tokenSource.IsCancellationRequested;
    }
 
-   private string GetServerName()
-   {
-      if (!string.IsNullOrWhiteSpace(Arguments.ServerName))
-         return Arguments.ServerName;
-
-      var process = Process.GetCurrentProcess();
-      return $"{process.ProcessName}.{process.Id}";
-   }
-
    #endregion
 
    [UsedImplicitly]
@@ -118,7 +106,7 @@ internal class RunCommand : ServerCommand, IAsyncCommand<RunCommand.RunArgs>
 
       [Argument("name", "server")]
       [HelpText("The name the server should run under")]
-      public string? ServerName { get; set; } = null;
+      public string? ServerName { get; set; }
 
       [Option("waitForStartup", "w")]
       [HelpText("Waits for a enter to startup the inter-process server")]

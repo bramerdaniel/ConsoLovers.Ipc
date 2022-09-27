@@ -16,6 +16,10 @@ internal class ServerArgs
 {
    #region Public Properties
 
+   [Command("reportResult", "result")]
+   [HelpText("Start a ipc server and reports the specified result after a defined timeout")]
+   public ReportResultCommand ReportResult { get; set; } = null!;
+
    [Command("run", "r", IsDefaultCommand = true)]
    [HelpText("Start a ipc server and reports progress")]
    public RunCommand Run { get; set; } = null!;

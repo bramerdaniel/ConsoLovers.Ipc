@@ -22,9 +22,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    private ResultInfo? result;
 
    private ClientState state = ClientState.Uninitialized;
-
-   private Task<ResultInfo>? waitingTask;
-
+   
    #endregion
 
    #region Constructors and Destructors
@@ -79,15 +77,8 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       return WaitForResultAsync(CancellationToken.None);
    }
 
-   protected override void OnConfigured()
-   {
-      CreateWaitingTask();
-   }
-
-
    public void Dispose()
    {
-      waitingTask?.Dispose();
    }
 
    #endregion
@@ -109,13 +100,16 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
 
    #region Methods
 
-   private void CreateWaitingTask()
+   protected override void OnConfigured()
    {
-      if (waitingTask == null)
-      {
-         var streamingCall = ServiceClient.ResultChanged(new ResultChangedRequest());
-         waitingTask = Task.Run(() => WaitForResult(streamingCall));
-      }
+      Task.Run(ConnectAsync);
+   }
+
+   private async Task ConnectAsync()
+   {
+      State = ClientState.Connecting;
+      await WaitForServerAsync(CancellationToken.None);
+      await WaitForResult();
    }
 
    private void WaitForFinished(CancellationToken cancellationToken)
@@ -153,7 +147,23 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       }
    }
 
-   private async Task<ResultInfo> WaitForResult(AsyncServerStreamingCall<ResultChangedResponse> changed)
+   private async Task WaitForResult()
+   {
+      try
+      {
+         var streamingCall = ServiceClient.ResultChanged(new ResultChangedRequest());
+         await WaitForResult(streamingCall);
+
+         State = ClientState.Closed;
+      }
+      catch (Exception ex)
+      {
+         State = ClientState.Failed;
+         Exception = ex;
+      }
+   }
+
+   private async Task WaitForResult(AsyncServerStreamingCall<ResultChangedResponse> changed)
    {
       try
       {
@@ -171,8 +181,6 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
          Exception = ex;
          result = new ResultInfo(ExitCode: int.MaxValue, Message: ex.Message, Data: new Dictionary<string, string>());
       }
-
-      return Result;
    }
 
    #endregion
