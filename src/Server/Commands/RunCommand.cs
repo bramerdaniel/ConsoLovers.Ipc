@@ -73,8 +73,7 @@ internal class RunCommand : IAsyncCommand<RunCommand.RunArgs>
          resultReporter.ReportSuccess();
          AnsiConsole.WriteLine("shutting down communication server");
       }
-
-      Console.ReadLine();
+      
       AnsiConsole.WriteLine("Setup has finished");
    }
 

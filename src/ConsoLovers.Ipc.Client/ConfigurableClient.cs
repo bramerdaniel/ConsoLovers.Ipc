@@ -28,9 +28,17 @@ public class ConfigurableClient<T> : IConfigurableClient
       OnConfigured();
    }
 
-   public async Task ConnectAsync(CancellationToken cancellationToken)
+   public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
       await SynchronizationClient.WaitForServerAsync(cancellationToken);
+      await OnServerConnectedAsync();
+   }
+
+   /// <summary>Called when the <see cref="SynchronizationClient"/> could be connected to the server</summary>
+   /// <returns></returns>
+   protected virtual Task OnServerConnectedAsync()
+   {
+      return Task.CompletedTask;
    }
 
    #endregion

@@ -15,8 +15,6 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
 {
    #region Constants and Fields
 
-   private Task? progressTask;
-
    private ClientState state = ClientState.Uninitialized;
 
    #endregion
@@ -46,17 +44,9 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
       }
    }
 
-   protected override void OnConfigured()
-   {
-      State = ClientState.Connecting;
-      progressTask = Task.Run(ReadProgress);
-   }
-
-
    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
    public void Dispose()
    {
-      progressTask?.Dispose();
    }
 
    public Task WaitForCompletedAsync()
@@ -67,10 +57,6 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
    /// <summary>Gets the exception that occurred when the state is failed.</summary>
    public Exception? Exception { get; private set; }
 
-   #endregion
-
-   #region Public Methods and Operators
-
    public Task WaitForCompletedAsync(CancellationToken cancellationToken)
    {
       return Task.Run(() => WaitForFinished(cancellationToken));
@@ -80,14 +66,29 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
 
    #region Methods
 
-   private async Task ReadProgress()
+   protected override void OnConfigured()
+   {
+      Task.Run(ConnectAsync);
+   }
+
+   protected override Task OnServerConnectedAsync()
+   {
+      State = ClientState.Active;
+      return Task.CompletedTask;
+   }
+
+   private async Task ConnectAsync()
+   {
+      State = ClientState.Connecting;
+      await WaitForServerAsync(CancellationToken.None);
+      await UpdateProgressAsync();
+   }
+
+   private async Task UpdateProgressAsync()
    {
       try
       {
          var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest());
-         
-         State = ClientState.Active;
-
          while (await streamingCall.ResponseStream.MoveNext(CancellationToken.None))
          {
             var currentResponse = streamingCall.ResponseStream.Current;
@@ -111,9 +112,9 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
       try
       {
          StateChanged += OnStateChanged;
-
          CheckForFinished(State);
-         resetEventSlim.Wait(cancellationToken);
+
+         resetEventSlim?.Wait(cancellationToken);
       }
       catch (OperationCanceledException)
       {
@@ -122,7 +123,6 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
       finally
       {
          StateChanged -= OnStateChanged;
-
       }
 
       void OnStateChanged(object? sender, StateChangedEventArgs e)
@@ -132,10 +132,14 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
 
       void CheckForFinished(ClientState stateToCheck)
       {
+         if (resetEventSlim == null)
+            return;
+
          if (stateToCheck == ClientState.Closed || stateToCheck == ClientState.Failed)
          {
             resetEventSlim.Set();
             resetEventSlim.Dispose();
+            resetEventSlim = null;
          }
       }
    }

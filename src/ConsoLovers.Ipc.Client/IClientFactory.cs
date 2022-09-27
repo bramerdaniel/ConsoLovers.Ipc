@@ -24,4 +24,6 @@ public interface IClientFactory
       where T : class, IConfigurableClient;
 
    #endregion
+
+   
 }

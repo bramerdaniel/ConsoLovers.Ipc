@@ -38,7 +38,7 @@ public class UnixDomainSocketConnectionFactory
          await socket.ConnectAsync(_endPoint, cancellationToken).ConfigureAwait(false);
          return new NetworkStream(socket, true);
       }
-      catch
+      catch(Exception)
       {
          socket.Dispose();
          throw;

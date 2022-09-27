@@ -6,6 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
+using ConsoLovers.Ipc.Clients;
 using ConsoLovers.Ipc.ProcessMonitoring;
 
 /// <summary>Extension methods for the <see cref="IClientFactory"/> interface</summary>
@@ -47,6 +48,33 @@ public static class ClientFactoryExtensions
          throw new ArgumentNullException(nameof(clientFactory));
 
       return clientFactory.CreateClient<IResultClient>();
+   }
+
+   public static Task WaitForServerAsync(this IClientFactory clientFactory, CancellationToken cancellationToken)
+   {
+      if (clientFactory == null)
+         throw new ArgumentNullException(nameof(clientFactory));
+
+      var synchronizationClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
+      return synchronizationClient.WaitForServerAsync(cancellationToken);
+   }
+
+   public static Task WaitForServerAsync(this IClientFactory clientFactory, TimeSpan timeout)
+   {
+      if (clientFactory == null)
+         throw new ArgumentNullException(nameof(clientFactory));
+
+      var synchronizationClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
+      return synchronizationClient.WaitForServerAsync(timeout);
+   }
+
+   public static Task WaitForServerAsync(this IClientFactory clientFactory, TimeSpan timeout, CancellationToken cancellationToken)
+   {
+      if (clientFactory == null)
+         throw new ArgumentNullException(nameof(clientFactory));
+
+      var synchronizationClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
+      return synchronizationClient.WaitForServerAsync(timeout, cancellationToken);
    }
 
    #endregion

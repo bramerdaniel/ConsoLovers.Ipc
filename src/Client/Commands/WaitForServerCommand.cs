@@ -26,10 +26,14 @@ internal class WaitForServerCommand : IAsyncCommand<WaitForServerCommand.WaitArg
 
       try
       {
-         var connectionClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
-         await connectionClient.WaitForServerAsync(TimeSpan.FromSeconds(Arguments.Timeout), cancellationToken);
+         //var connectionClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
+         //await connectionClient.WaitForServerAsync(TimeSpan.FromSeconds(Arguments.Timeout), cancellationToken);
+         var progressClient = clientFactory.CreateProgressClient();
+         await progressClient.WaitForServerAsync(cancellationToken);
 
          AnsiConsole.MarkupLine($"[green]Connected to server {clientFactory.ChannelFactory.ServerName} successfully[/]");
+
+
       }
       catch (OperationCanceledException)
       {

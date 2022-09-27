@@ -15,7 +15,7 @@ public interface IConfigurableClient
    /// <param name="configuration">The configuration the client must use.</param>
    void Configure(IClientConfiguration configuration);
 
-   Task ConnectAsync(CancellationToken cancellationToken);
+   Task WaitForServerAsync(CancellationToken cancellationToken);
 
    #endregion
 }

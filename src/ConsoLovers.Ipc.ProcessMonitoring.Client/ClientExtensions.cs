@@ -53,6 +53,7 @@ public static class ClientExtensions
       clientFactoryBuilder.AddService(s => s.AddSingleton<IProgressClient, ProgressClient>());
       return clientFactoryBuilder;
    }
+   
 
    /// <summary>Adds the <see cref="IResultClient"/>.</summary>
    /// <param name="clientFactoryBuilder">The client factory builder.</param>
