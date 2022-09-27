@@ -1,5 +1,5 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="WaitForCancelCommand.cs" company="ConsoLovers">
+// <copyright file="AwaitCancelCommand.cs" company="ConsoLovers">
 //    Copyright (c) ConsoLovers  2015 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
@@ -12,11 +12,11 @@ using ConsoLovers.Ipc;
 using Server.Annotations;
 
 [UsedImplicitly]
-internal class WaitForCancelCommand : ServerCommand, IAsyncCommand<WaitForCancelCommand.RunArgs>
+internal class AwaitCancelCommand : ServerCommand, IAsyncCommand<AwaitCancelCommand.RunArgs>
 {
    #region Constructors and Destructors
 
-   public WaitForCancelCommand(IConsole console)
+   public AwaitCancelCommand(IConsole console)
       : base(console)
    {
    }

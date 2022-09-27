@@ -15,11 +15,21 @@ using Server.Annotations;
 
 using Spectre.Console;
 
-internal class RunCommand : IAsyncCommand<RunCommand.RunArgs>
+[UsedImplicitly]
+internal class RunCommand : ServerCommand, IAsyncCommand<RunCommand.RunArgs>
 {
    #region Constants and Fields
 
    private readonly CancellationTokenSource tokenSource = new();
+
+   #endregion
+
+   #region Constructors and Destructors
+
+   public RunCommand(IConsole console)
+      : base(console)
+   {
+   }
 
    #endregion
 
@@ -28,52 +38,49 @@ internal class RunCommand : IAsyncCommand<RunCommand.RunArgs>
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
       var serverName = GetServerName();
-      Console.Title = serverName;
       AnsiConsole.WriteLine($"Starting server with name {serverName}");
 
       if (Arguments.WaitForKey)
       {
-         AnsiConsole.MarkupLine($"[blue]Waiting for ENTER to startup the server[/]");
+         AnsiConsole.MarkupLine("[blue]Waiting for ENTER to startup the server[/]");
          Console.ReadLine();
       }
-      
-      using (var communicationServer = CreateCommunicationServer(serverName))
+
+      await using var communicationServer = StartServer(serverName, c => c.AddProcessMonitoring().AddCancellationHandler(CancelExecution));
+
+      var progressReporter = communicationServer.GetProgressReporter();
+      var resultReporter = communicationServer.GetResultReporter();
+
+      var delay = Arguments.ExecutionTime * 9;
+      var stopwatch = Stopwatch.StartNew();
+
+      await AnsiConsole.Progress().StartAsync(async progressContext =>
       {
-         var progressReporter = communicationServer.GetProgressReporter();
-         var resultReporter = communicationServer.GetResultReporter();
-
-         var delay = Arguments.ExecutionTime * 9;
-         var stopwatch = Stopwatch.StartNew();
-
-         await AnsiConsole.Progress().StartAsync(async progressContext =>
+         var progressTask = progressContext.AddTask("Setup Progress");
+         for (var i = 0; i <= 100; i++)
          {
-            var progressTask = progressContext.AddTask("Setup Progress");
-            for (var i = 0; i <= 100; i++)
+            if (tokenSource.Token.IsCancellationRequested)
             {
-               if (tokenSource.Token.IsCancellationRequested)
-               {
-                  resultReporter.AddData("Cancellation", "Cancellation was accepted");
-                  break;
-               }
-
-
-               progressReporter.ReportProgress(i, $"Progress {i}");
-               progressTask.Value = i;
-               if (i == 55)
-                  resultReporter.AddData("FirstError", "Verbogener index auf nummer 55");
-
-               await Task.Delay(delay, cancellationToken);
+               resultReporter.AddData("Cancellation", "Cancellation was accepted");
+               break;
             }
-         });
 
-         stopwatch.Stop();
-         AnsiConsole.MarkupLine($"[blue]execution took {stopwatch.Elapsed}[/]");
+            progressReporter.ReportProgress(i, $"Progress {i}");
+            progressTask.Value = i;
+            if (i == 55)
+               resultReporter.AddData("FirstError", "Bend index on number 55");
 
-         resultReporter.AddData("MoreAdditionalData", "This is additional data");
-         resultReporter.ReportSuccess();
-         AnsiConsole.WriteLine("shutting down communication server");
-      }
-      
+            await Task.Delay(delay, cancellationToken);
+         }
+      });
+
+      stopwatch.Stop();
+      AnsiConsole.MarkupLine($"[blue]execution took {stopwatch.Elapsed}[/]");
+
+      resultReporter.AddData("MoreAdditionalData", "This is additional data");
+      resultReporter.ReportSuccess();
+      AnsiConsole.WriteLine("shutting down communication server");
+
       AnsiConsole.WriteLine("Setup has finished");
    }
 
@@ -87,17 +94,6 @@ internal class RunCommand : IAsyncCommand<RunCommand.RunArgs>
    {
       tokenSource.Cancel();
       return tokenSource.IsCancellationRequested;
-   }
-
-   private IIpcServer CreateCommunicationServer(string serverName)
-   {
-      return IpcServer
-         .CreateServer()
-         .ForName(serverName)
-         .AddGrpcReflection()
-         .AddProcessMonitoring()
-         .AddCancellationHandler(CancelExecution)
-         .Start();
    }
 
    private string GetServerName()
@@ -116,14 +112,14 @@ internal class RunCommand : IAsyncCommand<RunCommand.RunArgs>
    {
       #region Public Properties
 
-      [Argument("name", "server")]
-      [HelpText("The name the server should run under")]
-      public string? ServerName { get; set; }
-
       [Argument("time", "t")]
       [HelpText("Execution time in seconds")]
       public int ExecutionTime { get; set; } = 5;
-      
+
+      [Argument("name", "server")]
+      [HelpText("The name the server should run under")]
+      public string? ServerName { get; set; } = null;
+
       [Option("waitForStartup", "w")]
       [HelpText("Waits for a enter to startup the inter-process server")]
       public bool WaitForKey { get; set; }
