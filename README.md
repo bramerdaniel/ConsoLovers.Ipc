@@ -41,12 +41,12 @@ dependency injection container, and use them in your application logic.
          for (int i = 0; i <= 100; i++)
             reporter.ReportProgress(i, $"Hello from {i}");
 
-         result.Success();
+         result.ReportSuccess();
       }
       catch (Exception e)
       {
          result.AddData(nameof(e.StackTrace), e.StackTrace);
-         result.ReportResult(1, e.Message);
+         result.ReportError(1, e.Message);
       }
 ```
 
