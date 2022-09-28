@@ -1,7 +1,6 @@
 ﻿namespace ProcessMonitoringServerExtension
 {
    using ConsoLovers.ConsoleToolkit.Core;
-   using ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension;
 
    internal static class Program
    {

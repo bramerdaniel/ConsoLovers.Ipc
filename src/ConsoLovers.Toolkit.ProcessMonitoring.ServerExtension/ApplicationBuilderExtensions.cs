@@ -4,7 +4,8 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension;
+// ReSharper disable once CheckNamespace
+namespace ConsoLovers.ConsoleToolkit.Core;
 
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.Ipc;

@@ -25,9 +25,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Ipc.ProcessMonitoring.Server", "..\ConsoLovers.Ipc.ProcessMonitoring.Server\ConsoLovers.Ipc.ProcessMonitoring.Server.csproj", "{8E6B5510-AC53-44E1-996C-59FE7D1A5A8C}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{706A1372-2B78-4E86-8CD7-A1BC7CF76B84}"
-	ProjectSection(SolutionItems) = preProject
-		..\Client\Program.cs = ..\Client\Program.cs
-	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{7A986E39-821E-49B3-AB03-C51BF0B94719}"
 EndProject
@@ -39,7 +36,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Extensions", "Extensions", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension", "..\ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension\ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension.csproj", "{8F126B0A-B0C6-485F-ABB2-9418387B5703}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProcessMonitoringServerExtension", "..\Examples\ProcessMonitoringServerExtension\ProcessMonitoringServerExtension.csproj", "{AC54E67A-DAD4-4072-93C8-BCE6FF6ABF52}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProcessMonitoringServerExtension", "..\Examples\ProcessMonitoringServerExtension\ProcessMonitoringServerExtension.csproj", "{AC54E67A-DAD4-4072-93C8-BCE6FF6ABF52}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Toolkit.Ipc.ServerExtension", "..\ConsoLovers.Toolkit.Ipc.ServerExtension\ConsoLovers.Toolkit.Ipc.ServerExtension.csproj", "{6B4830F2-9796-41E9-BC80-E6DA24408BBA}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IpcServerExtension", "..\Examples\IpcServerExtension\IpcServerExtension.csproj", "{C62DBCEE-47D3-4B11-9C68-757D181260C4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -87,6 +88,14 @@ Global
 		{AC54E67A-DAD4-4072-93C8-BCE6FF6ABF52}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AC54E67A-DAD4-4072-93C8-BCE6FF6ABF52}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AC54E67A-DAD4-4072-93C8-BCE6FF6ABF52}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6B4830F2-9796-41E9-BC80-E6DA24408BBA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6B4830F2-9796-41E9-BC80-E6DA24408BBA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6B4830F2-9796-41E9-BC80-E6DA24408BBA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6B4830F2-9796-41E9-BC80-E6DA24408BBA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C62DBCEE-47D3-4B11-9C68-757D181260C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C62DBCEE-47D3-4B11-9C68-757D181260C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C62DBCEE-47D3-4B11-9C68-757D181260C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C62DBCEE-47D3-4B11-9C68-757D181260C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -98,6 +107,8 @@ Global
 		{4823265C-4780-4ACD-8F80-E08304A21177} = {7A986E39-821E-49B3-AB03-C51BF0B94719}
 		{8F126B0A-B0C6-485F-ABB2-9418387B5703} = {CE55094C-CF23-4178-BB43-5E8DC9E12868}
 		{AC54E67A-DAD4-4072-93C8-BCE6FF6ABF52} = {706A1372-2B78-4E86-8CD7-A1BC7CF76B84}
+		{6B4830F2-9796-41E9-BC80-E6DA24408BBA} = {CE55094C-CF23-4178-BB43-5E8DC9E12868}
+		{C62DBCEE-47D3-4B11-9C68-757D181260C4} = {706A1372-2B78-4E86-8CD7-A1BC7CF76B84}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08AF8FBA-696A-4E00-BAFC-F1A170E7E5A6}
