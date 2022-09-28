@@ -1,4 +1,4 @@
-# ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension
+# ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension?style=plastic)
 
 The package contains a set of extensions, that makes the usage and configuration of the ConsoLovers.Ipc.ProcessMonitoring.Server package easier. 
 
