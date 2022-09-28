@@ -22,7 +22,14 @@ When you are using the ConsoLovers.ConsoleToolkit you can use the following pack
 
 Package  | Version | Description
 -------- | -------- | --------
-ConsoLovers.Toolkit.Ipc.ServerExtension   | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.Ipc.ServerExtension?style=plastic) | Easy usage of the ConsoLovers.Ipc.Server
+ConsoLovers.Toolkit.Ipc.ServerExtension   | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.Ipc.ServerExtension?style=plastic) | Easy usage of the ConsoLovers.Ipc.Server combination with the ConsoLovers.ConsoleToolkit.Core
+ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension  | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension?style=plastic)| Easy usage of the ConsoLovers.Ipc.ProcessMonitoring.Server in combination with the ConsoLovers.ConsoleToolkit.Core
+
+
+
+
+
+
 
 ## Usage on server side
 This is how you set it up on the server side with the example of the ProcessMonitoring package
