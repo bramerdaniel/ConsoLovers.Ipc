@@ -12,6 +12,7 @@ using ConsoLovers.Ipc;
 
 using Microsoft.Extensions.DependencyInjection;
 
+/// <summary>A bunch of extensions methods for the IApplicationBuilder{T} interface</summary>
 public static class ApplicationBuilderExtensions
 {
    #region Public Methods and Operators
@@ -24,6 +25,9 @@ public static class ApplicationBuilderExtensions
    public static IApplicationBuilder<T> AddGrpcService<T>(this IApplicationBuilder<T> builder, Type serviceType)
       where T : class
    {
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
+
       builder.ConfigureService(x =>
       {
          var serverBuilder = x.GetRequiredService<IServerBuilder>();
@@ -70,6 +74,8 @@ public static class ApplicationBuilderExtensions
    public static IApplicationBuilder<T> AddIpcServer<T>(this IApplicationBuilder<T> builder, Func<IServerBuilderWithoutName, IServerBuilder> config)
       where T : class
    {
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
       if (config == null)
          throw new ArgumentNullException(nameof(config));
 
@@ -82,11 +88,13 @@ public static class ApplicationBuilderExtensions
    /// <typeparam name="T">The argument type of the application</typeparam>
    /// <param name="builder">The <see cref="IServerConfiguration"/> of the <see cref="IIpcServer"/>.</param>
    /// <param name="configAction">The configuration action.</param>
-   /// <returns></returns>
+   /// <returns>The current <see cref="IApplicationBuilder{T}"/> for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">configAction</exception>
    public static IApplicationBuilder<T> ConfigureIpcServer<T>(this IApplicationBuilder<T> builder, Action<IServerConfiguration> configAction)
       where T : class
    {
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
       if (configAction == null)
          throw new ArgumentNullException(nameof(configAction));
 

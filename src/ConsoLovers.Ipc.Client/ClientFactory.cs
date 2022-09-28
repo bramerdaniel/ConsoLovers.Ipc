@@ -29,7 +29,7 @@ internal class ClientFactory : IClientFactory
 
    /// <summary>Creates and configures the requested client.</summary>
    /// <typeparam name="T">The type of the client to create</typeparam>
-   /// <returns></returns>
+   /// <returns>The created client</returns>
    public T CreateClient<T>()
       where T : class, IConfigurableClient
    {
@@ -38,13 +38,15 @@ internal class ClientFactory : IClientFactory
       return client;
    }
 
-   private T CreateInstance<T>()
-      where T : class, IConfigurableClient
-   {
-      CheckForBuildInClients(typeof(T));
+   #endregion
 
-      return ActivatorUtilities.CreateInstance<T>(ServiceProvider);
-   }
+   #region Properties
+
+   private IServiceProvider ServiceProvider { get; }
+
+   #endregion
+
+   #region Methods
 
    private static void CheckForBuildInClients(Type serviceType)
    {
@@ -55,7 +57,6 @@ internal class ClientFactory : IClientFactory
          throw new InvalidOperationException(CreateMessage(serviceType, "AddProgressClient"));
       if (serviceType.Name == "ICancellationClient")
          throw new InvalidOperationException(CreateMessage(serviceType, "AddCancellationClient"));
-
    }
 
    private static string CreateMessage(Type serviceType, string addMethod)
@@ -66,11 +67,13 @@ internal class ClientFactory : IClientFactory
       return builder.ToString();
    }
 
-   #endregion
+   private T CreateInstance<T>()
+      where T : class, IConfigurableClient
+   {
+      CheckForBuildInClients(typeof(T));
 
-   #region Properties
-
-   private IServiceProvider ServiceProvider { get; }
+      return ActivatorUtilities.CreateInstance<T>(ServiceProvider);
+   }
 
    #endregion
 }

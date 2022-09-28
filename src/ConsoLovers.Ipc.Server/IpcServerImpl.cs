@@ -37,7 +37,7 @@ internal sealed class IpcServerImpl : IIpcServer
 
    /// <summary>Gets the service.</summary>
    /// <param name="serviceType">Type of the service.</param>
-   /// <returns></returns>
+   /// <returns>The requested service or null</returns>
    /// <exception cref="System.ArgumentNullException">serviceType</exception>
    public object? GetService(Type serviceType)
    {
@@ -56,7 +56,7 @@ internal sealed class IpcServerImpl : IIpcServer
    }
 
    /// <summary>Disposes the asynchronous.</summary>
-   /// <returns></returns>
+   /// <returns>A task that represents the asynchronous dispose operation.</returns>
    public async ValueTask DisposeAsync()
    {
       await webApplication.StopAsync();

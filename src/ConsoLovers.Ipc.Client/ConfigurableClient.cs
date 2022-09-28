@@ -35,7 +35,7 @@ public class ConfigurableClient<T> : IConfigurableClient
    }
 
    /// <summary>Called when the <see cref="SynchronizationClient"/> could be connected to the server</summary>
-   /// <returns></returns>
+   /// <returns>The task</returns>
    protected virtual Task OnServerConnectedAsync()
    {
       return Task.CompletedTask;
