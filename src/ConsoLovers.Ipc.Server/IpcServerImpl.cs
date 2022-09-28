@@ -20,10 +20,14 @@ internal sealed class IpcServerImpl : IIpcServer
 
    /// <summary>Initializes a new instance of the <see cref="IpcServerImpl"/> class.</summary>
    /// <param name="webApplication">The web application.</param>
+   /// <param name="name">The name of the server.</param>
+   /// <exception cref="System.ArgumentNullException">name or webApplication</exception>
    /// <exception cref="ArgumentNullException">webApplication</exception>
-   internal IpcServerImpl(WebApplication webApplication)
+   internal IpcServerImpl(WebApplication webApplication, string name)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));
+      Name = name ?? throw new ArgumentNullException(nameof(name));
+
       ServerTask = webApplication.RunAsync();
    }
 
@@ -59,6 +63,9 @@ internal sealed class IpcServerImpl : IIpcServer
       await webApplication.DisposeAsync();
       await ServerTask;
    }
+
+   /// <summary>Gets the name of the server.</summary>
+   public string Name { get; }
 
    #endregion
 

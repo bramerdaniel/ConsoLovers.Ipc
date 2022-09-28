@@ -6,10 +6,7 @@
 
 namespace ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension;
 
-using System.Resources;
-
 using ConsoLovers.ConsoleToolkit.Core;
-using ConsoLovers.ConsoleToolkit.Core.Services;
 using ConsoLovers.Ipc;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -19,23 +16,52 @@ public static class ApplicationBuilderExtensions
    public static IApplicationBuilder<T> AddProcessMonitoringServer<T>(this IApplicationBuilder<T> builder)
       where T : class
    {
-      builder.AddService(x => x.AddSingleton(CreateServerBuilder));
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
+
+      return builder.AddProcessMonitoringServer(b => b.ForCurrentProcess());
+   }
+
+   public static IApplicationBuilder<T> AddProcessMonitoringServer<T>(this IApplicationBuilder<T> builder, Func<IServerBuilderWithoutName, IServerBuilder> config)
+      where T : class
+   {
+      if (config == null)
+         throw new ArgumentNullException(nameof(config));
+
+      builder.AddService(x => x.AddSingleton(s => CreateServerBuilder(s, config)));
       builder.AddService(x => x.AddSingleton(CreateIpcServer));
+      builder.AddProcessMonitoringServices();
+      return builder;
+   }   
+   
+   public static IApplicationBuilder<T> AddProcessMonitoringServices<T>(this IApplicationBuilder<T> builder)
+      where T : class
+   {
+      builder.AddService(x => x.AddSingleton(AddIpcService<IProgressReporter>));
+      builder.AddService(x => x.AddSingleton(AddIpcService<IResultReporter>));
+      builder.AddService(x => x.AddSingleton(AddIpcService<ICancellationHandler>));
       return builder;
    }
 
-   private static IServerBuilder CreateServerBuilder(IServiceProvider services)
+   private static T AddIpcService<T>(IServiceProvider serviceProvider)
+      where T : notnull
    {
-      var serverBuilder = IpcServer.CreateServer()
-         .ForCurrentProcess()
-         .AddProcessMonitoring()
-         .RemoveAspNetCoreLogging();
+      var ipcServer = serviceProvider.GetRequiredService<IIpcServer>();
+      return ipcServer.GetRequiredService<T>();
+   }
 
-      return serverBuilder;
+   private static IServerBuilder CreateServerBuilder(IServiceProvider services, Func<IServerBuilderWithoutName, IServerBuilder> config)
+   {
+      var builderWithoutName = IpcServer.CreateServer();
+      var builder = config(builderWithoutName);
+      return builder.AddProcessMonitoring()
+         .RemoveAspNetCoreLogging();
    }
    private static IIpcServer CreateIpcServer(IServiceProvider services)
    {
       var builder = services.GetRequiredService<IServerBuilder>();
       return builder.Start();
    }
+
+
 }

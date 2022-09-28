@@ -7,8 +7,8 @@
    {
       static async Task Main()
       {
-         await ConsoleApplication.WithArguments<Args>()
-            .AddProcessMonitoringServer()
+         await ConsoleApplication.WithArguments<ApplicationArgs>()
+            .AddProcessMonitoringServer(config => config.ForName("server"))
             .RunAsync();
       }
    }

@@ -10,8 +10,6 @@ extern alias LoggingExtensions;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-using ConsoLovers.Ipc.Grpc;
-
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -96,7 +94,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       foreach (var action in applicationActions)
          action(application);
 
-      return new IpcServerImpl(application);
+      return new IpcServerImpl(application, Name);
    }
 
    #endregion
@@ -107,8 +105,9 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    {
       if (name == null)
          throw new ArgumentNullException(nameof(name));
-      EnsureValidFileName(name);
 
+      EnsureValidFileName(name);
+      Name = name;
       return WithSocketFile(() => Path.Combine(Path.GetTempPath(), $"{name}.uds"));
    }
 
@@ -125,6 +124,8 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
          options.ListenUnixSocket(socketFile, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
       });
 
+      if (string.IsNullOrWhiteSpace(Name))
+         Name = Path.GetFileNameWithoutExtension(socketFile);
       return this;
    }
 
@@ -144,6 +145,8 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    #endregion
 
    #region Properties
+
+   internal string Name { get; private set; }
 
    /// <summary>Gets the web application builder.</summary>
    /// <value>The web application builder.</value>
