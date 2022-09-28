@@ -18,6 +18,11 @@ ConsoLovers.Ipc.Client   | [![NuGet version (ConsoLovers.Ipc.Client)](https://im
 ConsoLovers.Ipc.ProcessMonitoring.Server   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Server/) | Server package for a process that should be monitored
 ConsoLovers.Ipc.ProcessMonitoring.Client   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Client/)  | Client package for applications that want to monitor processes hosting the ConsoLovers.Ipc.ProcessMonitoring.Server package services
 
+When you are using the ConsoLovers.ConsoleToolkit you can use the following packages
+
+Package  | Version | Description
+-------- | -------- | --------
+ConsoLovers.Toolkit.Ipc.ServerExtension   | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.Ipc.ServerExtension?style=plastic) | Easy usage of the ConsoLovers.Ipc.Server
 
 ## Usage on server side
 This is how you set it up on the server side with the example of the ProcessMonitoring package
