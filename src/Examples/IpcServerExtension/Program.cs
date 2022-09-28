@@ -10,8 +10,7 @@
       static async Task Main()
       {
          await ConsoleApplication.WithArguments<ApplicationArgs>()
-            .AddIpcServer("abc123")
-            .ConfigureIpcServer(x => x.RemoveAspNetCoreLogging())
+            .AddIpcServer(c => c.ForName("abc123"), false)
             .AddGrpcService(typeof(GreeterService))
             .RunAsync();
       }

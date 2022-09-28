@@ -1,4 +1,4 @@
-# ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension
+# ConsoLovers.Toolkit.Ipc.ServerExtension
 
 The package contains a set of extensions, that makes the usage and configuration of the ConsoLovers.Ipc.ProcessMonitoring.Server package easier. 
 

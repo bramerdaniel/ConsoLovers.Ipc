@@ -69,9 +69,24 @@ public static class ApplicationBuilderExtensions
    /// <summary>Adds an <see cref="IIpcServer"/> to the applications services.</summary>
    /// <typeparam name="T">The argument type of the application</typeparam>
    /// <param name="builder">The builder.</param>
+   /// <param name="config">The configuration.</param>
    /// <returns>The current <see cref="IApplicationBuilder{T}"/> for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IApplicationBuilder<T> AddIpcServer<T>(this IApplicationBuilder<T> builder, Func<IServerBuilderWithoutName, IServerBuilder> config)
+   public static IApplicationBuilder<T> AddIpcServer<T>(this IApplicationBuilder<T> builder, Action<IServerBuilderWithoutName> config)
+      where T : class
+   {
+      return builder.AddIpcServer(config, true);
+   }
+
+   /// <summary>Adds an <see cref="IIpcServer"/> to the applications services.</summary>
+   /// <typeparam name="T">The argument type of the application</typeparam>
+   /// <param name="builder">The builder.</param>
+   /// <param name="config">The configuration action.</param>
+   /// <param name="removeAspNetCoreLogging">if set to <c>true</c> the loggers of ASPNetCore will be removed, otherwise they will log to the console.</param>
+   /// <returns>The current <see cref="IApplicationBuilder{T}"/> for more fluent configuration</returns>
+   /// <exception cref="System.ArgumentNullException">builder</exception>
+   public static IApplicationBuilder<T> AddIpcServer<T>(this IApplicationBuilder<T> builder, Action<IServerBuilderWithoutName> config,
+      bool removeAspNetCoreLogging)
       where T : class
    {
       if (builder == null)
@@ -79,7 +94,7 @@ public static class ApplicationBuilderExtensions
       if (config == null)
          throw new ArgumentNullException(nameof(config));
 
-      builder.AddService(x => x.AddSingleton(_ => CreateServerBuilder(config)));
+      builder.AddService(x => x.AddSingleton(_ => CreateServerBuilder(config, removeAspNetCoreLogging)));
       builder.AddService(x => x.AddSingleton(CreateIpcServer));
       return builder;
    }
@@ -116,12 +131,15 @@ public static class ApplicationBuilderExtensions
       return builder.Start();
    }
 
-   private static IServerBuilder CreateServerBuilder(Func<IServerBuilderWithoutName, IServerBuilder> config)
+   private static IServerBuilder CreateServerBuilder(Action<IServerBuilderWithoutName> config, bool removeAspLoggin)
    {
       var builderWithoutName = IpcServer.CreateServer();
-      var builder = config(builderWithoutName);
+      config(builderWithoutName);
+      var serverBuilder = (IServerBuilder)builderWithoutName;
+      if (removeAspLoggin)
+         serverBuilder.RemoveAspNetCoreLogging();
 
-      return builder;
+      return serverBuilder;
    }
 
    #endregion
