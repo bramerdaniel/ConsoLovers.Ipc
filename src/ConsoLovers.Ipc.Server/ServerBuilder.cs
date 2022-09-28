@@ -8,9 +8,8 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
-
-using ConsoLovers.Ipc.Grpc;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -40,6 +39,8 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    #endregion
 
    #region IServerBuilder Members
+
+
 
    public IServerBuilder AddService(Action<IServiceCollection> serviceSetup)
    {
@@ -87,6 +88,20 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       return this;
    }
 
+   public IServerBuilder AddGrpcService(Type serviceType)
+   {
+      var method = typeof(ServerBuilder).GetMethods()
+         .FirstOrDefault(x => x.Name == nameof(AddGrpcService) && x.IsGenericMethod);
+
+      // MethodInfo methodInfo = typeof(ServerBuilder).GetMethod(nameof(ServerBuilder.AddGrpcService),BindingFlags.Public, new Type[]{ serviceType });
+      MethodInfo generic = method.MakeGenericMethod(serviceType);
+      generic.Invoke(this, null);
+
+      AddService(x => x.AddSingleton(serviceType));
+
+      return this;
+   }
+
    public IIpcServer Start()
    {
       WebApplicationBuilder.Services.AddGrpc();
@@ -96,7 +111,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       foreach (var action in applicationActions)
          action(application);
 
-      return new IpcServerImpl(application);
+      return new IpcServerImpl(application, Name);
    }
 
    #endregion
@@ -107,8 +122,9 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    {
       if (name == null)
          throw new ArgumentNullException(nameof(name));
-      EnsureValidFileName(name);
 
+      EnsureValidFileName(name);
+      Name = name;
       return WithSocketFile(() => Path.Combine(Path.GetTempPath(), $"{name}.uds"));
    }
 
@@ -125,6 +141,8 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
          options.ListenUnixSocket(socketFile, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
       });
 
+      if (string.IsNullOrWhiteSpace(Name))
+         Name = Path.GetFileNameWithoutExtension(socketFile);
       return this;
    }
 
@@ -144,6 +162,8 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    #endregion
 
    #region Properties
+
+   internal string Name { get; private set; }
 
    /// <summary>Gets the web application builder.</summary>
    /// <value>The web application builder.</value>

@@ -18,13 +18,23 @@ public static class ServerExtensions
 {
    #region Public Methods and Operators
 
+   /// <summary>Adds gRPC reflection to the server services.</summary>
+   /// <param name="builder">The configuration.</param>
+   /// <returns>The configuration for more fluent configuration</returns>
+   public static T AddGrpcReflection<T>(this T builder)
+      where T : IServerConfiguration
+   {
+      return builder.ConfigureWebApplication(app => app.Services.AddGrpcReflection());
+   }
+
    /// <summary>Configures the web application before it is build.</summary>
-   /// <param name="builder">The builder.</param>
+   /// <param name="builder">The configuration.</param>
    /// <param name="configureWebApplication">The configure web application.</param>
-   /// <returns>The builder for more fluent configuration</returns>
+   /// <returns>The configuration for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">configureWebApplication</exception>
-   /// <exception cref="System.ArgumentException">The specified {nameof(builder)} must be of type {{typeof(ServerBuilder).Name}}</exception>
-   public static IServerBuilder ConfigureWebApplication(this IServerBuilder builder, Action<WebApplicationBuilder> configureWebApplication)
+   /// <exception cref="System.ArgumentException">The specified {nameof(configuration)} must be of type {{typeof(ServerBuilder).Name}}</exception>
+   public static T ConfigureWebApplication<T>(this T builder, Action<WebApplicationBuilder> configureWebApplication)
+      where T : IServerConfiguration
    {
       if (configureWebApplication == null)
          throw new ArgumentNullException(nameof(configureWebApplication));
@@ -34,14 +44,6 @@ public static class ServerExtensions
 
       configureWebApplication(serverBuilder.WebApplicationBuilder);
       return builder;
-   }
-
-   /// <summary>Adds gRPC reflection to the server services.</summary>
-   /// <param name="builder">The builder.</param>
-   /// <returns>The builder for more fluent configuration</returns>
-   public static IServerBuilder AddGrpcReflection(this IServerBuilder builder)
-   {
-      return builder.ConfigureWebApplication(app => app.Services.AddGrpcReflection());
    }
 
    /// <summary>Adds a service as singleton only if it was not already added.</summary>
@@ -62,9 +64,9 @@ public static class ServerExtensions
    }
 
    /// <summary>Gets a <see cref="IServerBuilder"/> for the current process.</summary>
-   /// <param name="builder">The builder without the server name specified.</param>
+   /// <param name="builder">The configuration without the server name specified.</param>
    /// <returns>The <see cref="IServerBuilder"/></returns>
-   /// <exception cref="System.ArgumentNullException">builder</exception>
+   /// <exception cref="System.ArgumentNullException">configuration</exception>
    public static IServerBuilder ForCurrentProcess(this IServerBuilderWithoutName builder)
    {
       if (builder == null)
@@ -74,15 +76,15 @@ public static class ServerExtensions
    }
 
    /// <summary>Configures the web application before it is build.</summary>
-   /// <param name="builder">The builder.</param>
-   /// <returns>The builder for more fluent configuration</returns>
+   /// <param name="configuration">The configuration.</param>
+   /// <returns>The configuration for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">configureWebApplication</exception>
-   /// <exception cref="System.ArgumentException">The specified {nameof(builder)} must be of type {{typeof(ServerBuilder).Name}}</exception>
-   public static IServerBuilder RemoveAspNetCoreLogging(this IServerBuilder builder)
+   /// <exception cref="System.ArgumentException">The specified {nameof(configuration)} must be of type {{typeof(ServerBuilder).Name}}</exception>
+   public static T RemoveAspNetCoreLogging<T>(this T configuration)
+      where T : IServerConfiguration
    {
-      builder.ConfigureWebApplication(webApp => { webApp.Logging.ClearProviders(); });
-
-      return builder;
+      configuration.ConfigureWebApplication(webApp => { webApp.Logging.ClearProviders(); });
+      return configuration;
    }
 
    #endregion

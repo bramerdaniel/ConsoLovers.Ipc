@@ -38,7 +38,7 @@ public static class IpcServerExtensions
    /// <param name="server">The server that had the error.</param>
    /// <param name="exitCode">The exit code of the server.</param>
    /// <param name="message">The message for the error code.</param>
-   /// <returns></returns>
+   /// <returns>The server the method was called on</returns>
    /// <exception cref="System.ArgumentNullException">server</exception>
    public static IIpcServer ReportError(this IIpcServer server, int exitCode, string message)
    {
@@ -52,7 +52,7 @@ public static class IpcServerExtensions
    /// <summary>Reports the error code to the clients.</summary>
    /// <param name="server">The server that had the error.</param>
    /// <param name="exitCode">The exit code of the server.</param>
-   /// <returns></returns>
+   /// <returns>The server the method was called on</returns>
    /// <exception cref="System.ArgumentNullException">server</exception>
    public static IIpcServer ReportError(this IIpcServer server, int exitCode)
    {

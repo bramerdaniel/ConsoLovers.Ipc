@@ -15,7 +15,7 @@ public interface IClientFactoryBuilder
 
    /// <summary>Adds a service to the <see cref="IClientFactoryBuilder"/>.</summary>
    /// <param name="services">The services.</param>
-   /// <returns></returns>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
    IClientFactoryBuilder AddService(Action<ServiceCollection> services);
 
    /// <summary>Builds the <see cref="IClientFactory"/>.</summary>

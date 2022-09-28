@@ -12,4 +12,10 @@ namespace ConsoLovers.Ipc;
 /// <seealso cref="System.IAsyncDisposable"/>
 public interface IIpcServer : IServiceProvider, IDisposable, IAsyncDisposable
 {
+   #region Public Properties
+
+   /// <summary>Gets the name of the server.</summary>
+   string Name { get; }
+
+   #endregion
 }

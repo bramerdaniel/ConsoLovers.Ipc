@@ -19,7 +19,7 @@ public interface IClientFactory
 
    /// <summary>Creates and configures the requested client.</summary>
    /// <typeparam name="T">The type of the client to create</typeparam>
-   /// <returns></returns>
+   /// <returns>The created client</returns>
    T CreateClient<T>()
       where T : class, IConfigurableClient;
 

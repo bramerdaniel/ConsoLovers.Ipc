@@ -20,10 +20,14 @@ internal sealed class IpcServerImpl : IIpcServer
 
    /// <summary>Initializes a new instance of the <see cref="IpcServerImpl"/> class.</summary>
    /// <param name="webApplication">The web application.</param>
+   /// <param name="name">The name of the server.</param>
+   /// <exception cref="System.ArgumentNullException">name or webApplication</exception>
    /// <exception cref="ArgumentNullException">webApplication</exception>
-   internal IpcServerImpl(WebApplication webApplication)
+   internal IpcServerImpl(WebApplication webApplication, string name)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));
+      Name = name ?? throw new ArgumentNullException(nameof(name));
+
       ServerTask = webApplication.RunAsync();
    }
 
@@ -33,7 +37,7 @@ internal sealed class IpcServerImpl : IIpcServer
 
    /// <summary>Gets the service.</summary>
    /// <param name="serviceType">Type of the service.</param>
-   /// <returns></returns>
+   /// <returns>The requested service or null</returns>
    /// <exception cref="System.ArgumentNullException">serviceType</exception>
    public object? GetService(Type serviceType)
    {
@@ -52,13 +56,16 @@ internal sealed class IpcServerImpl : IIpcServer
    }
 
    /// <summary>Disposes the asynchronous.</summary>
-   /// <returns></returns>
+   /// <returns>A task that represents the asynchronous dispose operation.</returns>
    public async ValueTask DisposeAsync()
    {
       await webApplication.StopAsync();
       await webApplication.DisposeAsync();
       await ServerTask;
    }
+
+   /// <summary>Gets the name of the server.</summary>
+   public string Name { get; }
 
    #endregion
 
