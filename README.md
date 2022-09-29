@@ -32,7 +32,7 @@
 It is a small library for inter-process communication on a single machine,
 using [gRPC](https://grpc.io/) with [Unix Domain Sockets](https://de.wikipedia.org/wiki/Unix_Domain_Socket).
 Microsoft has an article called [Inter-process communication with gRPC](https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess?view=aspnetcore-6.0#configure-unix-domain-sockets),
-and the [ConsoLovers.Ipc.Server](https://www.nuget.org/packages/ConsoLovers.Ipc.Server) & Clients packages provide an easy and flexible implementation, 
+and the [ConsoLovers.Ipc.Server](https://www.nuget.org/packages/ConsoLovers.Ipc.Server) & Client packages provide an easy and flexible implementation, 
 without having to care about all the infratructure setup, that needs to be done.
 
 ## The available packages
