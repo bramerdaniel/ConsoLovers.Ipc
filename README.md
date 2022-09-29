@@ -21,6 +21,9 @@
    <a href="https://www.nuget.org/packages/ConsoLovers.Ipc.Client">
      <img alt="Nuget (with prereleases)" src="https://img.shields.io/nuget/vpre/ConsoLovers.Ipc.Client?label=nuget%20%28Client%29">
    </a>
+
+  
+  <img alt="platform" src="https://img.shields.io/badge/platform-win%20%7C%20linux-blue">
 </div>
 
 
