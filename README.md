@@ -1,10 +1,33 @@
-# ConsoLovers.Ipc [![ConsoLovers.Ipc](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master)](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)
+<h1 align="center">ConsoLovers.Ipc.Sever & Client </h1>
+<h4 align="center">Easy to use inter-process communication with <a href="https://grpc.io">gRPC</a> and <a href="https://de.wikipedia.org/wiki/Unix_Domain_Socket">unix domain sockets</a></h4>
 
-## What is it ?
+<div align="center">
+  <!-- License -->
+    <a href="https://github.com/bramerdaniel/ConsoLovers.Ipc/blob/15d081396399fe773bb072f5b3e6a7102549aaf0/LICENSE">
+      <img alt="GitHub" src="https://img.shields.io/github/license/bramerdaniel/ConsoLovers.Ipc?style=flat">
+    </a>
+
+  <!-- Build Status -->
+  <a href="https://travis-ci.org/choojs/choo">
+    <img src="https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master" alt="Build Status" />
+  </a>
+  
+   <!-- Server nuget package -->
+  <a href="https://www.nuget.org/packages/ConsoLovers.Ipc.Server">
+     <img alt="Nuget (with prereleases)" src="https://img.shields.io/nuget/vpre/ConsoLovers.Ipc.Server?label=nuget%20%28Sever%29">
+  </a>
+  
+  <!-- Client nuget package -->
+   <a href="https://www.nuget.org/packages/ConsoLovers.Ipc.Client">
+     <img alt="Nuget (with prereleases)" src="https://img.shields.io/nuget/vpre/ConsoLovers.Ipc.Client?label=nuget%20%28Client%29">
+   </a>
+</div>
+
+## Description
 It is a small library for inter-process communication on a single machine,
 using [gRPC](https://grpc.io/) with [Unix Domain Sockets](https://de.wikipedia.org/wiki/Unix_Domain_Socket).
 Microsoft has an article called [Inter-process communication with gRPC](https://learn.microsoft.com/en-us/aspnet/core/grpc/interprocess?view=aspnetcore-6.0#configure-unix-domain-sockets),
-and the [ConsoLovers.Ipc package](https://www.nuget.org/packages/ConsoLovers.Ipc) provides an easy and flexible implementation, 
+and the ConsoLovers.Ipc.Server & Clients packages provide an easy and flexible implementation, 
 without having to care about all the infratructure setup, that needs to be done.
 
 ## The available packages
@@ -22,8 +45,8 @@ When you are using the ConsoLovers.ConsoleToolkit you can use the following pack
 
 Package  | Version | Description
 -------- | -------- | --------
-ConsoLovers.Toolkit.Ipc.ServerExtension   | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.Ipc.ServerExtension?style=plastic) | Easy usage of the ConsoLovers.Ipc.Server combination with the ConsoLovers.ConsoleToolkit.Core
-ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension  | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension?style=plastic)| Easy usage of the ConsoLovers.Ipc.ProcessMonitoring.Server in combination with the ConsoLovers.ConsoleToolkit.Core
+ConsoLovers.Toolkit   .Ipc.ServerExtension   | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.Ipc.ServerExtension?style=plastic) | Easy usage of the ConsoLovers.Ipc.Server combination with the ConsoLovers.ConsoleToolkit.Core
+ConsoLovers.Toolkit   .ProcessMonitoring.ServerExtension  | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension?style=plastic)| Easy usage of the ConsoLovers.Ipc.ProcessMonitoring.Server in combination with the ConsoLovers.ConsoleToolkit.Core
 
 
 
