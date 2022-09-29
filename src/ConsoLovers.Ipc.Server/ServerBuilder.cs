@@ -8,7 +8,6 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
 
 using Microsoft.AspNetCore.Builder;
@@ -39,8 +38,6 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    #endregion
 
    #region IServerBuilder Members
-
-
 
    public IServerBuilder AddService(Action<IServiceCollection> serviceSetup)
    {
@@ -93,12 +90,13 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       var method = typeof(ServerBuilder).GetMethods()
          .FirstOrDefault(x => x.Name == nameof(AddGrpcService) && x.IsGenericMethod);
 
-      // MethodInfo methodInfo = typeof(ServerBuilder).GetMethod(nameof(ServerBuilder.AddGrpcService),BindingFlags.Public, new Type[]{ serviceType });
-      MethodInfo generic = method.MakeGenericMethod(serviceType);
-      generic.Invoke(this, null);
+      if (method == null)
+         throw new InvalidOperationException("AddGrpcService method could not be found");
+
+      method.MakeGenericMethod(serviceType)
+         .Invoke(this, null);
 
       AddService(x => x.AddSingleton(serviceType));
-
       return this;
    }
 
