@@ -1,4 +1,4 @@
-<h1 align="center">ConsoLovers.Ipc.Sever & Client </h1>
+<h1 align="center">ConsoLovers.Ipc.Sever & Client</h1>
 <h4 align="center">Easy to use inter-process communication with <a href="https://grpc.io">gRPC</a> and <a href="https://de.wikipedia.org/wiki/Unix_Domain_Socket">unix domain sockets</a></h4>
 
 <div align="center">
@@ -8,7 +8,7 @@
     </a>
 
   <!-- Build Status -->
-  <a href="https://travis-ci.org/choojs/choo">
+  <a href="[https://travis-ci.org/choojs/choo](https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml)">
     <img src="https://github.com/bramerdaniel/ConsoLovers.Ipc/actions/workflows/ConsoLovers.Ipc.yml/badge.svg?branch=master" alt="Build Status" />
   </a>
   
@@ -22,6 +22,8 @@
      <img alt="Nuget (with prereleases)" src="https://img.shields.io/nuget/vpre/ConsoLovers.Ipc.Client?label=nuget%20%28Client%29">
    </a>
 </div>
+
+
 
 ## Description
 It is a small library for inter-process communication on a single machine,
