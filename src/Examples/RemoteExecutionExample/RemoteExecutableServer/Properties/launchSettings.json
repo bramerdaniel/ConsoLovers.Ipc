@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "RemoteExecutableServer": {
+      "commandName": "Project",
+      "commandLineArgs": "remote ServerName=reServer"
+    }
+  }
+}

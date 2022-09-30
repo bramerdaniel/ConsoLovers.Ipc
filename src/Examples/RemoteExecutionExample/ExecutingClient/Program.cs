@@ -15,16 +15,10 @@
       {
          Console.Title = "Remote Execution Client";
 
-         var processStartInfo = new ProcessStartInfo("reServer.exe") { UseShellExecute = true };
-         var process = Process.Start(processStartInfo);
-
          await ConsoleApplication.WithArguments<ApplicationArgs>()
             .AddService(s => s.AddSingleton(CreateClientFactory))
             .UseMenuWithoutArguments()
             .RunAsync();
-
-         if (process != null)
-            await process.WaitForExitAsync();
       }
 
       static IClientFactory CreateClientFactory(IServiceProvider serviceProvider)

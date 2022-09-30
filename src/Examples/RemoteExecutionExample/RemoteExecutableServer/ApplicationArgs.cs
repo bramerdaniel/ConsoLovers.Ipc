@@ -19,5 +19,9 @@ internal class ApplicationArgs
    [HelpText("The start command")]
    internal StartCommand Start { get; set; } = null!;
 
+   [Command("count")]
+   [HelpText("Counts to the specified number")]
+   internal CountCommand Count { get; set; } = null!;
+
    #endregion
 }

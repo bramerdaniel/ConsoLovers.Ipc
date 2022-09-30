@@ -47,7 +47,7 @@ internal class RemoteExecutionCommand : IAsyncCommand<RemoteExecutionCommand.Arg
       await executor.WaitForServerAsync(cancellationToken);
 
       console.WriteLine($"Executing Start");
-      await executor.ExecuteCommandAsync("Start");
+      await executor.ExecuteCommandAsync(Arguments.CommandName);
       
       console.WriteLine("Delaying for 2 seconds");
       await Task.Delay(2000, cancellationToken);

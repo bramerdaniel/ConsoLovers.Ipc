@@ -6,6 +6,8 @@
 
 namespace RemoteExecutableServer;
 
+using ConsoLovers.ConsoleToolkit.Core;
+using ConsoLovers.ConsoleToolkit.Core.CommandLineArguments.Parsing;
 using ConsoLovers.ConsoleToolkit.Core.Middleware;
 using ConsoLovers.Ipc;
 
@@ -18,15 +20,18 @@ internal class RemoteExecutionMiddleware<T> : Middleware<T>
 
    private readonly IRemoteExecutionQueue executionQueue;
 
+   private readonly ICommandLineArgumentParser parser;
+
    private readonly IIpcServer server;
 
    #endregion
 
    #region Constructors and Destructors
 
-   public RemoteExecutionMiddleware(IRemoteExecutionQueue executionQueue, IIpcServer server)
+   public RemoteExecutionMiddleware(IRemoteExecutionQueue executionQueue, ICommandLineArgumentParser parser, IIpcServer server)
    {
       this.executionQueue = executionQueue ?? throw new ArgumentNullException(nameof(executionQueue));
+      this.parser = parser ?? throw new ArgumentNullException(nameof(parser));
       this.server = server ?? throw new ArgumentNullException(nameof(server));
    }
 
@@ -42,13 +47,45 @@ internal class RemoteExecutionMiddleware<T> : Middleware<T>
 
    public override async Task ExecuteAsync(IExecutionContext<T> context, CancellationToken cancellationToken)
    {
-      Console.WriteLine("Starting remote execution");
-
-      while (true)
+      if (RemoteExecutionRequested(context))
       {
-         var remoteContext = await GetNextExecutable();
-         await ExecutCommand(cancellationToken, remoteContext);
+         Console.WriteLine("Starting remote execution");
+         while (true)
+         {
+            var remoteContext = await GetNextExecutable();
+            await ExecutCommand(cancellationToken, remoteContext);
+         }
       }
+      else
+      {
+         await Next(context, cancellationToken);
+      }
+   }
+
+   private bool RemoteExecutionRequested(IExecutionContext<T> context)
+   {
+      var arguments = GetCommandLineArgs(context);
+      if (arguments == null)
+         return false;
+
+      if (arguments.ContainsName("Remote") && arguments.TryGetValue("ServerName", out var serverArg))
+         return !string.IsNullOrWhiteSpace(serverArg.Value);
+
+      return false;
+   }
+
+   private ICommandLineArguments? GetCommandLineArgs(IExecutionContext<T> context)
+   {
+      if (context.Commandline is string commandlineString)
+      {
+         return parser.ParseArguments(commandlineString);
+      }
+      else if (context.Commandline is string[] commandlineArray)
+      {
+         return parser.ParseArguments(commandlineArray);
+      }
+
+      return null;
    }
 
    #endregion

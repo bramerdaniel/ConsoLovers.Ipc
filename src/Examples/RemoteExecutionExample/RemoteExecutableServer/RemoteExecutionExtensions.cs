@@ -28,7 +28,6 @@ public static class RemoteExecutionExtensions
       {
          c.ForName("reServer")
             .AddService(x => x.AddSingleton<IRemoteExecutionQueue>(executionQueue));
-
       });
 
       builder.AddService(s => s.AddSingleton<IRemoteExecutionQueue>(executionQueue));

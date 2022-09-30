@@ -15,6 +15,11 @@ internal class ApplicationArgs
 {
    #region Properties
 
+   [Command("startServer")]
+   [HelpText("Starts the server process")]
+   [MenuCommand("Start server")]
+   internal StartServerCommand StartServer { get; set; } = null!;
+
    [Command("execute")]
    [HelpText("Executes a command on an other other process")]
    [MenuCommand("Execute remote command")]
