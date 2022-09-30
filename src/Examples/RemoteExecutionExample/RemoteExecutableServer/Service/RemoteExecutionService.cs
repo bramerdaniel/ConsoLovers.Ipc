@@ -10,18 +10,29 @@ using Grpc.Core;
 
 using IpcServerExtension.Grpc;
 
-/// <summary>The hello world of gRPC</summary>
-/// <seealso cref="IpcServerExtension.Grpc.GreeterService.GreeterServiceBase"/>
 internal class RemoteExecutionService : IpcServerExtension.Grpc.RemoteExecutionService.RemoteExecutionServiceBase
 {
+   #region Constants and Fields
+
+   private readonly IRemoteExecutionQueue executionQueue;
+
+   #endregion
+
+   #region Constructors and Destructors
+
+   public RemoteExecutionService(IRemoteExecutionQueue executionQueue)
+   {
+      this.executionQueue = executionQueue;
+   }
+
+   #endregion
+
    #region Public Methods and Operators
 
    public override Task<ExecuteCommandResponse> ExecuteCommand(ExecuteCommandRequest request, ServerCallContext context)
    {
-
-
-
-      return base.ExecuteCommand(request, context);
+      executionQueue.Jobs.Writer.TryWrite(new RemoteJob(request.Name));
+      return Task.FromResult(new ExecuteCommandResponse { Message = $"{request.Name} executed" });
    }
 
    #endregion

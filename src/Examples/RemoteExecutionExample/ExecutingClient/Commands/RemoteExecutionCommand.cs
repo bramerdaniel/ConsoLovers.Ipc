@@ -18,18 +18,15 @@ using Microsoft.Extensions.DependencyInjection;
 internal class RemoteExecutionCommand : IAsyncCommand<RemoteExecutionCommand.Args>
 {
    #region Constants and Fields
-
-   private readonly IClientFactory clientFactory;
-
+   
    private readonly IConsole console;
 
    #endregion
 
    #region Constructors and Destructors
 
-   public RemoteExecutionCommand(IClientFactory server, IConsole console)
+   public RemoteExecutionCommand(IConsole console)
    {
-      clientFactory = server ?? throw new ArgumentNullException(nameof(server));
       this.console = console ?? throw new ArgumentNullException(nameof(console));
    }
 
@@ -39,17 +36,17 @@ internal class RemoteExecutionCommand : IAsyncCommand<RemoteExecutionCommand.Arg
 
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
-      var initialDelay = 1000;
-      Console.Title = "Remote Execution Client";
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName(Arguments.ServerName)
+         .AddService(s => s.AddSingleton<IRemoteExecutionClient, RemoteExecutionClient>())
+         .Build();
 
-      console.WriteLine($"Delaying for {initialDelay / 1000} seconds");
-      await Task.Delay(initialDelay, cancellationToken);
-      
       var executor = clientFactory.CreateClient<IRemoteExecutionClient>();
 
       console.WriteLine($"Waiting for server ");
       await executor.WaitForServerAsync(cancellationToken);
 
+      console.WriteLine($"Executing Start");
       await executor.ExecuteCommandAsync("Start");
       
       console.WriteLine("Delaying for 2 seconds");
@@ -86,11 +83,11 @@ internal class RemoteExecutionCommand : IAsyncCommand<RemoteExecutionCommand.Arg
       
       [Argument("server", "sn")]
       [HelpText("The name of the server to execute the command on")]
-      public string ServerName{ get; set; } = "OK";
+      public string ServerName{ get; set; } = "reServer";
 
       [Argument("command", "c")]
       [HelpText("The name of the command that should be executed")]
-      public string CommandName { get; set; } = "OK";
+      public string CommandName { get; set; } = "Start";
 
       #endregion
    }

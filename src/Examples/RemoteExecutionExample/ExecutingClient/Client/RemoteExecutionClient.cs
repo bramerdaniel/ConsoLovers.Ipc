@@ -12,6 +12,11 @@ using IpcServerExtension.Grpc;
 
 internal class RemoteExecutionClient : ConfigurableClient<RemoteExecutionService.RemoteExecutionServiceClient>, IRemoteExecutionClient
 {
+   public RemoteExecutionClient()
+   {
+      
+   }
+
    public async Task<string> ExecuteCommandAsync(string name)
    {
       var commandRequest = new ExecuteCommandRequest { Name = name };

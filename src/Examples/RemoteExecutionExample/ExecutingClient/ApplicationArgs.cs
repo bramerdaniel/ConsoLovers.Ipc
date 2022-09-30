@@ -17,6 +17,7 @@ internal class ApplicationArgs
 
    [Command("execute")]
    [HelpText("Executes a command on an other other process")]
+   [MenuCommand("Execute remote command")]
    internal RemoteExecutionCommand RemoteExecution { get; set; } = null!;
 
    #endregion
