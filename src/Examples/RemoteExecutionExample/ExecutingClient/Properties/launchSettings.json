@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "ExecutingClient": {
+      "commandName": "Project",
+      "commandLineArgs": "execute"
+    }
+  }
+}

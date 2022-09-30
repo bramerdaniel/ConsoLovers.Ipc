@@ -1,0 +1,16 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "IpcServerExtension.Grpc";
+
+service RemoteExecutionService {
+	rpc ExecuteCommand (ExecuteCommandRequest) returns (ExecuteCommandResponse) {}
+}
+
+message ExecuteCommandRequest {
+	string name = 1;
+}
+
+message ExecuteCommandResponse {
+	string message = 1;
+}
+
