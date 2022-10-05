@@ -27,7 +27,6 @@
 </div>
 
 
-
 ## Description
 It is a small library for inter-process communication on a single machine,
 using [gRPC](https://grpc.io/) with [Unix Domain Sockets](https://de.wikipedia.org/wiki/Unix_Domain_Socket).
@@ -45,7 +44,7 @@ Package  | Version | Description
 ConsoLovers.Ipc.Server   | [![NuGet version (ConsoLovers.Ipc.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Server/) | Package for the process that hosts the gRPC server
 ConsoLovers.Ipc.Client   | [![NuGet version (ConsoLovers.Ipc.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Client/)  | Package for a client process that wants to communicate with a server 
 
-> After adding the ConsoLovers.Ipc.Server or ConsoLovers.Ipc.Client package, you do not have any other useful gRPC service than the .
+NOTE: After adding the ConsoLovers.Ipc.Server or ConsoLovers.Ipc.Client package, you do not have any other useful gRPC service than the .
 
 ## Quick start links
  - [Setup the server side](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Server-setup) 
@@ -54,6 +53,13 @@ ConsoLovers.Ipc.Client   | [![NuGet version (ConsoLovers.Ipc.Client)](https://im
  - [Setup server side with the ConsoLovers.Toolkit.Core](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Server-setup) 
 
 ## Additional packages
+
+There are additional packages that cover the common scenario of process monitoring. 
+This means that you will already get some build in sevices for.
+ - Progress
+ - Return/ExitCode
+ - Cancellation
+ 
 
 Package  | Version | Description
 -------- | -------- | --------
