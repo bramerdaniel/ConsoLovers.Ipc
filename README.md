@@ -57,28 +57,8 @@ NOTE: After adding the ConsoLovers.Ipc.Server or ConsoLovers.Ipc.Client package,
 ## Quick start links
  - [Setup the server side](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Server-setup) 
  - [Setup the client side](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Client-setup) 
- ---
  - [Setup server side with the ConsoLovers.Toolkit.Core](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Server-Setup-With-Toolkit) 
 
-## Additional packages
 
-There are additional packages that cover the common scenario of process monitoring. 
-This means that you will already get some build in sevices for.
- - Progress
- - Return/ExitCode
- - Cancellation
- 
-
-Package  | Version | Description
--------- | -------- | --------
-ConsoLovers.Ipc.ProcessMonitoring.Server   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Server/) | Server package for a process that should be monitored
-ConsoLovers.Ipc.ProcessMonitoring.Client   | [![NuGet version (ConsoLovers.Ipc.ProcessMonitoring.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.ProcessMonitoring.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.ProcessMonitoring.Client/)  | Client package for applications that want to monitor processes hosting the ConsoLovers.Ipc.ProcessMonitoring.Server package services
-
-When you are using the ConsoLovers.ConsoleToolkit you can use the following packages
-
-Package  | Version | Description
--------- | -------- | --------
-ConsoLovers.Toolkit   .Ipc.ServerExtension   | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.Ipc.ServerExtension?style=plastic) | Easy usage of the ConsoLovers.Ipc.Server combination with the ConsoLovers.ConsoleToolkit.Core
-ConsoLovers.Toolkit   .ProcessMonitoring.ServerExtension  | ![Nuget (with prereleases)](https://img.shields.io/nuget/vpre/ConsoLovers.Toolkit.ProcessMonitoring.ServerExtension?style=plastic)| Easy usage of the ConsoLovers.Ipc.ProcessMonitoring.Server in combination with the ConsoLovers.ConsoleToolkit.Core
 
 
