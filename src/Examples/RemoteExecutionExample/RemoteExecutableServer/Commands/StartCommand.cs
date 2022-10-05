@@ -29,12 +29,15 @@ internal class StartCommand : IAsyncCommand<StartCommand.Args>
 
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
-      var initialDelay = 5000;
+      console.WriteLine("Executing started");
+      for (int i = 0; i < 50; i++)
+      {
+         console.Write(".");
+         await Task.Delay(30, cancellationToken);
+      }
 
-      console.WriteLine($"Executing start for {initialDelay / 1000} seconds");
-      await Task.Delay(initialDelay, cancellationToken);
-
-      console.WriteLine("Start was executed");
+      console.WriteLine();
+      console.WriteLine("Execution completed");
    }
 
    public Args Arguments { get; set; } = null!;

@@ -18,12 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 
 internal class StartServerCommand : IAsyncCommand<StartServerCommand.Args>
 {
-   private readonly IServiceProvider serviceProvider;
-
-   public StartServerCommand(IServiceProvider serviceProvider)
-   {
-      this.serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-   }
 
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
@@ -32,7 +26,11 @@ internal class StartServerCommand : IAsyncCommand<StartServerCommand.Args>
       Process.Start(processStartInfo);
       Console.WriteLine("Started server process");
 
-      var clientFactory = serviceProvider.GetRequiredService<IClientFactory>();
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName(Arguments.ServerName)
+         .AddService(s => s.AddSingleton<IRemoteExecutionClient, RemoteExecutionClient>())
+         .Build();
+
       var executionClient = clientFactory.CreateClient<IRemoteExecutionClient>();
       
       Console.WriteLine("Waiting for server");

@@ -37,7 +37,7 @@ public static class ApplicationBuilderExtensions
       return builder;
    }
 
-   /// <summary>Adds an <see cref="IIpcServer"/> to the applications services.</summary>
+   /// <summary>Adds an <see cref="IIpcServer"/> to the applications services and uses the current process for computing the address.</summary>
    /// <typeparam name="T">The argument type of the application</typeparam>
    /// <param name="builder">The builder.</param>
    /// <returns>The current <see cref="IApplicationBuilder{T}"/> for more fluent configuration</returns>
@@ -85,7 +85,8 @@ public static class ApplicationBuilderExtensions
    /// <param name="removeAspNetCoreLogging">if set to <c>true</c> the loggers of ASPNetCore will be removed, otherwise they will log to the console.</param>
    /// <returns>The current <see cref="IApplicationBuilder{T}"/> for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IApplicationBuilder<T> AddIpcServer<T>(this IApplicationBuilder<T> builder, Action<IServerBuilderWithoutName> config, bool removeAspNetCoreLogging)
+   public static IApplicationBuilder<T> AddIpcServer<T>(this IApplicationBuilder<T> builder, Action<IServerBuilderWithoutName> config,
+      bool removeAspNetCoreLogging)
       where T : class
    {
       if (builder == null)
@@ -93,6 +94,7 @@ public static class ApplicationBuilderExtensions
       if (config == null)
          throw new ArgumentNullException(nameof(config));
 
+      // TODO ensure there is only one IpcServer !
       builder.AddService(x => x.AddSingleton(_ => CreateServerBuilder(config, removeAspNetCoreLogging)));
       builder.AddService(x => x.AddSingleton(CreateIpcServer));
       return builder;

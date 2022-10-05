@@ -16,20 +16,10 @@
          Console.Title = "Remote Execution Client";
 
          await ConsoleApplication.WithArguments<ApplicationArgs>()
-            .AddService(s => s.AddSingleton(CreateClientFactory))
             .UseMenuWithoutArguments()
             .RunAsync();
       }
 
-      static IClientFactory CreateClientFactory(IServiceProvider serviceProvider)
-      {
-         var clientFactory = IpcClient.CreateClientFactory()
-            .ForName("reServer")
-            .AddService(s => s.AddSingleton<IRemoteExecutionClient, RemoteExecutionClient>())
-            .Build();
-
-         return clientFactory;
-      }
    }
 
 }

@@ -11,6 +11,8 @@ using ConsoLovers.ConsoleToolkit.Core.CommandLineArguments.Parsing;
 using ConsoLovers.ConsoleToolkit.Core.Middleware;
 using ConsoLovers.Ipc;
 
+using Microsoft.Extensions.DependencyInjection;
+
 using RemoteExecutableServer.Service;
 
 internal class RemoteExecutionMiddleware<T> : Middleware<T>
@@ -22,17 +24,15 @@ internal class RemoteExecutionMiddleware<T> : Middleware<T>
 
    private readonly ICommandLineArgumentParser parser;
 
-   private readonly IIpcServer server;
 
    #endregion
 
    #region Constructors and Destructors
 
-   public RemoteExecutionMiddleware(IRemoteExecutionQueue executionQueue, ICommandLineArgumentParser parser, IIpcServer server)
+   public RemoteExecutionMiddleware(IRemoteExecutionQueue executionQueue, ICommandLineArgumentParser parser)
    {
       this.executionQueue = executionQueue ?? throw new ArgumentNullException(nameof(executionQueue));
       this.parser = parser ?? throw new ArgumentNullException(nameof(parser));
-      this.server = server ?? throw new ArgumentNullException(nameof(server));
    }
 
    #endregion
@@ -47,13 +47,23 @@ internal class RemoteExecutionMiddleware<T> : Middleware<T>
 
    public override async Task ExecuteAsync(IExecutionContext<T> context, CancellationToken cancellationToken)
    {
-      if (RemoteExecutionRequested(context))
+      if (RemoteExecutionRequested(context, out var serverName))
       {
          Console.WriteLine("Starting remote execution");
-         while (true)
+
+         using (var server = IpcServer.CreateServer()
+                   .ForName(serverName)
+                   .RemoveAspNetCoreLogging()
+                   .AddService(x => x.AddSingleton(executionQueue))
+                   .AddGrpcService(typeof(RemoteExecutionService))
+                   .Start())
          {
-            var remoteContext = await GetNextExecutable();
-            await ExecutCommand(cancellationToken, remoteContext);
+            Console.WriteLine($"Server listening to {server.Name}");
+            while (true)
+            {
+               var remoteContext = await GetNextExecutable();
+               await ExecuteCommand(cancellationToken, remoteContext);
+            }
          }
       }
       else
@@ -62,14 +72,21 @@ internal class RemoteExecutionMiddleware<T> : Middleware<T>
       }
    }
 
-   private bool RemoteExecutionRequested(IExecutionContext<T> context)
+   private bool RemoteExecutionRequested(IExecutionContext<T> context, out string serverName)
    {
+      serverName = string.Empty;
       var arguments = GetCommandLineArgs(context);
       if (arguments == null)
          return false;
 
       if (arguments.ContainsName("Remote") && arguments.TryGetValue("ServerName", out var serverArg))
-         return !string.IsNullOrWhiteSpace(serverArg.Value);
+      {
+         if (string.IsNullOrWhiteSpace(serverArg.Value))
+            return false;
+
+         serverName = serverArg.Value;
+         return true;
+      }
 
       return false;
    }
@@ -92,7 +109,7 @@ internal class RemoteExecutionMiddleware<T> : Middleware<T>
 
    #region Methods
 
-   private async Task ExecutCommand(CancellationToken cancellationToken, IExecutionContext<T> remoteContext)
+   private async Task ExecuteCommand(CancellationToken cancellationToken, IExecutionContext<T> remoteContext)
    {
       try
       {

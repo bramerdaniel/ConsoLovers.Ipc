@@ -7,6 +7,7 @@
 namespace RemoteExecutableServer;
 
 using ConsoLovers.ConsoleToolkit.Core;
+using ConsoLovers.Ipc;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,15 +24,9 @@ public static class RemoteExecutionExtensions
       if (builder == null)
          throw new ArgumentNullException(nameof(builder));
 
-      var executionQueue = new RemoteExecutionQueue();
-      builder.AddIpcServer(c =>
-      {
-         c.ForName("reServer")
-            .AddService(x => x.AddSingleton<IRemoteExecutionQueue>(executionQueue));
-      });
-
-      builder.AddService(s => s.AddSingleton<IRemoteExecutionQueue>(executionQueue));
-      builder.AddGrpcService(typeof(RemoteExecutionService));
+      builder.AddService(s => s.AddSingleton<IIpcServerFactory, IpcServerFactory>());
+      builder.AddService(s => s.AddSingleton(provider => provider.GetRequiredService<IIpcServerFactory>().Create()));
+      builder.AddService(s => s.AddSingleton<IRemoteExecutionQueue, RemoteExecutionQueue>());
       builder.AddMiddleware(typeof(RemoteExecutionMiddleware<T>));
 
       return builder;
