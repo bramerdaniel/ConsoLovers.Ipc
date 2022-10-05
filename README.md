@@ -34,7 +34,7 @@ Microsoft has an article called [Inter-process communication with gRPC](https://
 and the [ConsoLovers.Ipc.Server](https://www.nuget.org/packages/ConsoLovers.Ipc.Server) & Client packages provide an easy and flexible implementation, 
 without having to care about all the infratructure setup, that needs to be done.
 
-This is how easy you setup a gRPC server within your application.
+### This is how easy you setup a gRPC server within your application.
 ```C#
 var server = IpcServer.CreateServer()
    .ForCurrentProcess()
