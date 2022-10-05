@@ -44,7 +44,7 @@ var server = IpcServer.CreateServer()
 
 ## The available packages
 
-The library is splitt into serverside and client side packages. This reduces the client side dependencies to a minimum.
+The library is split into serverside and client side packages. This reduces the client side dependencies to a minimum.
 
 
 Package  | Version | Description
