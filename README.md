@@ -50,6 +50,8 @@ ConsoLovers.Ipc.Client   | [![NuGet version (ConsoLovers.Ipc.Client)](https://im
 ## Quick start 
  - [Setup the server side](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Server-setup) 
  - [Setup the client side](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Client-setup) 
+ ---
+ - [Setup server side with the ConsoLovers.Toolkit.Core](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Server-setup) 
 
 ## Additional packages
 
