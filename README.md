@@ -47,6 +47,10 @@ ConsoLovers.Ipc.Client   | [![NuGet version (ConsoLovers.Ipc.Client)](https://im
 
 > After adding the ConsoLovers.Ipc.Server or ConsoLovers.Ipc.Client package, you do not have any other useful gRPC service than the .
 
+## Quick start 
+ - [Setup the server side](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Server-setup) 
+ - [Setup the client side](https://github.com/bramerdaniel/ConsoLovers.Ipc/wiki/Client-setup) 
+
 ## Additional packages
 
 Package  | Version | Description
