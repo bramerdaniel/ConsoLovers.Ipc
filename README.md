@@ -49,8 +49,8 @@ The library is split into serverside and client side packages. This reduces the 
 
 Package  | Version | Description
 -------- | -------- | --------
-ConsoLovers.Ipc.Server   | [![NuGet version (ConsoLovers.Ipc.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Server/) | Package for the process that hosts the gRPC server
-ConsoLovers.Ipc.Client   | [![NuGet version (ConsoLovers.Ipc.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Client/)  | Package for a client process that wants to communicate with a server 
+[ConsoLovers.Ipc.Server](https://www.nuget.org/packages/ConsoLovers.Ipc.Server/)   | [![NuGet version (ConsoLovers.Ipc.Server)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Server.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Server/) | Package for the process that hosts the gRPC server
+[ConsoLovers.Ipc.Client](https://www.nuget.org/packages/ConsoLovers.Ipc.Client)   | [![NuGet version (ConsoLovers.Ipc.Client)](https://img.shields.io/nuget/v/ConsoLovers.Ipc.Client.svg?style=flat)](https://www.nuget.org/packages/ConsoLovers.Ipc.Client/)  | Package for a client process that wants to communicate with a server 
 
 NOTE: After adding the ConsoLovers.Ipc.Server or ConsoLovers.Ipc.Client package, you do not have any other useful gRPC service than the .
 
