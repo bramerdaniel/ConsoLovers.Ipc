@@ -20,6 +20,9 @@ public interface IClientFactoryBuilder
    /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
    IClientFactoryBuilder AddService(Action<ServiceCollection> services);
 
+   /// <summary>Specifies the culture the clients want to have the responses.</summary>
+   /// <param name="culture">The requested culture.</param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
    IClientFactoryBuilder WithCulture(CultureInfo culture);
 
    /// <summary>Builds the <see cref="IClientFactory"/>.</summary>

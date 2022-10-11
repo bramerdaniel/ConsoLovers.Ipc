@@ -35,7 +35,7 @@ internal class ProgressService : Grpc.ProgressService.ProgressServiceBase
    public override async Task ProgressChanged(ProgressChangedRequest request, IServerStreamWriter<ProgressChangedResponse> responseStream, 
       ServerCallContext context)
    {
-      var cultureInfo = GetCulture(context);
+      var cultureInfo = context.GetCulture();
       var clientProgress = progressReporter.CreateClientHandler(cultureInfo);
       
       try
@@ -48,14 +48,8 @@ internal class ProgressService : Grpc.ProgressService.ProgressServiceBase
       }
       finally
       {
-         progressReporter.Remove(clientProgress);
+         progressReporter.RemoveClientHandler(clientProgress);
       }
-   }
-
-   private CultureInfo GetCulture(ServerCallContext context)
-   {
-      // context.RequestHeaders.
-      return CultureInfo.CurrentCulture;
    }
 
    #endregion

@@ -6,6 +6,8 @@
 
 namespace Client.Commands;
 
+using System.Globalization;
+
 using Client.Annotations;
 
 using ConsoLovers.ConsoleToolkit.Core;
@@ -28,7 +30,13 @@ internal class AwaitProcessCommand : FactoryCommand, IAsyncCommand<AwaitProcessC
 
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
-      var factory = CreateFactory(Arguments.ServerName, config => config.AddProgressClient());
+      var factory = CreateFactory(Arguments.ServerName, config =>
+      {
+         if (Arguments.Culture != null)
+            config.WithCulture(new CultureInfo(Arguments.Culture));
+
+         config.AddProgressClient();
+      });
       var resultClient = factory.CreateProgressClient();
 
       Console.WriteLine($"Waiting for server {Arguments.ServerName}");
@@ -67,7 +75,7 @@ internal class AwaitProcessCommand : FactoryCommand, IAsyncCommand<AwaitProcessC
 
       [Argument("culture", "c", Index = 1)]
       [HelpText("The culture to get the progress in")]
-      public string Culture { get; set; } = null!;
+      public string? Culture { get; set; } = null;
 
       [Argument("server", "name", Index = 0)]
       [HelpText("The name of the server to wait for its result")]

@@ -33,9 +33,8 @@ internal class FactoryCommand
    protected IClientFactory CreateFactory(string serverName, params Action<IClientFactoryBuilder>[] configuration)
    {
       var factoryBuilder = IpcClient.CreateClientFactory()
-         .ForName(serverName)
-         .WithCulture(new CultureInfo("de-DE"));
-
+         .ForName(serverName);
+      
       foreach (var configurationAction in configuration)
          configurationAction(factoryBuilder);
 

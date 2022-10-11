@@ -29,14 +29,12 @@ internal class ProgressReporter : IProgressReporter
 
    public void ReportProgress(Func<CultureInfo, string> message)
    {
-      var progressHandler = new ProgressTranslator(message, -1);
-      ReportProgress(progressHandler);
+      ReportProgress(-1, message);
    }
 
    public void ReportProgress(int percentage, Func<CultureInfo, string> message)
    {
-      var progressHandler = new ProgressTranslator(message, percentage);
-      ReportProgress(progressHandler);
+      ReportProgress(new ProgressTranslator(message, percentage));
    }
 
    public void ReportProgress(string message)
@@ -48,7 +46,7 @@ internal class ProgressReporter : IProgressReporter
 
    #region Public Methods and Operators
 
-   public void Remove(ClientProgressHandler clientProgressHandler)
+   public void RemoveClientHandler(ClientProgressHandler clientProgressHandler)
    {
       clients.TryRemove(clientProgressHandler, out var _);
    }
@@ -61,9 +59,7 @@ internal class ProgressReporter : IProgressReporter
    {
       var clientProgress = new ClientProgressHandler(culture);
       if (lastProgress != null)
-      {
          clientProgress.ReportProgress(lastProgress);
-      }
 
       clients.TryAdd(clientProgress, true);
       return clientProgress;

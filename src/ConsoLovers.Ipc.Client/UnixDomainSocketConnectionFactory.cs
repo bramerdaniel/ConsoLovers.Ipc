@@ -32,14 +32,14 @@ public class UnixDomainSocketConnectionFactory
       CancellationToken cancellationToken = default)
    {
       var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
-      c.InitialRequestMessage.Headers.Add("Language", "de-DE");
 
       try
       {
          await socket.ConnectAsync(_endPoint, cancellationToken).ConfigureAwait(false);
+         // c.InitialRequestMessage.Headers.Add("Language", "de-DE");
          return new NetworkStream(socket, true);
       }
-      catch(Exception)
+      catch (Exception)
       {
          socket.Dispose();
          throw;

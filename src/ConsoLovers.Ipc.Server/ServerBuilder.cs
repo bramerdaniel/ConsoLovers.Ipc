@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 
 /// <summary>The default implementation of the <see cref="IServerBuilder"/> interface</summary>
 /// <seealso cref="ConsoLovers.Ipc.IServerBuilder"/>
@@ -225,7 +226,7 @@ internal class LanguageInterceptor : Interceptor
    public override Task ServerStreamingServerHandler<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context,
       ServerStreamingServerMethod<TRequest, TResponse> continuation)
    {
-      var headerLanguage = context.RequestHeaders.FirstOrDefault(t => t.Key == "Language");
+      var headerLanguage = context.RequestHeaders.FirstOrDefault(t => t.Key == HeaderNames.AcceptLanguage);
       if (headerLanguage != null)
       {
          Thread.CurrentThread.CurrentCulture = new CultureInfo(headerLanguage.Value);

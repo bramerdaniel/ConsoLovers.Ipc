@@ -6,6 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 
@@ -55,20 +56,23 @@ internal class ChannelFactory : IChannelFactory
          metadata.Add("Language", "en-US");
          return Task.CompletedTask;
       });
+      
+      var channelCredentials = ChannelCredentials.Create(ChannelCredentials.SecureSsl, credentials);
 
-      // var channelCredentials = ChannelCredentials.Create(ChannelCredentials.Insecure, credentials);
 
       var udsEndPoint = new UnixDomainSocketEndPoint(socketPath);
       var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
       var socketsHttpHandler = new SocketsHttpHandler
       {
          ConnectCallback = connectionFactory.ConnectAsync,
-         Proxy = new WebProxy()
+         Proxy = new WebProxy(),
+         
       };
-
+      
       var grpcChannel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
       {
-         HttpHandler = socketsHttpHandler
+         HttpHandler = socketsHttpHandler,
+         // Credentials = channelCredentials
       });
 
       return grpcChannel;

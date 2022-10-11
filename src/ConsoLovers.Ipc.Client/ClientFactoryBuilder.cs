@@ -20,6 +20,8 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    private ChannelFactory? channelFactory;
 
+   private CultureInfo? clientCulture;
+
    #endregion
 
    #region Constructors and Destructors
@@ -45,10 +47,10 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    public IClientFactoryBuilder WithCulture(CultureInfo culture)
    {
-      // TODO
+      clientCulture = culture ?? throw new ArgumentNullException(nameof(culture));
       return this;
    }
-
+   
    public IClientFactory Build()
    {
       if (channelFactory == null)
@@ -57,7 +59,8 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       var providerFactory = new DefaultServiceProviderFactory(new ServiceProviderOptions { ValidateOnBuild = true });
       var serviceProvider = providerFactory.CreateServiceProvider(serviceCollection);
 
-      return new ClientFactory(serviceProvider, channelFactory);
+      var clientFactory = new ClientFactory(serviceProvider, channelFactory, clientCulture);
+      return clientFactory;
    }
 
    #endregion

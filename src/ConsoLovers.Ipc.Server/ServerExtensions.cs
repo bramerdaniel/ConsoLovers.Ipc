@@ -8,11 +8,15 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
+using System.Globalization;
+
+using global::Grpc.Core;
 
 using LoggingExtensions::Microsoft.Extensions.Logging;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 
 public static class ServerExtensions
 {
@@ -73,6 +77,31 @@ public static class ServerExtensions
          throw new ArgumentNullException(nameof(builder));
 
       return builder.ForProcess(Process.GetCurrentProcess());
+   }
+
+   /// <summary>Gets the <see cref="CultureInfo"/> the client requested.</summary>
+   /// <param name="context">The <see cref="ServerCallContext"/>.</param>
+   /// <returns>The requested culture</returns>
+   public static CultureInfo GetCulture(this ServerCallContext context)
+   {
+      var languageHeader = context.RequestHeaders.Get(HeaderNames.AcceptLanguage);
+      if (languageHeader != null)
+      {
+         var culture = languageHeader.Value;
+         if (!string.IsNullOrWhiteSpace(culture))
+         {
+            try
+            {
+               return CultureInfo.GetCultureInfo(culture);
+            }
+            catch (CultureNotFoundException)
+            {
+               // we ignore unknown cultures here
+            }
+         }
+      }
+
+      return CultureInfo.InvariantCulture;
    }
 
    /// <summary>Configures the web application before it is build.</summary>

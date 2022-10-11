@@ -6,6 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Globalization;
 using System.Text;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +15,11 @@ internal class ClientFactory : IClientFactory
 {
    #region Constructors and Destructors
 
-   internal ClientFactory(IServiceProvider serviceProvider, IChannelFactory channelFactory)
+   internal ClientFactory(IServiceProvider serviceProvider, IChannelFactory channelFactory, CultureInfo? culture)
    {
       ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
       ChannelFactory = channelFactory ?? throw new ArgumentNullException(nameof(channelFactory));
+      Culture = culture;
    }
 
    #endregion
@@ -34,13 +36,17 @@ internal class ClientFactory : IClientFactory
       where T : class, IConfigurableClient
    {
       var client = ServiceProvider.GetService<T>() ?? CreateInstance<T>();
-      client.Configure(new ClientConfiguration(ChannelFactory));
+      var configuration = new ClientConfiguration(ChannelFactory, Culture);
+      client.Configure(configuration);
       return client;
    }
 
    #endregion
 
    #region Properties
+
+   /// <summary>Gets the culture info of the factory.</summary>
+   private CultureInfo? Culture { get; }
 
    private IServiceProvider ServiceProvider { get; }
 
