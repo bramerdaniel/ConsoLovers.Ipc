@@ -8,7 +8,11 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+
+using global::Grpc.Core;
+using global::Grpc.Core.Interceptors;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -85,6 +89,14 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       return this;
    }
 
+   public IServerBuilder AddGrpcService<T>(ServiceLifetime lifetime)
+      where T : class
+   {
+      AddService(x => x.Add(ServiceDescriptor.Describe(typeof(T), typeof(T), lifetime)));
+      applicationActions.Add(app => app.MapGrpcService<T>());
+      return this;
+   }
+
    public IServerBuilder AddGrpcService(Type serviceType)
    {
       var method = typeof(ServerBuilder).GetMethods()
@@ -102,7 +114,10 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    public IIpcServer Start()
    {
-      WebApplicationBuilder.Services.AddGrpc();
+      WebApplicationBuilder.Services.AddGrpc(options =>
+      {
+         options.Interceptors.Add<LanguageInterceptor>();
+      });
 
       var application = WebApplicationBuilder.Build();
 
@@ -196,4 +211,27 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    }
 
    #endregion
+}
+
+internal class LanguageInterceptor : Interceptor
+{
+   public override Task<TResponse> ClientStreamingServerHandler<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, ServerCallContext context,
+      ClientStreamingServerMethod<TRequest, TResponse> continuation)
+   {
+      Console.WriteLine("ClientStreamingServerHandler");
+      return base.ClientStreamingServerHandler(requestStream, context, continuation);
+   }
+
+   public override Task ServerStreamingServerHandler<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context,
+      ServerStreamingServerMethod<TRequest, TResponse> continuation)
+   {
+      var headerLanguage = context.RequestHeaders.FirstOrDefault(t => t.Key == "Language");
+      if (headerLanguage != null)
+      {
+         Thread.CurrentThread.CurrentCulture = new CultureInfo(headerLanguage.Value);
+         Thread.CurrentThread.CurrentUICulture = new CultureInfo(headerLanguage.Value);
+      }
+
+      return base.ServerStreamingServerHandler(request, responseStream, context, continuation);
+   }
 }

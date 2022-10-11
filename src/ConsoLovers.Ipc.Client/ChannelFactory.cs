@@ -9,6 +9,7 @@ namespace ConsoLovers.Ipc;
 using System.Net;
 using System.Net.Sockets;
 
+using global::Grpc.Core;
 using global::Grpc.Net.Client;
 
 
@@ -49,10 +50,28 @@ internal class ChannelFactory : IChannelFactory
 
    private GrpcChannel CreateChannelFromPath()
    {
+      var credentials = CallCredentials.FromInterceptor((context, metadata) =>
+      {
+         metadata.Add("Language", "en-US");
+         return Task.CompletedTask;
+      });
+
+      // var channelCredentials = ChannelCredentials.Create(ChannelCredentials.Insecure, credentials);
+
       var udsEndPoint = new UnixDomainSocketEndPoint(socketPath);
       var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-      var socketsHttpHandler = new SocketsHttpHandler { ConnectCallback = connectionFactory.ConnectAsync, Proxy = new WebProxy() };
-      return GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions { HttpHandler = socketsHttpHandler });
+      var socketsHttpHandler = new SocketsHttpHandler
+      {
+         ConnectCallback = connectionFactory.ConnectAsync,
+         Proxy = new WebProxy()
+      };
+
+      var grpcChannel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+      {
+         HttpHandler = socketsHttpHandler
+      });
+
+      return grpcChannel;
    }
 
    #endregion

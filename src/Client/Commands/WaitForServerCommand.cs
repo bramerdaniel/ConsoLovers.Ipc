@@ -7,6 +7,7 @@
 namespace Client.Commands;
 
 using System.Diagnostics;
+using System.Globalization;
 
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.ConsoleToolkit.Core.Exceptions;
@@ -60,6 +61,7 @@ internal class WaitForServerCommand : IAsyncCommand<WaitForServerCommand.WaitArg
       Process process = FindServerProcess();
       return builder.ForProcess(process)
          .AddProgressClient()
+         // .WithCulture(new CultureInfo("de-DE"))
          .Build();
    }
 

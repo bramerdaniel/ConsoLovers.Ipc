@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Globalization;
+
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>Builder that can create a <see cref="IClientFactory"/></summary>
@@ -17,6 +19,8 @@ public interface IClientFactoryBuilder
    /// <param name="services">The services.</param>
    /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
    IClientFactoryBuilder AddService(Action<ServiceCollection> services);
+
+   IClientFactoryBuilder WithCulture(CultureInfo culture);
 
    /// <summary>Builds the <see cref="IClientFactory"/>.</summary>
    /// <returns>The created <see cref="IClientFactory"/></returns>

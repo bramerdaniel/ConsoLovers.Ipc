@@ -28,10 +28,11 @@ public class UnixDomainSocketConnectionFactory
 
    #region Public Methods and Operators
 
-   public async ValueTask<Stream> ConnectAsync(SocketsHttpConnectionContext _,
+   public async ValueTask<Stream> ConnectAsync(SocketsHttpConnectionContext c,
       CancellationToken cancellationToken = default)
    {
       var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+      c.InitialRequestMessage.Headers.Add("Language", "de-DE");
 
       try
       {

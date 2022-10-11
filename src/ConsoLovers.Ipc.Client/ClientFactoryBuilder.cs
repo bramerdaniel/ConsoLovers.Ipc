@@ -7,6 +7,7 @@
 namespace ConsoLovers.Ipc;
 
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +40,12 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
          throw new ArgumentNullException(nameof(services));
 
       services(serviceCollection);
+      return this;
+   }
+
+   public IClientFactoryBuilder WithCulture(CultureInfo culture)
+   {
+      // TODO
       return this;
    }
 

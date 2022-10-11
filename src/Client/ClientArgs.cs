@@ -24,10 +24,15 @@ internal class ClientArgs : ICustomizedHeader, IMenuHeader
    [HelpText("Wait for a server to be connected")]
    public WaitForServerCommand WaitForServer { get; set; } = null!;
 
-   [Command("awaitResult", "result")]
+   [Command("awaitResult", "ar")]
    [HelpText("Connects to the server and awaits the execution result")]
    [MenuCommand("Await result")]
    public AwaitResultCommand AwaitResult { get; set; } = null!;
+
+   [Command("awaitProcess", "ap")]
+   [HelpText("Connects to the server and awaits the progress")]
+   [MenuCommand("Await progress")]
+   public AwaitProcessCommand AwaitProcess { get; set; } = null!;
 
    [Command("cancel", "c")]
    [HelpText("Sends a cancel request to the specified server ")]

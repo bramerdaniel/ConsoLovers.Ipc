@@ -31,6 +31,13 @@ public interface IServerConfiguration
       where T : class;
 
    /// <summary>Adds the specified service as gRPC service to the server.</summary>
+   /// <typeparam name="T">The gRPC service type</typeparam>
+   /// <param name="lifetime">The lifetime.</param>
+   /// <returns>The server builder for more fluent configuration</returns>
+   IServerBuilder AddGrpcService<T>(ServiceLifetime lifetime)
+      where T : class;
+
+   /// <summary>Adds the specified service as gRPC service to the server.</summary>
    /// <param name="serviceType">Type of the service.</param>
    /// <returns>The server builder for more fluent configuration</returns>
    IServerBuilder AddGrpcService(Type serviceType);

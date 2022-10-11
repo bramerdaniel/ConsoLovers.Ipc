@@ -6,6 +6,8 @@
 
 namespace Client.Commands;
 
+using System.Globalization;
+
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.Ipc;
 
@@ -31,7 +33,8 @@ internal class FactoryCommand
    protected IClientFactory CreateFactory(string serverName, params Action<IClientFactoryBuilder>[] configuration)
    {
       var factoryBuilder = IpcClient.CreateClientFactory()
-         .ForName(serverName);
+         .ForName(serverName)
+         .WithCulture(new CultureInfo("de-DE"));
 
       foreach (var configurationAction in configuration)
          configurationAction(factoryBuilder);
