@@ -6,8 +6,6 @@
 
 namespace ConsoLovers.Ipc.ProcessMonitoring.Services;
 
-using System.Globalization;
-
 using ConsoLovers.Ipc.Grpc;
 
 using global::Grpc.Core;
@@ -32,7 +30,8 @@ internal class ProgressService : Grpc.ProgressService.ProgressServiceBase
 
    #region Public Methods and Operators
 
-   public override async Task ProgressChanged(ProgressChangedRequest request, IServerStreamWriter<ProgressChangedResponse> responseStream, 
+   public override async Task ProgressChanged(ProgressChangedRequest request, 
+      IServerStreamWriter<ProgressChangedResponse> responseStream, 
       ServerCallContext context)
    {
       var cultureInfo = context.GetCulture();

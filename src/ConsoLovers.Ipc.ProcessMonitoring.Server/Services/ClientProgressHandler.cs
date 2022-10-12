@@ -18,23 +18,21 @@ internal class ClientProgressHandler
    public ClientProgressHandler(CultureInfo culture)
    {
       Culture = culture ?? throw new ArgumentNullException(nameof(culture));
-      ProgressChannel = Channel.CreateUnbounded<LocalizableMessage>();
+      ProgressChannel = Channel.CreateUnbounded<ProgressInfo>();
    }
 
-   private Channel<LocalizableMessage> ProgressChannel { get; }
+   private Channel<ProgressInfo> ProgressChannel { get; }
 
-   public void ReportProgress(LocalizableMessage localizableMessage)
+   public void ReportProgress(ProgressInfo progressInfo)
    {
-      ProgressChannel.Writer.TryWrite(localizableMessage);
+      if (progressInfo == null)
+         throw new ArgumentNullException(nameof(progressInfo));
+
+      ProgressChannel.Writer.TryWrite(progressInfo);
    }
 
    public async Task<ProgressInfo> ReadNextAsync(CancellationToken cancellationToken)
    {
-      var translator = await ProgressChannel.Reader.ReadAsync(cancellationToken);
-      return new ProgressInfo
-      {
-         Message = translator.MessageResolver(Culture),
-         Percentage = translator.Percentage
-      };
+      return await ProgressChannel.Reader.ReadAsync(cancellationToken);
    }
 }

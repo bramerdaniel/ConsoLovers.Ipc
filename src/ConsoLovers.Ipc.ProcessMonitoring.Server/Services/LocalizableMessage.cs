@@ -8,6 +8,8 @@ namespace ConsoLovers.Ipc.ProcessMonitoring.Services;
 
 using System.Globalization;
 
+using ConsoLovers.Ipc.Grpc;
+
 internal class LocalizableMessage
 {
    #region Constructors and Destructors
@@ -25,6 +27,12 @@ internal class LocalizableMessage
    public Func<CultureInfo, string> MessageResolver { get; }
 
    public int Percentage { get; }
+
+   public ProgressInfo Localize(CultureInfo culture)
+   {
+      var localizedMessage = MessageResolver(culture);
+      return new ProgressInfo { Message = localizedMessage, Percentage = Percentage };
+   }
 
    #endregion
 }

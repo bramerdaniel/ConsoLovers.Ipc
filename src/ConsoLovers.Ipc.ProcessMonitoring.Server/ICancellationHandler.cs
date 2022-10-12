@@ -4,6 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable once CheckNamespace
 namespace ConsoLovers.Ipc;
 
 public interface ICancellationHandler

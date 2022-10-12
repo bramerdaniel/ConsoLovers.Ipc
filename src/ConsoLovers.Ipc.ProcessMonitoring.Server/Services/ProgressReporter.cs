@@ -13,7 +13,7 @@ internal class ProgressReporter : IProgressReporter
 {
    #region Constants and Fields
 
-   private readonly ConcurrentDictionary<ClientProgressHandler, bool> clients = new();
+   private readonly ConcurrentDictionary<CultureInfo, List<ClientProgressHandler>> clients = new();
 
    private LocalizableMessage? lastProgress;
 
@@ -34,12 +34,18 @@ internal class ProgressReporter : IProgressReporter
 
    public void ReportProgress(int percentage, Func<CultureInfo, string> message)
    {
+      if (message == null)
+         throw new ArgumentNullException(nameof(message));
+
       ReportProgress(new LocalizableMessage(message, percentage));
    }
 
    public void ReportProgress(string message)
    {
-      ReportProgress(-1, message ?? string.Empty);
+      if (message == null)
+         throw new ArgumentNullException(nameof(message));
+      
+      ReportProgress(-1, message);
    }
 
    #endregion
@@ -48,7 +54,13 @@ internal class ProgressReporter : IProgressReporter
 
    public void RemoveClientHandler(ClientProgressHandler clientProgressHandler)
    {
-      clients.TryRemove(clientProgressHandler, out var _);
+      var culture = clientProgressHandler.Culture;
+      if (clients.TryGetValue(culture, out var cultureHandlers))
+      {
+         cultureHandlers.Remove(clientProgressHandler);
+         if (cultureHandlers.Count == 0)
+            clients.TryRemove(culture, out _);
+      }
    }
 
    #endregion
@@ -57,20 +69,36 @@ internal class ProgressReporter : IProgressReporter
 
    internal ClientProgressHandler CreateClientHandler(CultureInfo culture)
    {
-      var clientProgress = new ClientProgressHandler(culture);
-      if (lastProgress != null)
-         clientProgress.ReportProgress(lastProgress);
+      var cultureHandlers = clients.GetOrAdd(culture, _ => new List<ClientProgressHandler>());
 
-      clients.TryAdd(clientProgress, true);
+      var clientProgress = new ClientProgressHandler(culture);
+      cultureHandlers.Add(clientProgress);
+
+      if (lastProgress != null)
+      {
+         var progressInfo = lastProgress.Localize(culture);
+         clientProgress.ReportProgress(progressInfo);
+      }
+
       return clientProgress;
+   }
+
+   private IEnumerable<(CultureInfo, List<ClientProgressHandler>)> GetGroupedHandlers()
+   {
+      foreach (var client in clients)
+         yield return (client.Key, client.Value);
    }
 
    private void ReportProgress(LocalizableMessage localizableMessage)
    {
       lastProgress = localizableMessage;
 
-      foreach (var channel in clients.Keys)
-         channel.ReportProgress(localizableMessage);
+      foreach (var (culture, handlers) in GetGroupedHandlers())
+      {
+         var progressInfo = localizableMessage.Localize(culture);
+         foreach (var progressHandler in handlers)
+            progressHandler.ReportProgress(progressInfo);
+      }
    }
 
    #endregion

@@ -4,6 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable once CheckNamespace
 namespace ConsoLovers.Ipc;
 
 /// <summary>Service interface that is used on the <see cref="IIpcServer"/> side to report the result of the process"/></summary>
