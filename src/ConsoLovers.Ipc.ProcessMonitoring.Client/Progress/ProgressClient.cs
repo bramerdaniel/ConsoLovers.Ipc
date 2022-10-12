@@ -10,8 +10,6 @@ using System.Diagnostics.CodeAnalysis;
 
 using ConsoLovers.Ipc.Grpc;
 
-using global::Grpc.Core;
-
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public sealed class ProgressClient : ConfigurableClient<ProgressService.ProgressServiceClient>, IProgressClient
 {
@@ -90,7 +88,7 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
    {
       try
       {
-         var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateMetadata());
+         var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
          while (await streamingCall.ResponseStream.MoveNext(CancellationToken.None))
          {
             var currentResponse = streamingCall.ResponseStream.Current;
@@ -105,14 +103,6 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
          State = ClientState.Failed;
          Exception = ex;
       }
-   }
-
-   private Metadata? CreateMetadata()
-   {
-      // TODO this should come from ipc.client package and not from process monitoring
-      if (Configuration.Culture != null)
-         return new Metadata { { "Accept-Language", Configuration.Culture.Name } };
-      return null;
    }
 
    private void WaitForFinished(CancellationToken cancellationToken)

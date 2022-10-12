@@ -20,10 +20,11 @@ public interface IClientFactoryBuilder
    /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
    IClientFactoryBuilder AddService(Action<ServiceCollection> services);
 
-   /// <summary>Specifies the culture the clients want to have the responses.</summary>
-   /// <param name="culture">The requested culture.</param>
+   /// <summary>Specifies the default culture the clients will be created with.</summary>
+   /// <param name="culture">The default client culture every client will be created with,
+   /// when no other culture is specified in the <see cref="IClientFactory.CreateClient{T}()"/> method.</param>
    /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
-   IClientFactoryBuilder WithCulture(CultureInfo culture);
+   IClientFactoryBuilder WithDefaultCulture(CultureInfo culture);
 
    /// <summary>Builds the <see cref="IClientFactory"/>.</summary>
    /// <returns>The created <see cref="IClientFactory"/></returns>

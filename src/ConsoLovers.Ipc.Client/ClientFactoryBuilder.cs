@@ -36,6 +36,10 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    #region IClientFactoryBuilder Members
 
+   /// <summary>Adds a service to the <see cref="IClientFactoryBuilder"/>.</summary>
+   /// <param name="services">The services.</param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
+   /// <exception cref="System.ArgumentNullException">services</exception>
    public IClientFactoryBuilder AddService(Action<ServiceCollection> services)
    {
       if (services == null)
@@ -45,12 +49,19 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       return this;
    }
 
-   public IClientFactoryBuilder WithCulture(CultureInfo culture)
+   /// <summary>Specifies the default culture the clients will be created with.</summary>
+   /// <param name="culture">
+   ///    The default client culture every client will be created with, when no other culture is specified in the
+   ///    <see cref="IClientFactory.CreateClient{T}()"/> method.
+   /// </param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
+   /// <exception cref="System.ArgumentNullException">culture</exception>
+   public IClientFactoryBuilder WithDefaultCulture(CultureInfo culture)
    {
       clientCulture = culture ?? throw new ArgumentNullException(nameof(culture));
       return this;
    }
-   
+
    public IClientFactory Build()
    {
       if (channelFactory == null)
@@ -80,7 +91,7 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
    {
       if (process == null)
          throw new ArgumentNullException(nameof(process));
-      
+
       return ForName($"{process.ProcessName}.{process.Id}");
    }
 

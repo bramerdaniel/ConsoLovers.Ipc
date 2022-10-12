@@ -33,10 +33,10 @@ internal class AwaitProcessCommand : FactoryCommand, IAsyncCommand<AwaitProcessC
       var factory = CreateFactory(Arguments.ServerName, config =>
       {
          if (Arguments.Culture != null)
-            config.WithCulture(new CultureInfo(Arguments.Culture));
-
+            config.WithDefaultCulture(new CultureInfo(Arguments.Culture));
          config.AddProgressClient();
       });
+
       var resultClient = factory.CreateProgressClient();
 
       Console.WriteLine($"Waiting for server {Arguments.ServerName}");

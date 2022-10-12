@@ -61,7 +61,7 @@ internal class WaitForServerCommand : IAsyncCommand<WaitForServerCommand.WaitArg
       Process process = FindServerProcess();
       return builder.ForProcess(process)
          .AddProgressClient()
-         // .WithCulture(new CultureInfo("de-DE"))
+         // .WithDefaultCulture(new CultureInfo("de-DE"))
          .Build();
    }
 

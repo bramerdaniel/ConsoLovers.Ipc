@@ -8,6 +8,8 @@ namespace ConsoLovers.Ipc;
 
 using ConsoLovers.Ipc.Clients;
 
+using global::Grpc.Core;
+
 /// <summary>Base class for gRPC clients that should be configured</summary>
 /// <typeparam name="T"></typeparam>
 /// <seealso cref="ConsoLovers.Ipc.IConfigurableClient"/>
@@ -34,13 +36,6 @@ public class ConfigurableClient<T> : IConfigurableClient
       await OnServerConnectedAsync();
    }
 
-   /// <summary>Called when the <see cref="SynchronizationClient"/> could be connected to the server</summary>
-   /// <returns>The task</returns>
-   protected virtual Task OnServerConnectedAsync()
-   {
-      return Task.CompletedTask;
-   }
-
    #endregion
 
    #region Properties
@@ -48,18 +43,38 @@ public class ConfigurableClient<T> : IConfigurableClient
    /// <summary>Gets the configuration.</summary>
    protected IClientConfiguration Configuration { get; private set; } = null!;
 
-   protected ISynchronizationClient SynchronizationClient => connectionClient ??= new SynchronizationClient(Configuration.Channel);
-
    /// <summary>Gets the service client.</summary>
    protected T ServiceClient { get; private set; } = default!;
+
+   /// <summary>Gets a synchronization client.</summary>
+   protected ISynchronizationClient SynchronizationClient => connectionClient ??= new SynchronizationClient(Configuration.Channel);
 
    #endregion
 
    #region Methods
 
+   protected Metadata? AddLanguageHeader(Metadata? metadata)
+   {
+      if (metadata != null && Configuration.Culture != null)
+         metadata.Add("Accept-Language", Configuration.Culture.Name);
+      return metadata;
+   }
+
+   protected Metadata? CreateLanguageHeader()
+   {
+      return AddLanguageHeader(new Metadata());
+   }
+
    /// <summary>Called after the client was configured with the specified channel.</summary>
    protected virtual void OnConfigured()
    {
+   }
+
+   /// <summary>Called when the <see cref="SynchronizationClient"/> could be connected to the server</summary>
+   /// <returns>The task</returns>
+   protected virtual Task OnServerConnectedAsync()
+   {
+      return Task.CompletedTask;
    }
 
    #endregion

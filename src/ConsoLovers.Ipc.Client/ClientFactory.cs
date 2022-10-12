@@ -35,8 +35,18 @@ internal class ClientFactory : IClientFactory
    public T CreateClient<T>()
       where T : class, IConfigurableClient
    {
+      return CreateClient<T>(Culture);
+   }
+
+   /// <summary>Creates and configures the requested client.</summary>
+   /// <typeparam name="T">The type of the client to create</typeparam>
+   /// <param name="culture">The culture the client will be running in.</param>
+   /// <returns>The created client</returns>
+   public T CreateClient<T>(CultureInfo? culture)
+      where T : class, IConfigurableClient
+   {
       var client = ServiceProvider.GetService<T>() ?? CreateInstance<T>();
-      var configuration = new ClientConfiguration(ChannelFactory, Culture);
+      var configuration = new ClientConfiguration(ChannelFactory, culture);
       client.Configure(configuration);
       return client;
    }
