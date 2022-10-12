@@ -36,6 +36,12 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    #region IClientFactoryBuilder Members
 
+   public IClientFactoryBuilder AddClient<T>()
+      where T : class, IConfigurableClient
+   {
+      return AddService(services => services.AddSingleton<T>());
+   }
+
    /// <summary>Adds a service to the <see cref="IClientFactoryBuilder"/>.</summary>
    /// <param name="services">The services.</param>
    /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
@@ -60,6 +66,21 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
    {
       clientCulture = culture ?? throw new ArgumentNullException(nameof(culture));
       return this;
+   }
+
+   /// <summary>Specifies the default culture the clients will be created with.</summary>
+   /// <param name="culture">
+   ///    The default client culture name every client will be created with, when no other culture is specified in the
+   ///    <see cref="IClientFactory.CreateClient{T}()"/> method.
+   /// </param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
+   public IClientFactoryBuilder WithDefaultCulture(string culture)
+   {
+      if (culture == null)
+         throw new ArgumentNullException(nameof(culture));
+
+      var cultureInfo = CultureInfo.GetCultureInfo(culture);
+      return WithDefaultCulture(cultureInfo);
    }
 
    public IClientFactory Build()
@@ -106,6 +127,11 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       channelFactory = new ChannelFactory(socketFile);
       serviceCollection.AddSingleton(channelFactory);
       return this;
+   }
+
+   public IClientFactoryBuilder WithSocketFile(string socketFile)
+   {
+      return WithSocketFile(() => socketFile);
    }
 
    #endregion

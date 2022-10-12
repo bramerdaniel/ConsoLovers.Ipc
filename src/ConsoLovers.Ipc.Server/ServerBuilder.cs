@@ -116,10 +116,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    public IIpcServer Start()
    {
-      WebApplicationBuilder.Services.AddGrpc(options =>
-      {
-         options.Interceptors.Add<LanguageInterceptor>();
-      });
+      WebApplicationBuilder.Services.AddGrpc(options => { options.Interceptors.Add<LanguageInterceptor>(); });
 
       var application = WebApplicationBuilder.Build();
 
@@ -159,6 +156,11 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       if (string.IsNullOrWhiteSpace(Name))
          Name = Path.GetFileNameWithoutExtension(socketFile);
       return this;
+   }
+
+   public IServerBuilder WithSocketFile(string socketFile)
+   {
+      return WithSocketFile(() => socketFile);
    }
 
    public IServerBuilder ForProcess(Process process)
@@ -217,14 +219,18 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
 internal class LanguageInterceptor : Interceptor
 {
-   public override Task<TResponse> ClientStreamingServerHandler<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream, ServerCallContext context,
+   #region Public Methods and Operators
+
+   public override Task<TResponse> ClientStreamingServerHandler<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream,
+      ServerCallContext context,
       ClientStreamingServerMethod<TRequest, TResponse> continuation)
    {
       Console.WriteLine("ClientStreamingServerHandler");
       return base.ClientStreamingServerHandler(requestStream, context, continuation);
    }
 
-   public override Task ServerStreamingServerHandler<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream, ServerCallContext context,
+   public override Task ServerStreamingServerHandler<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream,
+      ServerCallContext context,
       ServerStreamingServerMethod<TRequest, TResponse> continuation)
    {
       var headerLanguage = context.RequestHeaders.FirstOrDefault(t => t.Key == HeaderNames.AcceptLanguage);
@@ -236,4 +242,6 @@ internal class LanguageInterceptor : Interceptor
 
       return base.ServerStreamingServerHandler(request, responseStream, context, continuation);
    }
+
+   #endregion
 }

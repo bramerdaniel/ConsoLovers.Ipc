@@ -1,18 +1,20 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProgressEventArgs.cs" company="ConsoLovers">
+// <copyright file="Setup.cs" company="ConsoLovers">
 //    Copyright (c) ConsoLovers  2015 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.ProcessMonitoring;
+namespace ConsoLovers.Ipc.UnitTests.Setups;
 
-public class ProgressEventArgs
+internal static class Setup
 {
-   #region Public Properties
+   #region Methods
 
-   public string Message { get; set; } = null!;
+   internal static IpcServerSetup IpcServer() => new();
 
-   public int Percentage { get; set; }
+   internal static IpcClientSetup IpcClient() => new();
+   
+   internal static IIpcTestSetup IpcTest() => new IpcTestSetup();
 
    #endregion
 }

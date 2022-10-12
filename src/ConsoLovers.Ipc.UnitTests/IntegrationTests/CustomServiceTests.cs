@@ -1,0 +1,63 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="CustomServiceTests.cs" company="ConsoLovers">
+//    Copyright (c) ConsoLovers  2015 - 2022
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ConsoLovers.Ipc.UnitTests.IntegrationTests;
+
+using System.Diagnostics.CodeAnalysis;
+
+using ConsoLovers.Ipc.UnitTests.Clients;
+using ConsoLovers.Ipc.UnitTests.Services;
+using ConsoLovers.Ipc.UnitTests.Setups;
+
+using FluentAssertions;
+
+using global::Grpc.Core;
+
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+[TestClass]
+[SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Reviewed. Suppression is OK here.")]
+public class CustomServiceTests
+{
+   #region Public Methods and Operators
+
+   [TestMethod]
+   public void EnsureClientFactoryUsesCultureOfCreateClientMethod()
+   {
+      using var ipcTest = Setup.IpcTest()
+         .ForCurrentTest()
+         .WithService<GreeterService, GreeterClient>()
+         .Done();
+
+      var greeterClient = ipcTest.CreateClient<GreeterClient>();
+      greeterClient.SayHello("Robert").Should().Be("Hello Robert");
+   }
+
+   [TestMethod]
+   public void EnsureCorrectErrorMessageWithoutCorrectServerSetup()
+   {
+      using var ipcTest = Setup.IpcTest()
+         .ForCurrentTest()
+         .Done();
+
+      var greeterClient = ipcTest.CreateClient<GreeterClient>();
+      greeterClient.Invoking(gc => gc.SayHello("Robert")).Should()
+         .Throw<RpcException>().Where(e => e.StatusCode == StatusCode.Unimplemented);
+   }
+
+   [TestMethod]
+   public void EnsureNoErrorWhenClientWasNotAddedToFactory()
+   {
+      using var ipcTest = Setup.IpcTest()
+         .ForCurrentTest()
+         .Done();
+
+      ipcTest.Invoking(x => x.CreateClient<GreeterClient>()).Should()
+         .NotThrow();
+   }
+
+   #endregion
+}

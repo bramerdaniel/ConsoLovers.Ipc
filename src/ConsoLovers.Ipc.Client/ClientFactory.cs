@@ -51,6 +51,16 @@ internal class ClientFactory : IClientFactory
       return client;
    }
 
+   public T CreateClient<T>(string culture)
+      where T : class, IConfigurableClient
+   {
+      if (culture == null)
+         throw new ArgumentNullException(nameof(culture));
+
+      var cultureInfo = CultureInfo.GetCultureInfo(culture);
+      return CreateClient<T>(cultureInfo);
+   }
+
    #endregion
 
    #region Properties
@@ -66,7 +76,6 @@ internal class ClientFactory : IClientFactory
 
    private static void CheckForBuildInClients(Type serviceType)
    {
-      // TODO : move this logic to process monitoring
       if (serviceType.Name == "IResultClient")
          throw new InvalidOperationException(CreateMessage(serviceType, "AddResultClient"));
       if (serviceType.Name == "IProgressClient")

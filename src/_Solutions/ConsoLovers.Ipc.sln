@@ -42,6 +42,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Toolkit.Ipc.Ser
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IpcServerExtension", "..\Examples\IpcServerExtension\IpcServerExtension.csproj", "{C62DBCEE-47D3-4B11-9C68-757D181260C4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Ipc.UnitTests", "..\ConsoLovers.Ipc.UnitTests\ConsoLovers.Ipc.UnitTests.csproj", "{CA490354-680C-47D9-9877-62096D88A89B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -96,6 +98,10 @@ Global
 		{C62DBCEE-47D3-4B11-9C68-757D181260C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C62DBCEE-47D3-4B11-9C68-757D181260C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C62DBCEE-47D3-4B11-9C68-757D181260C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA490354-680C-47D9-9877-62096D88A89B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA490354-680C-47D9-9877-62096D88A89B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA490354-680C-47D9-9877-62096D88A89B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA490354-680C-47D9-9877-62096D88A89B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,6 +115,7 @@ Global
 		{AC54E67A-DAD4-4072-93C8-BCE6FF6ABF52} = {706A1372-2B78-4E86-8CD7-A1BC7CF76B84}
 		{6B4830F2-9796-41E9-BC80-E6DA24408BBA} = {CE55094C-CF23-4178-BB43-5E8DC9E12868}
 		{C62DBCEE-47D3-4B11-9C68-757D181260C4} = {706A1372-2B78-4E86-8CD7-A1BC7CF76B84}
+		{CA490354-680C-47D9-9877-62096D88A89B} = {7A986E39-821E-49B3-AB03-C51BF0B94719}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {08AF8FBA-696A-4E00-BAFC-F1A170E7E5A6}

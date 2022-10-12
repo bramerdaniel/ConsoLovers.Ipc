@@ -1,0 +1,71 @@
+﻿// --------------------------------------------------------------------------------------------------------------------
+// <copyright file="IpcTest.cs" company="ConsoLovers">
+//    Copyright (c) ConsoLovers  2015 - 2022
+// </copyright>
+// --------------------------------------------------------------------------------------------------------------------
+
+namespace ConsoLovers.Ipc.UnitTests;
+
+using System;
+using System.IO;
+
+internal sealed class IpcTest : IDisposable
+{
+   #region Constructors and Destructors
+
+   public IpcTest(string socketFile, IIpcServer server, IClientFactory clientFactory)
+   {
+      SocketFile = socketFile ?? throw new ArgumentNullException(nameof(socketFile));
+      Server = server ?? throw new ArgumentNullException(nameof(server));
+      ClientFactory = clientFactory ?? throw new ArgumentNullException(nameof(clientFactory));
+   }
+
+   #endregion
+
+   #region IDisposable Members
+
+   public void Dispose()
+   {
+      Server?.Dispose();
+      DeleteSocketFile();
+   }
+
+   #endregion
+
+   #region Public Properties
+
+   public string SocketFile { get; }
+
+   #endregion
+
+   #region Properties
+
+   internal IClientFactory ClientFactory { get; }
+
+   internal IIpcServer Server { get; }
+
+   #endregion
+
+   #region Methods
+
+   private void DeleteSocketFile()
+   {
+      try
+      {
+         if (File.Exists(SocketFile))
+            File.Delete(SocketFile);
+      }
+      catch (IOException)
+      {
+         // Ignore io exceptions here
+      }
+   }
+
+   #endregion
+
+   public T CreateClient<T>()
+      where T : class, IConfigurableClient
+   {
+      return ClientFactory.CreateClient<T>();
+   }
+}

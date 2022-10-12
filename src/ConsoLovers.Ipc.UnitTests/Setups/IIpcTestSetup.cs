@@ -1,18 +1,18 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProgressEventArgs.cs" company="ConsoLovers">
+// <copyright file="IIpcTestSetup.cs" company="ConsoLovers">
 //    Copyright (c) ConsoLovers  2015 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.ProcessMonitoring;
+namespace ConsoLovers.Ipc.UnitTests.Setups;
 
-public class ProgressEventArgs
+using System.Runtime.CompilerServices;
+
+internal interface IIpcTestSetup
 {
-   #region Public Properties
-
-   public string Message { get; set; } = null!;
-
-   public int Percentage { get; set; }
+   #region Public Methods and Operators
+   
+   IpcTestSetup ForCurrentTest([CallerMemberName] string socketFileName = null);
 
    #endregion
 }

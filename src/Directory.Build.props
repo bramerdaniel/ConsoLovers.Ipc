@@ -2,6 +2,9 @@
 
 	<PropertyGroup>
 		<NugetPackageVersion>0.2.0</NugetPackageVersion>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\..\certificate\ConsoleToolkit.Core.snk</AssemblyOriginatorKeyFile>
+
 	</PropertyGroup>
 
 	<PropertyGroup>

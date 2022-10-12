@@ -1,0 +1,18 @@
+﻿syntax = "proto3";
+
+package ConsoLovers.Ipc.UnitTests;
+option csharp_namespace = "ConsoLovers.Ipc.UnitTests.Grpc";
+
+service UnitTestService
+{
+	rpc GetCultureName(GetCultureNameRequest) returns (GetCultureNameResponse);
+}
+
+message GetCultureNameRequest 
+{    
+}
+
+message GetCultureNameResponse 
+{    
+	string culture_name = 1;
+}

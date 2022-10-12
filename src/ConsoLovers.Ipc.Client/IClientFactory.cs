@@ -23,13 +23,20 @@ public interface IClientFactory
    /// <typeparam name="T">The type of the client to create</typeparam>
    /// <returns>The created client</returns>
    T CreateClient<T>()
-
       where T : class, IConfigurableClient;
+
    /// <summary>Creates and configures the requested client.</summary>
    /// <typeparam name="T">The type of the client to create</typeparam>
    /// <param name="culture">The culture the client will be running in.</param>
    /// <returns>The created client</returns>
    T CreateClient<T>(CultureInfo culture)
+      where T : class, IConfigurableClient;
+
+   /// <summary>Creates and configures the requested client.</summary>
+   /// <typeparam name="T">The type of the client to create</typeparam>
+   /// <param name="culture">The culture name the client will be running in.</param>
+   /// <returns>The created client</returns>
+   T CreateClient<T>(string culture)
       where T : class, IConfigurableClient;
 
    #endregion
