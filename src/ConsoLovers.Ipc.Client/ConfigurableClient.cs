@@ -33,7 +33,7 @@ public class ConfigurableClient<T> : IConfigurableClient
    private static object CreateInstance(IClientConfiguration configuration)
    {
       var clientType = typeof(T);
-      return Activator.CreateInstance(clientType, configuration.Channel) 
+      return Activator.CreateInstance(clientType, configuration.Channel)
              ?? throw new InvalidOperationException($"A service client of type {clientType.Name} could not be created.");
    }
 
@@ -70,6 +70,11 @@ public class ConfigurableClient<T> : IConfigurableClient
    protected Metadata? CreateLanguageHeader()
    {
       return AddLanguageHeader(new Metadata());
+   }
+
+   protected Metadata CreateLanguageHeader(string culture)
+   {
+      return new Metadata { { "Accept-Language", culture } };
    }
 
    /// <summary>Called after the client was configured with the specified channel.</summary>

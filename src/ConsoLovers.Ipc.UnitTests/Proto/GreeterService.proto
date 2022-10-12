@@ -6,6 +6,8 @@ option csharp_namespace = "ConsoLovers.Ipc.UnitTests.Grpc";
 service GreeterService
 {
 	rpc SayHello(SayHelloRequest) returns (SayHelloResponse);
+
+	rpc SayGoodby(SayGoodbyRequest) returns (SayGoodbyResponse);
 }
 
 message SayHelloRequest 
@@ -13,7 +15,17 @@ message SayHelloRequest
 	string name = 1;
 }
 
+message SayGoodbyRequest 
+{    
+	string name = 1;
+}
+
 message SayHelloResponse 
+{    
+	string message = 1;
+}
+
+message SayGoodbyResponse 
 {    
 	string message = 1;
 }

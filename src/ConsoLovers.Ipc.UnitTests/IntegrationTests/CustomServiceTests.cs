@@ -59,5 +59,20 @@ public class CustomServiceTests
          .NotThrow();
    }
 
+   [TestMethod]
+   public void EnsureDynamicLocalizationWorksCorrectly()
+   {
+      using var ipcTest = Setup.IpcTest()
+         .ForCurrentTest()
+         .WithService<GreeterService, GreeterClient>()
+         .Done();
+
+      var client = ipcTest.CreateClient<GreeterClient>();
+      client.SayGoodby("Paul", "en-US").Should().Be("Goodby Paul");
+      client.SayGoodby("Paul", "de-DE").Should().Be("Auf Wiedersehen Paul");
+      client.SayGoodby("Paul", "fr-FR").Should().Be("Au revoir Paul");
+
+   }
+
    #endregion
 }
