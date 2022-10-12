@@ -26,8 +26,15 @@ public class ConfigurableClient<T> : IConfigurableClient
    public void Configure(IClientConfiguration configuration)
    {
       Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-      ServiceClient = (T)Activator.CreateInstance(typeof(T), configuration.Channel);
+      ServiceClient = (T)CreateInstance(configuration);
       OnConfigured();
+   }
+
+   private static object CreateInstance(IClientConfiguration configuration)
+   {
+      var clientType = typeof(T);
+      return Activator.CreateInstance(clientType, configuration.Channel) 
+             ?? throw new InvalidOperationException($"A service client of type {clientType.Name} could not be created.");
    }
 
    public async Task WaitForServerAsync(CancellationToken cancellationToken)

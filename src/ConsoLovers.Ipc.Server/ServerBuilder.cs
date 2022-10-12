@@ -36,6 +36,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    /// <summary>Initializes a new instance of the <see cref="ServerBuilder"/> class.</summary>
    internal ServerBuilder()
    {
+      Name = string.Empty;
       WebApplicationBuilder = WebApplication.CreateBuilder(new WebApplicationOptions());
       AddGrpcService<SynchronizationService>();
    }
