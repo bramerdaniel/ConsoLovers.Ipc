@@ -13,9 +13,9 @@ internal class ProgressReporter : IProgressReporter
 {
    #region Constants and Fields
 
-   private ConcurrentDictionary<ClientProgressHandler, bool> clients = new ConcurrentDictionary<ClientProgressHandler, bool>();
+   private readonly ConcurrentDictionary<ClientProgressHandler, bool> clients = new();
 
-   private ProgressTranslator? lastProgress;
+   private LocalizableMessage? lastProgress;
 
    #endregion
 
@@ -23,7 +23,7 @@ internal class ProgressReporter : IProgressReporter
 
    public void ReportProgress(int percentage, string message)
    {
-      var progressHandler = new ProgressTranslator(_ => message, percentage);
+      var progressHandler = new LocalizableMessage(_ => message, percentage);
       ReportProgress(progressHandler);
    }
 
@@ -34,7 +34,7 @@ internal class ProgressReporter : IProgressReporter
 
    public void ReportProgress(int percentage, Func<CultureInfo, string> message)
    {
-      ReportProgress(new ProgressTranslator(message, percentage));
+      ReportProgress(new LocalizableMessage(message, percentage));
    }
 
    public void ReportProgress(string message)
@@ -65,12 +65,12 @@ internal class ProgressReporter : IProgressReporter
       return clientProgress;
    }
 
-   private void ReportProgress(ProgressTranslator progressTranslator)
+   private void ReportProgress(LocalizableMessage localizableMessage)
    {
-      lastProgress = progressTranslator;
+      lastProgress = localizableMessage;
 
       foreach (var channel in clients.Keys)
-         channel.ReportProgress(progressTranslator);
+         channel.ReportProgress(localizableMessage);
    }
 
    #endregion

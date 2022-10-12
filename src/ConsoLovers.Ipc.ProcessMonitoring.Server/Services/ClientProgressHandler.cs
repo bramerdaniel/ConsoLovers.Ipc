@@ -18,14 +18,14 @@ internal class ClientProgressHandler
    public ClientProgressHandler(CultureInfo culture)
    {
       Culture = culture ?? throw new ArgumentNullException(nameof(culture));
-      ProgressChannel = Channel.CreateUnbounded<ProgressTranslator>();
+      ProgressChannel = Channel.CreateUnbounded<LocalizableMessage>();
    }
 
-   private Channel<ProgressTranslator> ProgressChannel { get; }
+   private Channel<LocalizableMessage> ProgressChannel { get; }
 
-   public void ReportProgress(ProgressTranslator progressTranslator)
+   public void ReportProgress(LocalizableMessage localizableMessage)
    {
-      ProgressChannel.Writer.TryWrite(progressTranslator);
+      ProgressChannel.Writer.TryWrite(localizableMessage);
    }
 
    public async Task<ProgressInfo> ReadNextAsync(CancellationToken cancellationToken)
