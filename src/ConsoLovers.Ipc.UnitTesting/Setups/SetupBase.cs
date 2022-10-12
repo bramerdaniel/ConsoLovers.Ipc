@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.UnitTesting.Setups
+namespace ConsoLovers.Ipc.UnitTesting
 {
    using System;
    using System.Collections.Generic;
@@ -20,14 +20,18 @@ namespace ConsoLovers.Ipc.UnitTesting.Setups
 
       #endregion
 
-      #region Methods
+      #region Public Methods and Operators
 
-      internal T Done()
+      public T Done()
       {
          var instance = CreateInstance();
          SetupInstance(instance);
          return instance;
       }
+
+      #endregion
+
+      #region Methods
 
       protected bool Add<TFt>(string name, TFt value)
       {

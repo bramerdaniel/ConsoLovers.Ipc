@@ -8,9 +8,9 @@ namespace ConsoLovers.Ipc.UnitTests.IntegrationTests;
 
 using System.Diagnostics.CodeAnalysis;
 
+using ConsoLovers.Ipc.UnitTesting;
 using ConsoLovers.Ipc.UnitTests.Clients;
 using ConsoLovers.Ipc.UnitTests.Services;
-using ConsoLovers.Ipc.UnitTests.Setups;
 
 using FluentAssertions;
 

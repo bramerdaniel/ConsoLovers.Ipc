@@ -34,15 +34,21 @@ public sealed class IpcTest : IDisposable
 
    #region Public Properties
 
+   public IClientFactory ClientFactory { get; }
+
+   public IIpcServer Server { get; }
+
    public string SocketFile { get; }
 
    #endregion
 
-   #region Properties
+   #region Public Methods and Operators
 
-   internal IClientFactory ClientFactory { get; }
-
-   internal IIpcServer Server { get; }
+   public T CreateClient<T>()
+      where T : class, IConfigurableClient
+   {
+      return ClientFactory.CreateClient<T>();
+   }
 
    #endregion
 
@@ -62,10 +68,4 @@ public sealed class IpcTest : IDisposable
    }
 
    #endregion
-
-   public T CreateClient<T>()
-      where T : class, IConfigurableClient
-   {
-      return ClientFactory.CreateClient<T>();
-   }
 }

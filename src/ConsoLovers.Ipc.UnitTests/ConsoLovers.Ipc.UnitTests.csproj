@@ -44,6 +44,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\ConsoLovers.Ipc.Client\ConsoLovers.Ipc.Client.csproj" />
 		<ProjectReference Include="..\ConsoLovers.Ipc.Server\ConsoLovers.Ipc.Server.csproj" />
+		<ProjectReference Include="..\ConsoLovers.Ipc.UnitTesting\ConsoLovers.Ipc.UnitTesting.csproj" />
 	</ItemGroup>
 
 
@@ -54,6 +55,12 @@
 	    <Access>Internal</Access>
 	    <GrpcServices>Both</GrpcServices>
 	  </Protobuf>
+	</ItemGroup>
+
+
+
+	<ItemGroup>
+	  <Folder Include="Setups\" />
 	</ItemGroup>
 
 </Project>

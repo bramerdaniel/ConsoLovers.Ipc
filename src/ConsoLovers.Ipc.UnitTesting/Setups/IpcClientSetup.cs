@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.UnitTesting.Setups;
+namespace ConsoLovers.Ipc.UnitTesting;
 
 using System;
 using System.Collections.Generic;
