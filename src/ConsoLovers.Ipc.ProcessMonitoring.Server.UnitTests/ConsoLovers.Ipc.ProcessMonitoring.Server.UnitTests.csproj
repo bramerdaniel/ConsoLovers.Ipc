@@ -32,7 +32,9 @@
 
 
 	<ItemGroup>
+	  <ProjectReference Include="..\ConsoLovers.Ipc.ProcessMonitoring.Client\ConsoLovers.Ipc.ProcessMonitoring.Client.csproj" />
 	  <ProjectReference Include="..\ConsoLovers.Ipc.ProcessMonitoring.Server\ConsoLovers.Ipc.ProcessMonitoring.Server.csproj" />
+	  <ProjectReference Include="..\ConsoLovers.Ipc.UnitTesting\ConsoLovers.Ipc.UnitTesting.csproj" />
 	</ItemGroup>
 
 </Project>
