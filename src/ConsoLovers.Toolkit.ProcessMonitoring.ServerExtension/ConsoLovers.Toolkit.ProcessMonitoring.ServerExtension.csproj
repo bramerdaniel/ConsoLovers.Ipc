@@ -16,6 +16,7 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\ConsoLovers.Ipc.ProcessMonitoring.Server\ConsoLovers.Ipc.ProcessMonitoring.Server.csproj" />
+	  <ProjectReference Include="..\ConsoLovers.Toolkit.Ipc.ServerExtension\ConsoLovers.Toolkit.Ipc.ServerExtension.csproj" />
 	</ItemGroup>
 
 	<Target Name="ChangeAliases" BeforeTargets="FindReferenceAssembliesForReferences;ResolveReferences">

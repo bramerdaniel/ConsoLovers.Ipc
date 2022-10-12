@@ -8,13 +8,17 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
-using System.Reflection;
+using System.Globalization;
 using System.Runtime.CompilerServices;
+
+using global::Grpc.Core;
+using global::Grpc.Core.Interceptors;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Net.Http.Headers;
 
 /// <summary>The default implementation of the <see cref="IServerBuilder"/> interface</summary>
 /// <seealso cref="ConsoLovers.Ipc.IServerBuilder"/>
@@ -32,6 +36,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    /// <summary>Initializes a new instance of the <see cref="ServerBuilder"/> class.</summary>
    internal ServerBuilder()
    {
+      Name = string.Empty;
       WebApplicationBuilder = WebApplication.CreateBuilder(new WebApplicationOptions());
       AddGrpcService<SynchronizationService>();
    }
@@ -39,8 +44,6 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    #endregion
 
    #region IServerBuilder Members
-
-
 
    public IServerBuilder AddService(Action<IServiceCollection> serviceSetup)
    {
@@ -88,23 +91,32 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       return this;
    }
 
+   public IServerBuilder AddGrpcService<T>(ServiceLifetime lifetime)
+      where T : class
+   {
+      AddService(x => x.Add(ServiceDescriptor.Describe(typeof(T), typeof(T), lifetime)));
+      applicationActions.Add(app => app.MapGrpcService<T>());
+      return this;
+   }
+
    public IServerBuilder AddGrpcService(Type serviceType)
    {
       var method = typeof(ServerBuilder).GetMethods()
          .FirstOrDefault(x => x.Name == nameof(AddGrpcService) && x.IsGenericMethod);
 
-      // MethodInfo methodInfo = typeof(ServerBuilder).GetMethod(nameof(ServerBuilder.AddGrpcService),BindingFlags.Public, new Type[]{ serviceType });
-      MethodInfo generic = method.MakeGenericMethod(serviceType);
-      generic.Invoke(this, null);
+      if (method == null)
+         throw new InvalidOperationException("AddGrpcService method could not be found");
+
+      method.MakeGenericMethod(serviceType)
+         .Invoke(this, null);
 
       AddService(x => x.AddSingleton(serviceType));
-
       return this;
    }
 
    public IIpcServer Start()
    {
-      WebApplicationBuilder.Services.AddGrpc();
+      WebApplicationBuilder.Services.AddGrpc(options => { options.Interceptors.Add<LanguageInterceptor>(); });
 
       var application = WebApplicationBuilder.Build();
 
@@ -144,6 +156,11 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       if (string.IsNullOrWhiteSpace(Name))
          Name = Path.GetFileNameWithoutExtension(socketFile);
       return this;
+   }
+
+   public IServerBuilder WithSocketFile(string socketFile)
+   {
+      return WithSocketFile(() => socketFile);
    }
 
    public IServerBuilder ForProcess(Process process)
@@ -195,6 +212,35 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
       if (filePath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
          throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
+   }
+
+   #endregion
+}
+
+internal class LanguageInterceptor : Interceptor
+{
+   #region Public Methods and Operators
+
+   public override Task<TResponse> ClientStreamingServerHandler<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream,
+      ServerCallContext context,
+      ClientStreamingServerMethod<TRequest, TResponse> continuation)
+   {
+      Console.WriteLine("ClientStreamingServerHandler");
+      return base.ClientStreamingServerHandler(requestStream, context, continuation);
+   }
+
+   public override Task ServerStreamingServerHandler<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream,
+      ServerCallContext context,
+      ServerStreamingServerMethod<TRequest, TResponse> continuation)
+   {
+      var headerLanguage = context.RequestHeaders.FirstOrDefault(t => t.Key == HeaderNames.AcceptLanguage);
+      if (headerLanguage != null)
+      {
+         Thread.CurrentThread.CurrentCulture = new CultureInfo(headerLanguage.Value);
+         Thread.CurrentThread.CurrentUICulture = new CultureInfo(headerLanguage.Value);
+      }
+
+      return base.ServerStreamingServerHandler(request, responseStream, context, continuation);
    }
 
    #endregion

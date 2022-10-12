@@ -7,6 +7,7 @@
 namespace Server.Commands;
 
 using System.Diagnostics;
+using System.Globalization;
 
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.Ipc;
@@ -43,6 +44,7 @@ internal class RunCommand : ServerCommand, IAsyncCommand<RunCommand.RunArgs>
          Console.ReadLine();
       }
 
+
       await using var communicationServer = StartServer(Arguments.ServerName, c => c.AddProcessMonitoring().AddCancellationHandler(CancelExecution));
 
       var progressReporter = communicationServer.GetProgressReporter();
@@ -62,7 +64,7 @@ internal class RunCommand : ServerCommand, IAsyncCommand<RunCommand.RunArgs>
                break;
             }
 
-            progressReporter.ReportProgress(i, $"Progress {i}");
+            progressReporter.ReportProgress(i, c => GetMessage(nameof(Properties.Resources.Progress), c, i));
             progressTask.Value = i;
             if (i == 55)
                resultReporter.AddData("FirstError", "Bend index on number 55");
@@ -79,6 +81,15 @@ internal class RunCommand : ServerCommand, IAsyncCommand<RunCommand.RunArgs>
       AnsiConsole.WriteLine("shutting down communication server");
 
       AnsiConsole.WriteLine("Setup has finished");
+   }
+
+   private string GetMessage(string resourceKey, CultureInfo culture, int percentage)
+   {
+      var resourceManager = Properties.Resources.ResourceManager;
+      if (resourceManager == null)
+         return resourceKey;
+
+      return string.Format(resourceManager.GetString(resourceKey, culture) ?? resourceKey, percentage);
    }
 
    public RunArgs Arguments { get; set; } = null!;

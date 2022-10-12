@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Globalization;
+
 using global::Grpc.Net.Client;
 
 public interface IClientConfiguration
@@ -17,6 +19,9 @@ public interface IClientConfiguration
 
    /// <summary>Gets the server name the channel was created for.</summary>
    public string ServerName { get; }
+
+   /// <summary>Gets the <see cref="CultureInfo"/> the client runs in.</summary>
+   CultureInfo? Culture { get; }
 
    #endregion
 }

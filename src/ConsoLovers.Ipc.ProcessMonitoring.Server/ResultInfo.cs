@@ -10,6 +10,12 @@ internal record ResultInfo
 {
    #region Public Properties
 
+   public ResultInfo(int exitCode, string message)
+   {
+      ExitCode = exitCode;
+      Message = message ?? throw new ArgumentNullException(nameof(message));
+   }
+
    public IDictionary<string, string> Data { get; } = new Dictionary<string, string>();
 
    /// <summary>Gets or sets the exit code.</summary>

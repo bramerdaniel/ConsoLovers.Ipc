@@ -8,6 +8,8 @@ namespace ConsoLovers.Ipc;
 
 using ConsoLovers.Ipc.Clients;
 
+using global::Grpc.Core;
+
 /// <summary>Base class for gRPC clients that should be configured</summary>
 /// <typeparam name="T"></typeparam>
 /// <seealso cref="ConsoLovers.Ipc.IConfigurableClient"/>
@@ -24,21 +26,21 @@ public class ConfigurableClient<T> : IConfigurableClient
    public void Configure(IClientConfiguration configuration)
    {
       Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
-      ServiceClient = (T)Activator.CreateInstance(typeof(T), configuration.Channel);
+      ServiceClient = (T)CreateInstance(configuration);
       OnConfigured();
+   }
+
+   private static object CreateInstance(IClientConfiguration configuration)
+   {
+      var clientType = typeof(T);
+      return Activator.CreateInstance(clientType, configuration.Channel)
+             ?? throw new InvalidOperationException($"A service client of type {clientType.Name} could not be created.");
    }
 
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
       await SynchronizationClient.WaitForServerAsync(cancellationToken);
       await OnServerConnectedAsync();
-   }
-
-   /// <summary>Called when the <see cref="SynchronizationClient"/> could be connected to the server</summary>
-   /// <returns>The task</returns>
-   protected virtual Task OnServerConnectedAsync()
-   {
-      return Task.CompletedTask;
    }
 
    #endregion
@@ -48,18 +50,43 @@ public class ConfigurableClient<T> : IConfigurableClient
    /// <summary>Gets the configuration.</summary>
    protected IClientConfiguration Configuration { get; private set; } = null!;
 
-   protected ISynchronizationClient SynchronizationClient => connectionClient ??= new SynchronizationClient(Configuration.Channel);
-
    /// <summary>Gets the service client.</summary>
    protected T ServiceClient { get; private set; } = default!;
+
+   /// <summary>Gets a synchronization client.</summary>
+   protected ISynchronizationClient SynchronizationClient => connectionClient ??= new SynchronizationClient(Configuration.Channel);
 
    #endregion
 
    #region Methods
 
+   protected Metadata? AddLanguageHeader(Metadata? metadata)
+   {
+      if (metadata != null && Configuration.Culture != null)
+         metadata.Add("Accept-Language", Configuration.Culture.Name);
+      return metadata;
+   }
+
+   protected Metadata? CreateLanguageHeader()
+   {
+      return AddLanguageHeader(new Metadata());
+   }
+
+   protected Metadata CreateLanguageHeader(string culture)
+   {
+      return new Metadata { { "Accept-Language", culture } };
+   }
+
    /// <summary>Called after the client was configured with the specified channel.</summary>
    protected virtual void OnConfigured()
    {
+   }
+
+   /// <summary>Called when the <see cref="SynchronizationClient"/> could be connected to the server</summary>
+   /// <returns>The task</returns>
+   protected virtual Task OnServerConnectedAsync()
+   {
+      return Task.CompletedTask;
    }
 
    #endregion

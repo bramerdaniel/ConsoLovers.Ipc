@@ -23,14 +23,20 @@ public static class ApplicationBuilderExtensions
       return builder.AddProcessMonitoringServer(b => b.ForCurrentProcess());
    }
 
-   public static IApplicationBuilder<T> AddProcessMonitoringServer<T>(this IApplicationBuilder<T> builder, Func<IServerBuilderWithoutName, IServerBuilder> config)
+   public static IApplicationBuilder<T> AddProcessMonitoringServer<T>(this IApplicationBuilder<T> builder, Action<IServerBuilderWithoutName> config)
       where T : class
    {
       if (config == null)
          throw new ArgumentNullException(nameof(config));
 
-      builder.AddService(x => x.AddSingleton(s => CreateServerBuilder(s, config)));
-      builder.AddService(x => x.AddSingleton(CreateIpcServer));
+      builder.AddIpcServer(server =>
+      {
+         config(server);
+
+         var serverBuilder = (IServerBuilder)server;
+         serverBuilder.AddProcessMonitoring();
+      });
+
       builder.AddProcessMonitoringServices();
       return builder;
    }   
@@ -50,19 +56,4 @@ public static class ApplicationBuilderExtensions
       var ipcServer = serviceProvider.GetRequiredService<IIpcServer>();
       return ipcServer.GetRequiredService<T>();
    }
-
-   private static IServerBuilder CreateServerBuilder(IServiceProvider services, Func<IServerBuilderWithoutName, IServerBuilder> config)
-   {
-      var builderWithoutName = IpcServer.CreateServer();
-      var builder = config(builderWithoutName);
-      return builder.AddProcessMonitoring()
-         .RemoveAspNetCoreLogging();
-   }
-   private static IIpcServer CreateIpcServer(IServiceProvider services)
-   {
-      var builder = services.GetRequiredService<IServerBuilder>();
-      return builder.Start();
-   }
-
-
 }

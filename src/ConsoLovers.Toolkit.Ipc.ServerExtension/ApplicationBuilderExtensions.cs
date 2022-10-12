@@ -85,8 +85,7 @@ public static class ApplicationBuilderExtensions
    /// <param name="removeAspNetCoreLogging">if set to <c>true</c> the loggers of ASPNetCore will be removed, otherwise they will log to the console.</param>
    /// <returns>The current <see cref="IApplicationBuilder{T}"/> for more fluent configuration</returns>
    /// <exception cref="System.ArgumentNullException">builder</exception>
-   public static IApplicationBuilder<T> AddIpcServer<T>(this IApplicationBuilder<T> builder, Action<IServerBuilderWithoutName> config,
-      bool removeAspNetCoreLogging)
+   public static IApplicationBuilder<T> AddIpcServer<T>(this IApplicationBuilder<T> builder, Action<IServerBuilderWithoutName> config, bool removeAspNetCoreLogging)
       where T : class
    {
       if (builder == null)
