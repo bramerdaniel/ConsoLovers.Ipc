@@ -32,8 +32,8 @@ internal class GreeterService : Grpc.GreeterService.GreeterServiceBase
    #endregion
 
    #region Methods
-
-   private string GetMessage(string name, string culture)
+   
+   private static string GetMessage(string name, string culture)
    {
       return culture switch
       {
