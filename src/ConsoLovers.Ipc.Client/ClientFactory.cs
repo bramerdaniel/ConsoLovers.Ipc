@@ -6,6 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Globalization;
 using System.Text;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -14,10 +15,11 @@ internal class ClientFactory : IClientFactory
 {
    #region Constructors and Destructors
 
-   internal ClientFactory(IServiceProvider serviceProvider, IChannelFactory channelFactory)
+   internal ClientFactory(IServiceProvider serviceProvider, IChannelFactory channelFactory, CultureInfo? culture)
    {
       ServiceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
       ChannelFactory = channelFactory ?? throw new ArgumentNullException(nameof(channelFactory));
+      Culture = culture;
    }
 
    #endregion
@@ -33,14 +35,38 @@ internal class ClientFactory : IClientFactory
    public T CreateClient<T>()
       where T : class, IConfigurableClient
    {
+      return CreateClient<T>(Culture);
+   }
+
+   /// <summary>Creates and configures the requested client.</summary>
+   /// <typeparam name="T">The type of the client to create</typeparam>
+   /// <param name="culture">The culture the client will be running in.</param>
+   /// <returns>The created client</returns>
+   public T CreateClient<T>(CultureInfo? culture)
+      where T : class, IConfigurableClient
+   {
       var client = ServiceProvider.GetService<T>() ?? CreateInstance<T>();
-      client.Configure(new ClientConfiguration(ChannelFactory));
+      var configuration = new ClientConfiguration(ChannelFactory, culture);
+      client.Configure(configuration);
       return client;
+   }
+
+   public T CreateClient<T>(string culture)
+      where T : class, IConfigurableClient
+   {
+      if (culture == null)
+         throw new ArgumentNullException(nameof(culture));
+
+      var cultureInfo = CultureInfo.GetCultureInfo(culture);
+      return CreateClient<T>(cultureInfo);
    }
 
    #endregion
 
    #region Properties
+
+   /// <summary>Gets the culture info of the factory.</summary>
+   private CultureInfo? Culture { get; }
 
    private IServiceProvider ServiceProvider { get; }
 
@@ -50,7 +76,6 @@ internal class ClientFactory : IClientFactory
 
    private static void CheckForBuildInClients(Type serviceType)
    {
-      // TODO : move this logic to process monitoring
       if (serviceType.Name == "IResultClient")
          throw new InvalidOperationException(CreateMessage(serviceType, "AddResultClient"));
       if (serviceType.Name == "IProgressClient")

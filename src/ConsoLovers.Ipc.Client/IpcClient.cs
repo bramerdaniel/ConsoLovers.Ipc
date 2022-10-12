@@ -15,5 +15,4 @@ public static class IpcClient
    {
       return new ClientFactoryBuilder();
    }
-
 }

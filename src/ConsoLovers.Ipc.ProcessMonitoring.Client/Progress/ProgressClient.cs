@@ -11,7 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 using ConsoLovers.Ipc.Grpc;
 
 [SuppressMessage("ReSharper", "UnusedType.Global")]
-public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.ProgressServiceClient>, IProgressClient
+public sealed class ProgressClient : ConfigurableClient<ProgressService.ProgressServiceClient>, IProgressClient
 {
    #region Constants and Fields
 
@@ -21,8 +21,10 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
 
    #region Public Events
 
+   /// <summary>Occurs when the reported progress of the server has changed.</summary>
    public event EventHandler<ProgressEventArgs>? ProgressChanged;
 
+   /// <summary>Occurs when <see cref="State"/> property has changed.</summary>
    public event EventHandler<StateChangedEventArgs>? StateChanged;
 
    #endregion
@@ -47,16 +49,17 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
    public void Dispose()
    {
-   }
-
-   public Task WaitForCompletedAsync()
-   {
-      return WaitForCompletedAsync(CancellationToken.None);
+      // Noting to dispose
    }
 
    /// <summary>Gets the exception that occurred when the state is failed.</summary>
    public Exception? Exception { get; private set; }
 
+   public Task WaitForCompletedAsync()
+   {
+      return WaitForCompletedAsync(CancellationToken.None);
+   }
+   
    public Task WaitForCompletedAsync(CancellationToken cancellationToken)
    {
       return Task.Run(() => WaitForFinished(cancellationToken));
@@ -88,7 +91,7 @@ public sealed class ProgressClient : ConfigurableClient<Grpc.ProgressService.Pro
    {
       try
       {
-         var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest());
+         var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
          while (await streamingCall.ResponseStream.MoveNext(CancellationToken.None))
          {
             var currentResponse = streamingCall.ResponseStream.Current;

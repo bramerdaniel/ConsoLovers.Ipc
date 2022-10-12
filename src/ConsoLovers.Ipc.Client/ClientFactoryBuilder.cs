@@ -7,6 +7,7 @@
 namespace ConsoLovers.Ipc;
 
 using System.Diagnostics;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 using Microsoft.Extensions.DependencyInjection;
@@ -18,6 +19,8 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
    private readonly ServiceCollection serviceCollection;
 
    private ChannelFactory? channelFactory;
+
+   private CultureInfo? clientCulture;
 
    #endregion
 
@@ -33,6 +36,16 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    #region IClientFactoryBuilder Members
 
+   public IClientFactoryBuilder AddClient<T>()
+      where T : class, IConfigurableClient
+   {
+      return AddService(services => services.AddSingleton<T>());
+   }
+
+   /// <summary>Adds a service to the <see cref="IClientFactoryBuilder"/>.</summary>
+   /// <param name="services">The services.</param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
+   /// <exception cref="System.ArgumentNullException">services</exception>
    public IClientFactoryBuilder AddService(Action<ServiceCollection> services)
    {
       if (services == null)
@@ -40,6 +53,34 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
       services(serviceCollection);
       return this;
+   }
+
+   /// <summary>Specifies the default culture the clients will be created with.</summary>
+   /// <param name="culture">
+   ///    The default client culture every client will be created with, when no other culture is specified in the
+   ///    <see cref="IClientFactory.CreateClient{T}()"/> method.
+   /// </param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
+   /// <exception cref="System.ArgumentNullException">culture</exception>
+   public IClientFactoryBuilder WithDefaultCulture(CultureInfo culture)
+   {
+      clientCulture = culture ?? throw new ArgumentNullException(nameof(culture));
+      return this;
+   }
+
+   /// <summary>Specifies the default culture the clients will be created with.</summary>
+   /// <param name="culture">
+   ///    The default client culture name every client will be created with, when no other culture is specified in the
+   ///    <see cref="IClientFactory.CreateClient{T}()"/> method.
+   /// </param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
+   public IClientFactoryBuilder WithDefaultCulture(string culture)
+   {
+      if (culture == null)
+         throw new ArgumentNullException(nameof(culture));
+
+      var cultureInfo = CultureInfo.GetCultureInfo(culture);
+      return WithDefaultCulture(cultureInfo);
    }
 
    public IClientFactory Build()
@@ -50,7 +91,8 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       var providerFactory = new DefaultServiceProviderFactory(new ServiceProviderOptions { ValidateOnBuild = true });
       var serviceProvider = providerFactory.CreateServiceProvider(serviceCollection);
 
-      return new ClientFactory(serviceProvider, channelFactory);
+      var clientFactory = new ClientFactory(serviceProvider, channelFactory, clientCulture);
+      return clientFactory;
    }
 
    #endregion
@@ -70,7 +112,7 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
    {
       if (process == null)
          throw new ArgumentNullException(nameof(process));
-      
+
       return ForName($"{process.ProcessName}.{process.Id}");
    }
 
@@ -85,6 +127,11 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       channelFactory = new ChannelFactory(socketFile);
       serviceCollection.AddSingleton(channelFactory);
       return this;
+   }
+
+   public IClientFactoryBuilder WithSocketFile(string socketFile)
+   {
+      return WithSocketFile(() => socketFile);
    }
 
    #endregion
