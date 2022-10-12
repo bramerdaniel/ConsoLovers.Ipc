@@ -31,10 +31,13 @@ public class ProgressReporterTests
       var client = ipcTest.CreateClient<IProgressClient>();
       client.WaitForServerAsync(CancellationToken.None);
 
+      var waitHandle = new ManualResetEventSlim();
+
       var monitor = client.Monitor();
+      client.ProgressChanged += (_, _) => waitHandle.Set();
       
       reporter.ReportProgress(100, "100 %");
-      Thread.Sleep(100);
+      waitHandle.Wait(2000);
 
       monitor.Should().Raise(nameof(IProgressClient.ProgressChanged))
          .WithArgs<ProgressEventArgs>(args => args.Percentage == 100);
