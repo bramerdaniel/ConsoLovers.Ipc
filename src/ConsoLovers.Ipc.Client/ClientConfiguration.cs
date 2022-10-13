@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Globalization;
+
 using global::Grpc.Net.Client;
 
 internal class ClientConfiguration : IClientConfiguration
@@ -18,9 +20,10 @@ internal class ClientConfiguration : IClientConfiguration
 
    #region Constructors and Destructors
 
-   public ClientConfiguration(IChannelFactory channelFactory)
+   public ClientConfiguration(IChannelFactory channelFactory, CultureInfo? cultureInfo)
    {
       this.channelFactory = channelFactory ?? throw new ArgumentNullException(nameof(channelFactory));
+      Culture = cultureInfo;
    }
 
    #endregion
@@ -28,6 +31,8 @@ internal class ClientConfiguration : IClientConfiguration
    #region IClientConfiguration Members
 
    public string ServerName => channelFactory.ServerName;
+
+   public CultureInfo? Culture { get; }
 
    public GrpcChannel Channel => channelFactory.Channel;
 

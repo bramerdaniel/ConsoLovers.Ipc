@@ -4,13 +4,11 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.ProcessMonitoring.Client.UnitTests;
+namespace ConsoLovers.Ipc.ProcessMonitoring.Server.UnitTests;
 
 using System.Diagnostics.CodeAnalysis;
 
 using FluentAssertions;
-
-using global::Grpc.Core;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

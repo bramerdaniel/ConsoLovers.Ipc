@@ -1,7 +1,8 @@
 {
   "profiles": {
     "Server": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "run time=10"
     },
     "Run As Peter": {
       "commandName": "Project",

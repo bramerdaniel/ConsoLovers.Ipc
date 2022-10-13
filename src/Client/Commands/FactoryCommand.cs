@@ -6,6 +6,8 @@
 
 namespace Client.Commands;
 
+using System.Globalization;
+
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.Ipc;
 
@@ -32,7 +34,7 @@ internal class FactoryCommand
    {
       var factoryBuilder = IpcClient.CreateClientFactory()
          .ForName(serverName);
-
+      
       foreach (var configurationAction in configuration)
          configurationAction(factoryBuilder);
 

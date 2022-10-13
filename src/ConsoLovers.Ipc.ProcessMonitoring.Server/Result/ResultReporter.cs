@@ -20,10 +20,11 @@ internal class ResultReporter : IResultReporter
 
    #region Constructors and Destructors
 
+   /// <summary>Initializes a new instance of the <see cref="ResultReporter"/> class.</summary>
    public ResultReporter()
    {
       resetEvent = new ManualResetEventSlim();
-      resultInfo = new ResultInfo { ExitCode = -1, Message = "NotExecuted" };
+      resultInfo = new ResultInfo(-1, "NotExecuted");
    }
 
    #endregion
@@ -38,6 +39,10 @@ internal class ResultReporter : IResultReporter
       ReportResult(exitCode, message);
    }
 
+   /// <summary>Reports the result of the host process.</summary>
+   /// <param name="exitCode">The exit code.</param>
+   /// <param name="message">The message.</param>
+   /// <exception cref="System.ArgumentNullException">message</exception>
    public void ReportResult(int exitCode, string message)
    {
       if (message == null)

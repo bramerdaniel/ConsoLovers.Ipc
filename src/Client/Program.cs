@@ -23,8 +23,6 @@ public static class Program
 
    public static async Task Main()
    {
-      // Initialize(1000);
-
       await ConsoleApplication.WithArguments<ClientArgs>()
          .AddService(x => x.AddSingleton(CreateClientFactory))
          .UseExceptionHandler(typeof(SpectreHandler))

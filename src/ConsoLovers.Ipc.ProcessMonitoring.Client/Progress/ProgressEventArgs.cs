@@ -10,7 +10,7 @@ public class ProgressEventArgs
 {
    #region Public Properties
 
-   public string Message { get; set; }
+   public string Message { get; set; } = null!;
 
    public int Percentage { get; set; }
 

@@ -1,34 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<SignAssembly>False</SignAssembly>
+	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Google.Protobuf" />
+		<PackageReference Include="Google.Protobuf"/>
 		<PackageReference Include="Grpc.Tools">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="ConsoLovers.ConsoleToolkit.Core" />
-		<PackageReference Include="ConsoLovers.ConsoleToolkit" />
+		<PackageReference Include="ConsoLovers.ConsoleToolkit.Core"/>
+		<PackageReference Include="ConsoLovers.ConsoleToolkit"/>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Folder Include="Proto\" />
+		<Folder Include="Proto\"/>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\..\..\ConsoLovers.Ipc.Client\ConsoLovers.Ipc.Client.csproj" />
+		<ProjectReference Include="..\..\..\ConsoLovers.Ipc.Client\ConsoLovers.Ipc.Client.csproj"/>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Protobuf Include="..\RemoteExecutableServer\Proto\RemoteExecutionService.proto">
-	    <Link>Proto\RemoteExecutionService.proto</Link>
-	  </Protobuf>
+		<Protobuf Include="..\RemoteExecutableServer\Proto\RemoteExecutionService.proto">
+			<Link>Proto\RemoteExecutionService.proto</Link>
+		</Protobuf>
 	</ItemGroup>
 
 
