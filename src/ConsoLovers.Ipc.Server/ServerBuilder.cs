@@ -8,17 +8,12 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
-using System.Globalization;
 using System.Runtime.CompilerServices;
-
-using global::Grpc.Core;
-using global::Grpc.Core.Interceptors;
 
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Net.Http.Headers;
 
 /// <summary>The default implementation of the <see cref="IServerBuilder"/> interface</summary>
 /// <seealso cref="ConsoLovers.Ipc.IServerBuilder"/>
@@ -116,14 +111,14 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    public IIpcServer Start()
    {
-      WebApplicationBuilder.Services.AddGrpc(options => { options.Interceptors.Add<LanguageInterceptor>(); });
+      WebApplicationBuilder.Services.AddGrpc();
 
       var application = WebApplicationBuilder.Build();
-
       foreach (var action in applicationActions)
          action(application);
 
-      return new IpcServerImpl(application, Name);
+      Logger.Log("Web application was created");
+      return new IpcServerImpl(application, Name, Logger);
    }
 
    #endregion
@@ -180,6 +175,9 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    #region Properties
 
+   /// <summary>Gets or sets the logger.</summary>
+   internal IDiagnosticLogger Logger { get; set; } = new DelegateLogger(_ => { });
+
    internal string Name { get; private set; }
 
    /// <summary>Gets the web application builder.</summary>
@@ -212,35 +210,6 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
       if (filePath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
          throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
-   }
-
-   #endregion
-}
-
-internal class LanguageInterceptor : Interceptor
-{
-   #region Public Methods and Operators
-
-   public override Task<TResponse> ClientStreamingServerHandler<TRequest, TResponse>(IAsyncStreamReader<TRequest> requestStream,
-      ServerCallContext context,
-      ClientStreamingServerMethod<TRequest, TResponse> continuation)
-   {
-      Console.WriteLine("ClientStreamingServerHandler");
-      return base.ClientStreamingServerHandler(requestStream, context, continuation);
-   }
-
-   public override Task ServerStreamingServerHandler<TRequest, TResponse>(TRequest request, IServerStreamWriter<TResponse> responseStream,
-      ServerCallContext context,
-      ServerStreamingServerMethod<TRequest, TResponse> continuation)
-   {
-      var headerLanguage = context.RequestHeaders.FirstOrDefault(t => t.Key == HeaderNames.AcceptLanguage);
-      if (headerLanguage != null)
-      {
-         Thread.CurrentThread.CurrentCulture = new CultureInfo(headerLanguage.Value);
-         Thread.CurrentThread.CurrentUICulture = new CultureInfo(headerLanguage.Value);
-      }
-
-      return base.ServerStreamingServerHandler(request, responseStream, context, continuation);
    }
 
    #endregion
