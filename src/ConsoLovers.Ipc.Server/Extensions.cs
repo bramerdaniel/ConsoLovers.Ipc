@@ -6,31 +6,37 @@
 
 namespace ConsoLovers.Ipc;
 
-using Microsoft.Extensions.DependencyInjection;
-
 /// <summary>Extension methods for the <see cref="IServerConfiguration"/></summary>
 public static class Extensions
 {
    #region Public Methods and Operators
 
-   public static IServerConfiguration AddDiagnosticLogging(this IServerConfiguration configuration, IDiagnosticLogger logger)
+   /// <summary>Adds the specified <see cref="logger"/>.</summary>
+   /// <param name="configuration">The configuration to add the logger to.</param>
+   /// <param name="logger">The logger.</param>
+   /// <returns>The current server for more fluent configuration</returns>
+   /// <exception cref="System.ArgumentNullException">configuration or logger</exception>
+   public static T AddDiagnosticLogging<T>(this T configuration, IDiagnosticLogger logger)
+      where T : IServerConfiguration
    {
       if (configuration == null)
          throw new ArgumentNullException(nameof(configuration));
       if (logger == null)
          throw new ArgumentNullException(nameof(logger));
 
-      configuration.AddService(s => s.AddSingleton(logger));
       if (configuration is ServerBuilder serverBuilder)
-      {
          serverBuilder.Logger = logger;
-
-      }
 
       return configuration;
    }
 
-   public static IServerConfiguration AddDiagnosticLogging(this IServerConfiguration configuration, Action<string> logFunction)
+   /// <summary>Adds a <see cref="DelegateLogger"/> that calls the <see cref="logFunction"/>.</summary>
+   /// <param name="configuration">The configuration to add the logger to.</param>
+   /// <param name="logFunction">The log function that should be called for logging.</param>
+   /// <returns>The current server for more fluent configuration</returns>
+   /// <exception cref="System.ArgumentNullException">configuration or logger</exception>
+   public static T AddDiagnosticLogging<T>(this T configuration, Action<string> logFunction)
+      where T : IServerConfiguration
    {
       if (configuration == null)
          throw new ArgumentNullException(nameof(configuration));

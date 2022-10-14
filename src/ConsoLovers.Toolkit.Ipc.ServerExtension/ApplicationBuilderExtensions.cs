@@ -9,6 +9,7 @@
 namespace ConsoLovers.ConsoleToolkit.Core;
 
 using ConsoLovers.Ipc;
+using ConsoLovers.Toolkit.Ipc.ServerExtension;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -95,7 +96,7 @@ public static class ApplicationBuilderExtensions
 
       builder.AddService(x => x.AddSingleton(_ => CreateServerBuilder(config, removeAspNetCoreLogging)));
       builder.AddService(x => x.AddSingleton(CreateIpcServer));
-      builder.AddService(x => x.AddSingleton<IAsyncShutdownHandler, DisposeServerHandler>());
+      builder.AddService(x => x.AddSingleton<IAsyncShutdownHandler, IpcServerShutdownHandler>());
       return builder;
    }
 

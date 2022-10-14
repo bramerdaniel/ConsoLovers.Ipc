@@ -111,6 +111,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    public IIpcServer Start()
    {
+      WebApplicationBuilder.Services.AddSingleton(Logger);
       WebApplicationBuilder.Services.AddGrpc();
 
       var application = WebApplicationBuilder.Build();
