@@ -9,6 +9,7 @@
 namespace ConsoLovers.ConsoleToolkit.Core;
 
 using ConsoLovers.Ipc;
+using ConsoLovers.Toolkit.Ipc.ServerExtension;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -95,6 +96,7 @@ public static class ApplicationBuilderExtensions
 
       builder.AddService(x => x.AddSingleton(_ => CreateServerBuilder(config, removeAspNetCoreLogging)));
       builder.AddService(x => x.AddSingleton(CreateIpcServer));
+      builder.AddService(x => x.AddSingleton<IAsyncShutdownHandler, IpcServerShutdownHandler>());
       return builder;
    }
 
@@ -130,12 +132,12 @@ public static class ApplicationBuilderExtensions
       return builder.Start();
    }
 
-   private static IServerBuilder CreateServerBuilder(Action<IServerBuilderWithoutName> config, bool removeAspLoggin)
+   private static IServerBuilder CreateServerBuilder(Action<IServerBuilderWithoutName> config, bool removeAspLogging)
    {
       var builderWithoutName = IpcServer.CreateServer();
       config(builderWithoutName);
       var serverBuilder = (IServerBuilder)builderWithoutName;
-      if (removeAspLoggin)
+      if (removeAspLogging)
          serverBuilder.RemoveAspNetCoreLogging();
 
       return serverBuilder;

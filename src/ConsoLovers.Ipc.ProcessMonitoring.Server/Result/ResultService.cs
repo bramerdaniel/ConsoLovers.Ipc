@@ -16,13 +16,16 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
 
    private readonly ResultReporter resultReporter;
 
+   private readonly IDiagnosticLogger logger;
+
    #endregion
 
    #region Constructors and Destructors
 
-   public ResultService(ResultReporter resultReporter)
+   public ResultService(ResultReporter resultReporter, IDiagnosticLogger logger)
    {
       this.resultReporter = resultReporter ?? throw new ArgumentNullException(nameof(resultReporter));
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
    }
 
    #endregion
@@ -32,6 +35,7 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
    public override async Task ResultChanged(ResultChangedRequest request, IServerStreamWriter<ResultChangedResponse> responseStream,
       ServerCallContext context)
    {
+      logger.Log("Result handler was attached");
       var resultInfo = await resultReporter.GetResultAsync();
       var response = CreateResponse(resultInfo);
       await responseStream.WriteAsync(response);
