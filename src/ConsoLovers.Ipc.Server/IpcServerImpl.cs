@@ -21,14 +21,17 @@ internal sealed class IpcServerImpl : IIpcServer
    /// <summary>Initializes a new instance of the <see cref="IpcServerImpl"/> class.</summary>
    /// <param name="webApplication">The web application.</param>
    /// <param name="name">The name of the server.</param>
+   /// <param name="logger">The logger.</param>
    /// <exception cref="System.ArgumentNullException">name or webApplication</exception>
    /// <exception cref="ArgumentNullException">webApplication</exception>
-   internal IpcServerImpl(WebApplication webApplication, string name)
+   internal IpcServerImpl(WebApplication webApplication, string name, IDiagnosticLogger logger)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));
       Name = name ?? throw new ArgumentNullException(nameof(name));
+      Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
       ServerTask = webApplication.RunAsync();
+      Logger.Log($"Ipc server was started with name '{Name}'");
    }
 
    #endregion
@@ -59,13 +62,23 @@ internal sealed class IpcServerImpl : IIpcServer
    /// <returns>A task that represents the asynchronous dispose operation.</returns>
    public async ValueTask DisposeAsync()
    {
+      Logger.Log($"Disposing ipc server '{Name}'");
+
       await webApplication.StopAsync();
       await webApplication.DisposeAsync();
       await ServerTask;
+
+      Logger.Log($"Ipc server '{Name}' disposed successfully.");
    }
 
    /// <summary>Gets the name of the server.</summary>
    public string Name { get; }
+
+   #endregion
+
+   #region Public Properties
+
+   public IDiagnosticLogger Logger { get; }
 
    #endregion
 

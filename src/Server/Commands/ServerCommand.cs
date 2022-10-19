@@ -38,6 +38,7 @@ internal class ServerCommand
       return IpcServer
          .CreateServer()
          .ForName(serverName)
+         .AddDiagnosticLogging(System.Console.WriteLine)
          .RemoveAspNetCoreLogging()
          .AddGrpcReflection();
    }
