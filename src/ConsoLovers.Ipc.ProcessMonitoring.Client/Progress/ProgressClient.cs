@@ -10,13 +10,9 @@ using System.Diagnostics.CodeAnalysis;
 
 using ConsoLovers.Ipc.Grpc;
 
-using global::Grpc.Core;
-
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public sealed class ProgressClient : ConfigurableClient<ProgressService.ProgressServiceClient>, IProgressClient
 {
-
-
    #region Constants and Fields
 
    private ClientState state = ClientState.Uninitialized;
@@ -66,7 +62,7 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
 
    public Task WaitForCompletedAsync(CancellationToken cancellationToken)
    {
-      return Task.Run(() => WaitForFinished(cancellationToken));
+      return Task.Run(() => WaitForFinished(cancellationToken), cancellationToken);
    }
 
    #endregion

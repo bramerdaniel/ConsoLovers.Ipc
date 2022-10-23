@@ -45,8 +45,9 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
       try
       {
          logger.Debug("Result handler was attached");
-
          var resultInfo = await resultReporter.GetResultAsync(tokenSource.Token);
+         
+         logger.Debug("Result was available in result service");
          var response = CreateResponse(resultInfo);
          await responseStream.WriteAsync(response, tokenSource.Token);
       }

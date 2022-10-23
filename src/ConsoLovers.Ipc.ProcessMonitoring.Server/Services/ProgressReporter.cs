@@ -8,6 +8,7 @@ namespace ConsoLovers.Ipc.ProcessMonitoring.Services;
 
 using System.Collections.Concurrent;
 using System.Globalization;
+using System.Threading.Channels;
 
 internal class ProgressReporter : IProgressReporter
 {
@@ -101,6 +102,9 @@ internal class ProgressReporter : IProgressReporter
 
    internal ClientProgressHandler CreateClientHandler(CultureInfo culture)
    {
+      if (IsCompleted())
+         throw new ChannelClosedException();
+
       var cultureHandlers = clients.GetOrAdd(culture, _ => new List<ClientProgressHandler>());
 
       var clientProgress = new ClientProgressHandler(culture);

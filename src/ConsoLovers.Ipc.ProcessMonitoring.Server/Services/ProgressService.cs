@@ -45,6 +45,9 @@ internal class ProgressService : Grpc.ProgressService.ProgressServiceBase
          return;
 
       var cultureInfo = context.GetCulture();
+      if(progressReporter.IsCompleted())
+         return;
+
       var clientProgress = progressReporter.CreateClientHandler(cultureInfo);
       logger.Debug($"Created progress handler for culture {cultureInfo.Name}");
       
