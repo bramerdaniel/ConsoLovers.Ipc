@@ -1,12 +1,11 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClientFactoryExtensions.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="ClientFactoryExtensions.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Clients;
 using ConsoLovers.Ipc.ProcessMonitoring;
 
 /// <summary>Extension methods for the <see cref="IClientFactory"/> interface</summary>
@@ -55,8 +54,7 @@ public static class ClientFactoryExtensions
       if (clientFactory == null)
          throw new ArgumentNullException(nameof(clientFactory));
 
-      var synchronizationClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
-      return synchronizationClient.WaitForServerAsync(cancellationToken);
+      return clientFactory.SynchronizationClient.WaitForServerAsync(cancellationToken);
    }
 
    public static Task WaitForServerAsync(this IClientFactory clientFactory, TimeSpan timeout)
@@ -64,8 +62,7 @@ public static class ClientFactoryExtensions
       if (clientFactory == null)
          throw new ArgumentNullException(nameof(clientFactory));
 
-      var synchronizationClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
-      return synchronizationClient.WaitForServerAsync(timeout);
+      return clientFactory.SynchronizationClient.WaitForServerAsync(timeout);
    }
 
    public static Task WaitForServerAsync(this IClientFactory clientFactory, TimeSpan timeout, CancellationToken cancellationToken)
@@ -73,8 +70,7 @@ public static class ClientFactoryExtensions
       if (clientFactory == null)
          throw new ArgumentNullException(nameof(clientFactory));
 
-      var synchronizationClient = new SynchronizationClient(clientFactory.ChannelFactory.Channel);
-      return synchronizationClient.WaitForServerAsync(timeout, cancellationToken);
+      return clientFactory.SynchronizationClient.WaitForServerAsync(timeout, cancellationToken);
    }
 
    #endregion

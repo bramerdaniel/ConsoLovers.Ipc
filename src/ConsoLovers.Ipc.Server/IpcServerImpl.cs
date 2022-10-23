@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Diagnostics;
+
 using Microsoft.AspNetCore.Builder;
 
 internal sealed class IpcServerImpl : IIpcServer
@@ -63,12 +65,14 @@ internal sealed class IpcServerImpl : IIpcServer
    public async ValueTask DisposeAsync()
    {
       Logger.Log($"Disposing ipc server '{Name}'");
+      var stopwatch = Stopwatch.StartNew();
 
       await webApplication.StopAsync();
       await webApplication.DisposeAsync();
       await ServerTask;
+      stopwatch.Stop();
 
-      Logger.Log($"Ipc server '{Name}' disposed successfully.");
+      Logger.Log($"Ipc server '{Name}' disposed successfully after {stopwatch.ElapsedMilliseconds} ms.");
    }
 
    /// <summary>Gets the name of the server.</summary>

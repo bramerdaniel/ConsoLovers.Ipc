@@ -13,6 +13,8 @@ using ConsoLovers.Ipc.Grpc;
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public sealed class ProgressClient : ConfigurableClient<ProgressService.ProgressServiceClient>, IProgressClient
 {
+
+
    #region Constants and Fields
 
    private ClientState state = ClientState.Uninitialized;
@@ -59,7 +61,7 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
    {
       return WaitForCompletedAsync(CancellationToken.None);
    }
-   
+
    public Task WaitForCompletedAsync(CancellationToken cancellationToken)
    {
       return Task.Run(() => WaitForFinished(cancellationToken));
@@ -92,11 +94,15 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
       try
       {
          var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
+         
          while (await streamingCall.ResponseStream.MoveNext(CancellationToken.None))
          {
             var currentResponse = streamingCall.ResponseStream.Current;
-            ProgressChanged?.Invoke(this,
-               new ProgressEventArgs { Percentage = currentResponse.Progress.Percentage, Message = currentResponse.Progress.Message });
+            ProgressChanged?.Invoke(this, new ProgressEventArgs
+            {
+               Percentage = currentResponse.Progress.Percentage, 
+               Message = currentResponse.Progress.Message
+            });
          }
 
          State = ClientState.Closed;

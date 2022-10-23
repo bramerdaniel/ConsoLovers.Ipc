@@ -38,7 +38,7 @@ internal class ProgressService : Grpc.ProgressService.ProgressServiceBase
       var cultureInfo = context.GetCulture();
       var clientProgress = progressReporter.CreateClientHandler(cultureInfo);
       logger.Log($"Created progress handler for culture {cultureInfo.Name}");
-      
+
       try
       {
          while (!context.CancellationToken.IsCancellationRequested)
@@ -46,6 +46,10 @@ internal class ProgressService : Grpc.ProgressService.ProgressServiceBase
             var progressInfo = await clientProgress.ReadNextAsync(context.CancellationToken);
             await responseStream.WriteAsync(new ProgressChangedResponse { Progress = progressInfo });
          }
+      }
+      catch (OperationCanceledException)
+      {
+         // don't throw here
       }
       finally
       {

@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClientFactoryBuilder.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="ClientFactoryBuilder.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,10 +17,12 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
    #region Constants and Fields
 
    private readonly ServiceCollection serviceCollection;
-
-   private ChannelFactory? channelFactory;
-
+   
    private CultureInfo? clientCulture;
+
+   private IClientLogger? loggerToUse;
+
+   private string? socketFile;
 
    #endregion
 
@@ -68,6 +70,12 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       return this;
    }
 
+   public IClientFactoryBuilder WithLogger(IClientLogger logger)
+   {
+      loggerToUse = logger;
+      return this;
+   }
+
    /// <summary>Specifies the default culture the clients will be created with.</summary>
    /// <param name="culture">
    ///    The default client culture name every client will be created with, when no other culture is specified in the
@@ -85,13 +93,20 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    public IClientFactory Build()
    {
-      if (channelFactory == null)
-         throw new InvalidOperationException($"The {nameof(channelFactory)} is not specified yet");
+      if (socketFile == null)
+         throw new InvalidOperationException($"The {nameof(socketFile)} was not specified yet");
+      
+      var logger = loggerToUse ?? new ClientDelegateLogger(_ => { });
+      serviceCollection.AddSingleton(logger);
+
+      var channelFactory = new ChannelFactory(socketFile, logger);
+      serviceCollection.AddSingleton(channelFactory);
 
       var providerFactory = new DefaultServiceProviderFactory(new ServiceProviderOptions { ValidateOnBuild = true });
       var serviceProvider = providerFactory.CreateServiceProvider(serviceCollection);
 
       var clientFactory = new ClientFactory(serviceProvider, channelFactory, clientCulture);
+      logger.Log("Created client factory");
       return clientFactory;
    }
 
@@ -121,17 +136,14 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       if (computeSocketFile == null)
          throw new ArgumentNullException(nameof(computeSocketFile));
 
-      var socketFile = computeSocketFile();
+      socketFile = computeSocketFile();
       EnsureValidFilePath(socketFile);
-
-      channelFactory = new ChannelFactory(socketFile);
-      serviceCollection.AddSingleton(channelFactory);
       return this;
    }
 
-   public IClientFactoryBuilder WithSocketFile(string socketFile)
+   public IClientFactoryBuilder WithSocketFile(string file)
    {
-      return WithSocketFile(() => socketFile);
+      return WithSocketFile(() => file);
    }
 
    #endregion

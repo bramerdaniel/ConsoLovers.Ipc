@@ -15,20 +15,27 @@ using global::Grpc.Net.Client;
 /// <seealso cref="ConsoLovers.Ipc.ISynchronizationClient"/>
 public class SynchronizationClient : ISynchronizationClient
 {
+   private readonly IClientLogger logger;
+
    #region Constants and Fields
 
    private readonly SynchronizatioService.SynchronizatioServiceClient connectionService;
+
+   private bool wasConnected;
 
    #endregion
 
    #region Constructors and Destructors
 
-   public SynchronizationClient(GrpcChannel channel)
+   public SynchronizationClient(GrpcChannel channel, IClientLogger logger)
    {
       if (channel == null)
          throw new ArgumentNullException(nameof(channel));
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
+      logger.Log("SynchronizationClient was created");
       connectionService = new SynchronizatioService.SynchronizatioServiceClient(channel);
+      wasConnected = false;
    }
 
    #endregion
@@ -37,21 +44,64 @@ public class SynchronizationClient : ISynchronizationClient
 
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
-      while (true)
+      logger.Log("WaitForServerAsync was called");
+
+      while (!wasConnected)
       {
          cancellationToken.ThrowIfCancellationRequested();
 
          try
          {
             await connectionService.ConnectAsync(new ConnectRequest());
+            logger.Log($"{nameof(ISynchronizationClient)} could connect successfully {Thread.CurrentThread.ManagedThreadId}");
+            wasConnected = true;
             return;
          }
-         catch (RpcException)
+         catch (RpcException e)
          {
-            await Task.Delay(100, cancellationToken);
+            // logger.Log($"{nameof(ISynchronizationClient)} connection failed {Thread.CurrentThread.ManagedThreadId}");
+            if (e.StatusCode == StatusCode.Unavailable)
+            {
+               await Task.Delay(100, cancellationToken);
+            }
+            else
+            {
+               return;
+            }
          }
       }
    }
+
+   private async Task WaitAsync(CancellationToken cancellationToken)
+   {
+      while (!wasConnected)
+      {
+         cancellationToken.ThrowIfCancellationRequested();
+
+         try
+         {
+            await connectionService.ConnectAsync(new ConnectRequest());
+            logger.Log($"{nameof(ISynchronizationClient)} could connect successfully {Thread.CurrentThread.ManagedThreadId}");
+            wasConnected = true;
+            return;
+         }
+         catch (RpcException e)
+         {
+            logger.Log($"{nameof(ISynchronizationClient)} connection failed {Thread.CurrentThread.ManagedThreadId}");
+            if (e.StatusCode == StatusCode.Unavailable)
+            {
+               await Task.Delay(100, cancellationToken);
+            }
+            else
+            {
+               return;
+            }
+         }
+      }
+
+   }
+
+   private Task? WaitingTask { get; set; }
 
    public async Task WaitForServerAsync(TimeSpan timeout)
    {
