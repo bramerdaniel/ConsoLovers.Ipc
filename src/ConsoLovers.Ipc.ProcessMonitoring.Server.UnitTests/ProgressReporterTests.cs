@@ -39,10 +39,10 @@ public class ProgressReporterTests
       client.ProgressChanged += (_, _) => waitHandle.Set();
       
       // we have to wait for the client progress to be created
-      waitHandle.Wait(100);
+      waitHandle.Wait(2000);
 
       reporter.ReportProgress(100, "100 %");
-      waitHandle.Wait(1000);
+      waitHandle.Wait(2000);
 
       monitor.Should().Raise(nameof(IProgressClient.ProgressChanged))
          .WithArgs<ProgressEventArgs>(args => args.Percentage == 100);
