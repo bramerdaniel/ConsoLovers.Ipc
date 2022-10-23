@@ -6,8 +6,6 @@
 
 namespace ConsoLovers.Ipc;
 
-using ConsoLovers.Ipc.Clients;
-
 using global::Grpc.Core;
 
 /// <summary>Base class for gRPC clients that should be configured</summary>
@@ -17,8 +15,6 @@ public class ConfigurableClient<T> : IConfigurableClient
 {
    #region Constants and Fields
 
-   private ISynchronizationClient? connectionClient;
-
    #endregion
 
    #region IConfigurableClient Members
@@ -27,14 +23,17 @@ public class ConfigurableClient<T> : IConfigurableClient
    {
       Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
       ServiceClient = (T)CreateInstance(configuration);
+      SynchronizationClient = configuration.SynchronizationClient;
       OnConfigured();
    }
 
    private static object CreateInstance(IClientConfiguration configuration)
    {
       var clientType = typeof(T);
-      return Activator.CreateInstance(clientType, configuration.Channel)
-             ?? throw new InvalidOperationException($"A service client of type {clientType.Name} could not be created.");
+      var instance = Activator.CreateInstance(clientType, configuration.Channel)
+                     ?? throw new InvalidOperationException($"A service client of type {clientType.Name} could not be created.");
+      
+      return instance;
    }
 
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
@@ -54,7 +53,7 @@ public class ConfigurableClient<T> : IConfigurableClient
    protected T ServiceClient { get; private set; } = default!;
 
    /// <summary>Gets a synchronization client.</summary>
-   protected ISynchronizationClient SynchronizationClient => connectionClient ??= new SynchronizationClient(Configuration.Channel);
+   protected ISynchronizationClient SynchronizationClient { get; private set; } = null!;
 
    #endregion
 

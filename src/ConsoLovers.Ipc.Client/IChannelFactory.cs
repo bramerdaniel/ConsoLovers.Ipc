@@ -1,13 +1,12 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IChannelFactory.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="IChannelFactory.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ConsoLovers.Ipc;
 
 using global::Grpc.Net.Client;
-
 
 // TODO this should be named channel info?
 public interface IChannelFactory
@@ -19,6 +18,9 @@ public interface IChannelFactory
 
    /// <summary>Gets the server name.</summary>
    string ServerName { get; }
+
+   /// <summary>Gets the synchronization client.</summary>
+   ISynchronizationClient SynchronizationClient { get; }
 
    #endregion
 }

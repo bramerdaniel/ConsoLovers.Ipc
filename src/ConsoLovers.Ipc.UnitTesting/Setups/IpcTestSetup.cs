@@ -18,6 +18,7 @@ public class IpcTestSetup : SetupBase<IpcTest>, IIpcTestSetup
    public IpcTestSetup ForCurrentTest(string socketFileName = null)
    {
       SocketPath = Path.Combine(Path.GetTempPath(), $"{socketFileName}.uds");
+
       ServerBuilder = IpcServer.CreateServer()
          .WithSocketFile(SocketPath)
          .RemoveAspNetCoreLogging();

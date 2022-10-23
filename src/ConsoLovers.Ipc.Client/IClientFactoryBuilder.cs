@@ -46,5 +46,10 @@ public interface IClientFactoryBuilder
    /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
    IClientFactoryBuilder WithDefaultCulture(string culture);
 
+   /// <summary>Specifies the <see cref="IClientLogger"/> that should be used.</summary>
+   /// <param name="logger">The logger to use.</param>
+   /// <returns>The <see cref="IClientFactoryBuilder"/> the method was called on</returns>
+   IClientFactoryBuilder WithLogger(IClientLogger logger);
+
    #endregion
 }

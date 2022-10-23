@@ -15,7 +15,10 @@ public interface IConfigurableClient
    /// <param name="configuration">The configuration the client must use.</param>
    void Configure(IClientConfiguration configuration);
 
+   /// <summary>Waits for the server to be available.</summary>
+   /// <param name="cancellationToken">The cancellation token when the waiting should be cancelled.</param>
+   /// <returns>The waiting task</returns>
    Task WaitForServerAsync(CancellationToken cancellationToken);
-
+   
    #endregion
 }

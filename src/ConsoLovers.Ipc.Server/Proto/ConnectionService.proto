@@ -2,6 +2,7 @@
 
 package ConsoLovers.Ipc;
 option csharp_namespace = "ConsoLovers.Ipc.Grpc";
+import "google/protobuf/wrappers.proto";
 
 service SynchronizatioService
 {
@@ -9,7 +10,8 @@ service SynchronizatioService
 }
 
 message ConnectRequest 
-{    
+{      
+	.google.protobuf.StringValue client_name = 1;
 }
 
 message ConnectResponse 

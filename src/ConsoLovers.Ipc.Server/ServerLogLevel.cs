@@ -1,17 +1,24 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IDiagnosticLogger.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="ServerLogLevel.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ConsoLovers.Ipc;
 
-public interface IDiagnosticLogger
+public enum ServerLogLevel
 {
-   #region Public Methods and Operators
+   Off,
 
-   /// <summary>Logs the specified message.</summary>
-   void Log(string message);
+   Fatal,
 
-   #endregion
+   Error,
+
+   Warn,
+
+   Info,
+
+   Debug,
+
+   Trace
 }
