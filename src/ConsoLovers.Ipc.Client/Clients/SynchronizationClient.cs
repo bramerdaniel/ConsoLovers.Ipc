@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc.Clients;
 
+using System.Diagnostics;
+
 using ConsoLovers.Ipc.Grpc;
 
 using global::Grpc.Core;
@@ -23,6 +25,8 @@ public class SynchronizationClient : ISynchronizationClient
 
    private bool wasConnected;
 
+   private readonly string clientName;
+
    #endregion
 
    #region Constructors and Destructors
@@ -33,7 +37,8 @@ public class SynchronizationClient : ISynchronizationClient
          throw new ArgumentNullException(nameof(channel));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-      logger.Log("SynchronizationClient was created");
+      clientName = CreateClientName();
+      logger.Debug($"SynchronizationClient with name {clientName} was created");
       connectionService = new SynchronizatioService.SynchronizatioServiceClient(channel);
       wasConnected = false;
    }
@@ -44,22 +49,20 @@ public class SynchronizationClient : ISynchronizationClient
 
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
-      logger.Log("WaitForServerAsync was called");
-
       while (!wasConnected)
       {
          cancellationToken.ThrowIfCancellationRequested();
 
          try
          {
-            await connectionService.ConnectAsync(new ConnectRequest());
-            logger.Log($"{nameof(ISynchronizationClient)} could connect successfully {Thread.CurrentThread.ManagedThreadId}");
+            await connectionService.ConnectAsync(new ConnectRequest { ClientName = clientName });
+            logger.Debug($"{nameof(ISynchronizationClient)} could connect successfully");
             wasConnected = true;
             return;
          }
          catch (RpcException e)
          {
-            // logger.Log($"{nameof(ISynchronizationClient)} connection failed {Thread.CurrentThread.ManagedThreadId}");
+            logger.Trace($"{nameof(ISynchronizationClient)} connection failed");
             if (e.StatusCode == StatusCode.Unavailable)
             {
                await Task.Delay(100, cancellationToken);
@@ -72,36 +75,10 @@ public class SynchronizationClient : ISynchronizationClient
       }
    }
 
-   private async Task WaitAsync(CancellationToken cancellationToken)
+   private string CreateClientName()
    {
-      while (!wasConnected)
-      {
-         cancellationToken.ThrowIfCancellationRequested();
-
-         try
-         {
-            await connectionService.ConnectAsync(new ConnectRequest());
-            logger.Log($"{nameof(ISynchronizationClient)} could connect successfully {Thread.CurrentThread.ManagedThreadId}");
-            wasConnected = true;
-            return;
-         }
-         catch (RpcException e)
-         {
-            logger.Log($"{nameof(ISynchronizationClient)} connection failed {Thread.CurrentThread.ManagedThreadId}");
-            if (e.StatusCode == StatusCode.Unavailable)
-            {
-               await Task.Delay(100, cancellationToken);
-            }
-            else
-            {
-               return;
-            }
-         }
-      }
-
+      return Process.GetCurrentProcess().ProcessName;
    }
-
-   private Task? WaitingTask { get; set; }
 
    public async Task WaitForServerAsync(TimeSpan timeout)
    {

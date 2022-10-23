@@ -106,7 +106,7 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       var serviceProvider = providerFactory.CreateServiceProvider(serviceCollection);
 
       var clientFactory = new ClientFactory(serviceProvider, channelFactory, clientCulture);
-      logger.Log("Created client factory");
+      logger.Debug("Created client factory");
       return clientFactory;
    }
 

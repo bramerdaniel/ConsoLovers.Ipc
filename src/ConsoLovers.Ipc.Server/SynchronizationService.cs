@@ -11,9 +11,6 @@ using ConsoLovers.Ipc.Grpc;
 using global::Grpc.Core;
 using global::Grpc.Net.Client;
 
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Hosting.Internal;
-
 /// <summary>
 ///    Build in gRPC service that allows the client to call a service function to check if the server is available. This is required as the
 ///    <see cref="GrpcChannel"/> functions did not work for unix domain sockets.
@@ -21,14 +18,10 @@ using Microsoft.Extensions.Hosting.Internal;
 /// <seealso cref="ConsoLovers.Ipc.Grpc.SynchronizatioService.SynchronizatioServiceBase"/>
 internal class SynchronizationService : SynchronizatioService.SynchronizatioServiceBase
 {
+   private readonly IServerLogger logger;
 
-
-
-   private readonly IDiagnosticLogger logger;
-
-   public SynchronizationService(IDiagnosticLogger logger )
+   public SynchronizationService(IServerLogger logger)
    {
-      
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
    }
 
@@ -36,7 +29,7 @@ internal class SynchronizationService : SynchronizatioService.SynchronizatioServ
 
    public override Task<ConnectResponse> Connect(ConnectRequest request, ServerCallContext context)
    {
-      logger.Log("Client connected");
+      logger.Debug($"Client {request.ClientName} connected");
       return Task.FromResult(new ConnectResponse());
    }
 

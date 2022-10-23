@@ -175,6 +175,11 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
 
          State = ClientState.Closed;
       }
+      catch (RpcException ex)
+      {
+         State = ClientState.Failed;
+         Exception = ex;
+      }
       catch (Exception ex)
       {
          State = ClientState.Failed;

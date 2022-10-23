@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ProgressReporter.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="ProgressReporter.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -11,13 +11,24 @@ using System.Globalization;
 
 internal class ProgressReporter : IProgressReporter
 {
+   private readonly IServerLogger logger;
+
    #region Constants and Fields
 
    private readonly ConcurrentDictionary<CultureInfo, List<ClientProgressHandler>> clients = new();
 
+   private readonly object completionLock = new();
+
+   private bool completed;
+
    private LocalizableMessage? lastProgress;
 
    #endregion
+
+   public ProgressReporter(IServerLogger logger)
+   {
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+   }
 
    #region IProgressReporter Members
 
@@ -44,13 +55,34 @@ internal class ProgressReporter : IProgressReporter
    {
       if (message == null)
          throw new ArgumentNullException(nameof(message));
-      
+
       ReportProgress(-1, message);
+   }
+
+   public void ProgressCompleted()
+   {
+      CompleteInternal();
+   }
+
+   public bool AutoComplete { get; set; } = true;
+
+   public void Dispose()
+   {
+      CompleteInternal();
    }
 
    #endregion
 
    #region Public Methods and Operators
+
+   public bool IsCompleted()
+   {
+      bool result;
+      lock (completionLock)
+         result = completed;
+
+      return result;
+   }
 
    public void RemoveClientHandler(ClientProgressHandler clientProgressHandler)
    {
@@ -83,6 +115,20 @@ internal class ProgressReporter : IProgressReporter
       return clientProgress;
    }
 
+   private void CompleteInternal()
+   {
+      lock (completionLock)
+      {
+         if (completed)
+            return;
+
+         completed = true;
+      }
+
+      foreach (var handler in clients.SelectMany(x => x.Value))
+         handler.Complete();
+   }
+
    private IEnumerable<(CultureInfo, List<ClientProgressHandler>)> GetGroupedHandlers()
    {
       foreach (var client in clients)
@@ -91,6 +137,12 @@ internal class ProgressReporter : IProgressReporter
 
    private void ReportProgress(LocalizableMessage localizableMessage)
    {
+      if (IsCompleted())
+      {
+         logger.Warn($"{nameof(ReportProgress)} was called, on a completed progress reporter");
+         return;
+      }
+
       lastProgress = localizableMessage;
 
       foreach (var (culture, handlers) in GetGroupedHandlers())
@@ -99,6 +151,9 @@ internal class ProgressReporter : IProgressReporter
          foreach (var progressHandler in handlers)
             progressHandler.ReportProgress(progressInfo);
       }
+
+      if (AutoComplete && localizableMessage.Percentage >= 100)
+         CompleteInternal();
    }
 
    #endregion

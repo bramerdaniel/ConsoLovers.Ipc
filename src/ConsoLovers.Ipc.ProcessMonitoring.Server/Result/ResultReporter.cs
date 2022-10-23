@@ -72,9 +72,9 @@ internal class ResultReporter : IResultReporter
 
    #region Methods
 
-   internal Task<ResultInfo> GetResultAsync()
+   internal Task<ResultInfo> GetResultAsync(CancellationToken cancellationToken)
    {
-      resetEvent.Wait();
+      resetEvent.Wait(cancellationToken);
       return Task.FromResult(resultInfo);
    }
 

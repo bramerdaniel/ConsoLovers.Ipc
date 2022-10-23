@@ -10,22 +10,27 @@ using ConsoLovers.Ipc.Grpc;
 
 using global::Grpc.Core;
 
+using Microsoft.Extensions.Hosting;
+
 internal class ResultService : Grpc.ResultService.ResultServiceBase
 {
    #region Constants and Fields
 
    private readonly ResultReporter resultReporter;
 
-   private readonly IDiagnosticLogger logger;
+   private readonly IServerLogger logger;
+
+   private readonly IHostApplicationLifetime hostLifetime;
 
    #endregion
 
    #region Constructors and Destructors
 
-   public ResultService(ResultReporter resultReporter, IDiagnosticLogger logger)
+   public ResultService(ResultReporter resultReporter, IServerLogger logger, IHostApplicationLifetime hostLifetime)
    {
       this.resultReporter = resultReporter ?? throw new ArgumentNullException(nameof(resultReporter));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+      this.hostLifetime = hostLifetime ?? throw new ArgumentNullException(nameof(hostLifetime));
    }
 
    #endregion
@@ -35,10 +40,20 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
    public override async Task ResultChanged(ResultChangedRequest request, IServerStreamWriter<ResultChangedResponse> responseStream,
       ServerCallContext context)
    {
-      logger.Log("Result handler was attached");
-      var resultInfo = await resultReporter.GetResultAsync();
-      var response = CreateResponse(resultInfo);
-      await responseStream.WriteAsync(response);
+      var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, hostLifetime.ApplicationStopping);
+
+      try
+      {
+         logger.Debug("Result handler was attached");
+
+         var resultInfo = await resultReporter.GetResultAsync(tokenSource.Token);
+         var response = CreateResponse(resultInfo);
+         await responseStream.WriteAsync(response, tokenSource.Token);
+      }
+      catch (OperationCanceledException)
+      {
+         logger.Debug("Waiting for result was canceled");
+      }
    }
 
    private static ResultChangedResponse CreateResponse(ResultInfo resultInfo)

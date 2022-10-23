@@ -7,8 +7,8 @@
 namespace ConsoLovers.Ipc;
 
 /// <summary>implementation that calls the specified delegate for logging</summary>
-/// <seealso cref="ConsoLovers.Ipc.IDiagnosticLogger"/>
-public class DelegateLogger : IDiagnosticLogger
+/// <seealso cref="IServerLogger"/>
+public class DelegateLogger : IServerLogger
 {
    #region Constants and Fields
 
@@ -28,14 +28,22 @@ public class DelegateLogger : IDiagnosticLogger
 
    #endregion
 
-   #region IDiagnosticLogger Members
+   public ServerLogLevel LogLevel { get; set; } = ServerLogLevel.Warn;
 
-   /// <summary>Logs the specified message.</summary>
-   /// <param name="message">The message to log</param>
-   public void Log(string message)
+   public void Log(ServerLogLevel level, string message)
    {
-      logAction(message);
+      if (IsEnabled(level))
+         logAction(message);
    }
 
-   #endregion
+   public void Log(ServerLogLevel level, Func<string> messageFunc)
+   {
+      if (IsEnabled(level))
+         logAction(messageFunc());
+   }
+
+   public bool IsEnabled(ServerLogLevel logLevel)
+   {
+      return logLevel <= LogLevel;
+   }
 }

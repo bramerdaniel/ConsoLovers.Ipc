@@ -14,9 +14,9 @@ internal class CancellationService : Grpc.CancellationService.CancellationServic
 {
    private readonly CancellationHandler cancellationHandler;
 
-   private readonly IDiagnosticLogger logger;
+   private readonly IServerLogger logger;
 
-   public CancellationService(CancellationHandler cancellationHandler, IDiagnosticLogger logger)
+   public CancellationService(CancellationHandler cancellationHandler, IServerLogger logger)
    {
       this.cancellationHandler = cancellationHandler ?? throw new ArgumentNullException(nameof(cancellationHandler));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
@@ -24,7 +24,7 @@ internal class CancellationService : Grpc.CancellationService.CancellationServic
 
    public override Task<RequestCancelResponse> RequestCancel(RequestCancelRequest request, ServerCallContext context)
    {
-      logger.Log("Cancellation was requested by client");
+      logger.Debug("Cancellation was requested by client");
       var accepted = cancellationHandler.RequestCancel();
       return Task.FromResult(new RequestCancelResponse { CancelationAccepted = accepted });
    }

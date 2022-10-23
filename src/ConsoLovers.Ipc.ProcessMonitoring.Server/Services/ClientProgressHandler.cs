@@ -11,7 +11,7 @@ using System.Threading.Channels;
 
 using ConsoLovers.Ipc.Grpc;
 
-internal class ClientProgressHandler
+internal sealed class ClientProgressHandler
 {
    internal CultureInfo Culture { get; }
 
@@ -27,12 +27,17 @@ internal class ClientProgressHandler
    {
       if (progressInfo == null)
          throw new ArgumentNullException(nameof(progressInfo));
-
+      
       ProgressChannel.Writer.TryWrite(progressInfo);
    }
 
    public async Task<ProgressInfo> ReadNextAsync(CancellationToken cancellationToken)
    {
       return await ProgressChannel.Reader.ReadAsync(cancellationToken);
+   }
+
+   public void Complete()
+   {
+      ProgressChannel.Writer.Complete();
    }
 }

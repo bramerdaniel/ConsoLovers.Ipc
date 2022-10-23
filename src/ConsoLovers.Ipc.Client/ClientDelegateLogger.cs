@@ -6,7 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
-/// <summary>Implementation that calls the specified delegate for logging</summary>
+/// <summary>implementation that calls the specified delegate for logging</summary>
 /// <seealso cref="IClientLogger"/>
 public class ClientDelegateLogger : IClientLogger
 {
@@ -18,9 +18,9 @@ public class ClientDelegateLogger : IClientLogger
 
    #region Constructors and Destructors
 
-   /// <summary>Initializes a new instance of the <see cref="ClientDelegateLogger"/> class.</summary>
+   /// <summary>Initializes a new instance of the <see cref="DelegateLogger"/> class.</summary>
    /// <param name="logAction">The log action.</param>
-   /// <exception cref="System">logAction</exception>
+   /// <exception cref="System.ArgumentNullException">logAction</exception>
    public ClientDelegateLogger(Action<string> logAction)
    {
       this.logAction = logAction ?? throw new ArgumentNullException(nameof(logAction));
@@ -28,14 +28,22 @@ public class ClientDelegateLogger : IClientLogger
 
    #endregion
 
-   #region IClientLogger Members
+   public ClientLogLevel LogLevel { get; set; } = ClientLogLevel.Warn;
 
-   /// <summary>Logs the specified message.</summary>
-   /// <param name="message">The message to log</param>
-   public void Log(string message)
+   public void Log(ClientLogLevel level, string message)
    {
-      logAction(message);
+      if (IsEnabled(level))
+         logAction(message);
    }
 
-   #endregion
+   public void Log(ClientLogLevel level, Func<string> messageFunc)
+   {
+      if (IsEnabled(level))
+         logAction(messageFunc());
+   }
+
+   public bool IsEnabled(ClientLogLevel logLevel)
+   {
+      return logLevel <= LogLevel;
+   }
 }

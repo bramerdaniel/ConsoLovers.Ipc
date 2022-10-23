@@ -16,6 +16,8 @@ internal sealed class IpcServerImpl : IIpcServer
 
    private readonly WebApplication webApplication;
 
+   private bool disposed;
+
    #endregion
 
    #region Constructors and Destructors
@@ -26,14 +28,14 @@ internal sealed class IpcServerImpl : IIpcServer
    /// <param name="logger">The logger.</param>
    /// <exception cref="System.ArgumentNullException">name or webApplication</exception>
    /// <exception cref="ArgumentNullException">webApplication</exception>
-   internal IpcServerImpl(WebApplication webApplication, string name, IDiagnosticLogger logger)
+   internal IpcServerImpl(WebApplication webApplication, string name, IServerLogger logger)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));
       Name = name ?? throw new ArgumentNullException(nameof(name));
       Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
       ServerTask = webApplication.RunAsync();
-      Logger.Log($"Ipc server was started with name '{Name}'");
+      Logger.Info($"Ipc server was started with name '{Name}'");
    }
 
    #endregion
@@ -64,15 +66,24 @@ internal sealed class IpcServerImpl : IIpcServer
    /// <returns>A task that represents the asynchronous dispose operation.</returns>
    public async ValueTask DisposeAsync()
    {
-      Logger.Log($"Disposing ipc server '{Name}'");
+      if(disposed)
+         return;
+      
+      disposed = true;
+
+      Logger.Debug($"Disposing ipc server '{Name}'");
       var stopwatch = Stopwatch.StartNew();
 
       await webApplication.StopAsync();
-      await webApplication.DisposeAsync();
-      await ServerTask;
-      stopwatch.Stop();
+      Logger.Debug("Stopped the web application");
 
-      Logger.Log($"Ipc server '{Name}' disposed successfully after {stopwatch.ElapsedMilliseconds} ms.");
+      await webApplication.DisposeAsync();
+      Logger.Debug("Disposing the web application");
+      
+      await ServerTask;
+
+      stopwatch.Stop();
+      Logger.Info($"Ipc server '{Name}' disposed successfully after {stopwatch.ElapsedMilliseconds} ms.");
    }
 
    /// <summary>Gets the name of the server.</summary>
@@ -82,7 +93,7 @@ internal sealed class IpcServerImpl : IIpcServer
 
    #region Public Properties
 
-   public IDiagnosticLogger Logger { get; }
+   public IServerLogger Logger { get; }
 
    #endregion
 
