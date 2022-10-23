@@ -68,7 +68,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       if (result != null)
          return result;
 
-      await Task.Run(() => WaitForFinished(cancellationToken));
+      await Task.Run(() => WaitForFinished(cancellationToken), cancellationToken);
       return Result;
    }
 
@@ -109,6 +109,8 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    {
       State = ClientState.Connecting;
       await WaitForServerAsync(CancellationToken.None);
+
+      State = ClientState.Active;
       await WaitForResult();
    }
 
@@ -174,6 +176,11 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
          }
 
          State = ClientState.Closed;
+      }
+      catch (RpcException ex)
+      {
+         State = ClientState.Failed;
+         Exception = ex;
       }
       catch (Exception ex)
       {

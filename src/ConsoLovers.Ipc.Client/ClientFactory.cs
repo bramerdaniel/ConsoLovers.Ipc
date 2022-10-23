@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClientFactory.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="ClientFactory.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -29,6 +29,9 @@ internal class ClientFactory : IClientFactory
    /// <summary>Gets the channel factory the <see cref="IClientFactory"/> uses.</summary>
    public IChannelFactory ChannelFactory { get; }
 
+   /// <summary>Gets the <see cref="ISynchronizationClient"/>.</summary>
+   public ISynchronizationClient SynchronizationClient => ChannelFactory.SynchronizationClient;
+
    /// <summary>Creates and configures the requested client.</summary>
    /// <typeparam name="T">The type of the client to create</typeparam>
    /// <returns>The created client</returns>
@@ -48,6 +51,7 @@ internal class ClientFactory : IClientFactory
       var client = ServiceProvider.GetService<T>() ?? CreateInstance<T>();
       var configuration = new ClientConfiguration(ChannelFactory, culture);
       client.Configure(configuration);
+      
       return client;
    }
 
@@ -96,7 +100,6 @@ internal class ClientFactory : IClientFactory
       where T : class, IConfigurableClient
    {
       CheckForBuildInClients(typeof(T));
-
       return ActivatorUtilities.CreateInstance<T>(ServiceProvider);
    }
 

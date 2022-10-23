@@ -6,8 +6,6 @@
 
 namespace ConsoLovers.Ipc;
 
-using System.Diagnostics.CodeAnalysis;
-
 using ConsoLovers.Ipc.Grpc;
 
 using global::Grpc.Core;
@@ -18,14 +16,23 @@ using global::Grpc.Net.Client;
 ///    <see cref="GrpcChannel"/> functions did not work for unix domain sockets.
 /// </summary>
 /// <seealso cref="ConsoLovers.Ipc.Grpc.SynchronizatioService.SynchronizatioServiceBase"/>
-internal class SynchronizationService : Grpc.SynchronizatioService.SynchronizatioServiceBase
+internal class SynchronizationService : SynchronizatioService.SynchronizatioServiceBase
 {
+   private readonly IServerLogger logger;
+
+   public SynchronizationService(IServerLogger logger)
+   {
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+   }
+
    #region Public Methods and Operators
 
    public override Task<ConnectResponse> Connect(ConnectRequest request, ServerCallContext context)
    {
+      logger.Debug($"Client {request.ClientName} connected");
       return Task.FromResult(new ConnectResponse());
    }
 
    #endregion
+
 }

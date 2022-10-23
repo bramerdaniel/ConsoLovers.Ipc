@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc.Clients;
 
+using System.Diagnostics;
+
 using ConsoLovers.Ipc.Grpc;
 
 using global::Grpc.Core;
@@ -15,20 +17,30 @@ using global::Grpc.Net.Client;
 /// <seealso cref="ConsoLovers.Ipc.ISynchronizationClient"/>
 public class SynchronizationClient : ISynchronizationClient
 {
+   private readonly IClientLogger logger;
+
    #region Constants and Fields
 
    private readonly SynchronizatioService.SynchronizatioServiceClient connectionService;
+
+   private bool wasConnected;
+
+   private readonly string clientName;
 
    #endregion
 
    #region Constructors and Destructors
 
-   public SynchronizationClient(GrpcChannel channel)
+   public SynchronizationClient(GrpcChannel channel, IClientLogger logger)
    {
       if (channel == null)
          throw new ArgumentNullException(nameof(channel));
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
+      clientName = CreateClientName();
+      logger.Debug($"SynchronizationClient with name {clientName} was created");
       connectionService = new SynchronizatioService.SynchronizatioServiceClient(channel);
+      wasConnected = false;
    }
 
    #endregion
@@ -37,20 +49,35 @@ public class SynchronizationClient : ISynchronizationClient
 
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
-      while (true)
+      while (!wasConnected)
       {
          cancellationToken.ThrowIfCancellationRequested();
 
          try
          {
-            await connectionService.ConnectAsync(new ConnectRequest());
+            await connectionService.ConnectAsync(new ConnectRequest { ClientName = clientName });
+            logger.Debug($"{nameof(ISynchronizationClient)} could connect successfully");
+            wasConnected = true;
             return;
          }
-         catch (RpcException)
+         catch (RpcException e)
          {
-            await Task.Delay(100, cancellationToken);
+            logger.Trace($"{nameof(ISynchronizationClient)} connection failed");
+            if (e.StatusCode == StatusCode.Unavailable)
+            {
+               await Task.Delay(100, cancellationToken);
+            }
+            else
+            {
+               return;
+            }
          }
       }
+   }
+
+   private string CreateClientName()
+   {
+      return Process.GetCurrentProcess().ProcessName;
    }
 
    public async Task WaitForServerAsync(TimeSpan timeout)

@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc.ProcessMonitoring.Server.UnitTests;
 
+using System;
+
 using ConsoLovers.Ipc.UnitTesting;
 
 using Microsoft.VisualStudio.TestPlatform.TestExecutor;
@@ -18,5 +20,29 @@ internal static class IpcTestExtensions
       testSetup.ClientFactoryBuilder.AddProcessMonitoringClients();
 
       return testSetup;
+   }
+
+   internal static IProgressReporter GetProgressReporter(this IpcTest testSetup)
+   {
+      if (testSetup == null)
+         throw new ArgumentNullException(nameof(testSetup));
+
+      return testSetup.Server.GetProgressReporter();
+   }
+
+   internal static IProgressClient CreateProgressClient(this IpcTest testSetup)
+   {
+      if (testSetup == null)
+         throw new ArgumentNullException(nameof(testSetup));
+
+      return testSetup.ClientFactory.CreateProgressClient();
+   }
+
+   internal static IResultClient CreateResultClient(this IpcTest testSetup)
+   {
+      if (testSetup == null)
+         throw new ArgumentNullException(nameof(testSetup));
+
+      return testSetup.ClientFactory.CreateResultClient();
    }
 }

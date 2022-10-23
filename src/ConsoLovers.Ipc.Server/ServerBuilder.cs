@@ -118,7 +118,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       foreach (var action in applicationActions)
          action(application);
 
-      Logger.Log("Web application was created");
+      Logger.Debug("The web application was created");
       return new IpcServerImpl(application, Name, Logger);
    }
 
@@ -177,7 +177,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    #region Properties
 
    /// <summary>Gets or sets the logger.</summary>
-   internal IDiagnosticLogger Logger { get; set; } = new DelegateLogger(_ => { });
+   internal IServerLogger Logger { get; set; } = new DelegateLogger(_ => { });
 
    internal string Name { get; private set; }
 

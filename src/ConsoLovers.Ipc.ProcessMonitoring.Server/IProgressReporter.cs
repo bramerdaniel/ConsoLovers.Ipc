@@ -10,7 +10,7 @@ namespace ConsoLovers.Ipc;
 using System.Globalization;
 
 /// <summary>Service interface that is used on the <see cref="IIpcServer"/> side to report progress for the current process"/></summary>
-public interface IProgressReporter
+public interface IProgressReporter : IDisposable
 {
    #region Public Methods and Operators
 
@@ -26,6 +26,13 @@ public interface IProgressReporter
    /// <summary>Reports indeterminate progress.</summary>
    /// <param name="message">The message.</param>
    void ReportProgress(string message);
+
+   /// <summary>Notifies the clients that the progress has completed.</summary>
+   void ProgressCompleted();
+
+   /// <summary>Gets or sets a value indicating whether the <see cref="ProgressCompleted"/> method is called automatically
+   /// when the progress percentage reaches 100 %. The default value is true</summary>
+   bool AutoComplete { get; set; }
 
    #endregion
 }

@@ -9,6 +9,9 @@ namespace ConsoLovers.Ipc.UnitTesting;
 using System;
 using System.IO;
 
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+
 public sealed class IpcTest : IDisposable
 {
    #region Constructors and Destructors
@@ -68,4 +71,13 @@ public sealed class IpcTest : IDisposable
    }
 
    #endregion
+
+   public void StopServerApplication()
+   {
+      if (Server is IpcServerImpl server)
+      {
+         var lifetime = server.GetRequiredService<IHostApplicationLifetime>();
+         lifetime.StopApplication();
+      }
+   }
 }

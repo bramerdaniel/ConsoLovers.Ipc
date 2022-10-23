@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IClientFactory.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="IClientFactory.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -14,6 +14,9 @@ public interface IClientFactory
 
    /// <summary>Gets the channel factory the <see cref="IClientFactory"/> uses.</summary>
    IChannelFactory ChannelFactory { get; }
+
+   /// <summary>Gets the <see cref="ISynchronizationClient"/>.</summary>
+   ISynchronizationClient SynchronizationClient { get; }
 
    #endregion
 
@@ -40,6 +43,4 @@ public interface IClientFactory
       where T : class, IConfigurableClient;
 
    #endregion
-
-   
 }

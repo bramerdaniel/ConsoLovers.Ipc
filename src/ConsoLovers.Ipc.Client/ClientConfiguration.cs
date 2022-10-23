@@ -36,5 +36,7 @@ internal class ClientConfiguration : IClientConfiguration
 
    public GrpcChannel Channel => channelFactory.Channel;
 
+   public ISynchronizationClient SynchronizationClient => channelFactory.SynchronizationClient;
+
    #endregion
 }

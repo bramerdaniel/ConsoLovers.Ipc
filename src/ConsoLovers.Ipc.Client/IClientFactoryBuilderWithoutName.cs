@@ -29,9 +29,9 @@ public interface IClientFactoryBuilderWithoutName
    IClientFactoryBuilder WithSocketFile(Func<string> computeSocketFile);
 
    /// <summary>The function that computes the path to the socket file the client factory will use.</summary>
-   /// <param name="socketFile">The socket file path.</param>
+   /// <param name="file">The socket file path.</param>
    /// <returns>The server builder</returns>
-   IClientFactoryBuilder WithSocketFile(string socketFile);
+   IClientFactoryBuilder WithSocketFile(string file);
 
    #endregion
 }
