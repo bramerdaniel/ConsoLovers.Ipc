@@ -4,7 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Ipc.ProcessMonitoring.Services;
+namespace ConsoLovers.Ipc.ProcessMonitoring.Progress;
 
 using System.Globalization;
 

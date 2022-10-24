@@ -21,9 +21,8 @@ public static class ClientExtensions
       if (client == null)
          throw new ArgumentNullException(nameof(client));
 
-      var source = new CancellationTokenSource();
+      using var source = new CancellationTokenSource();
       source.CancelAfter(timeout);
-
       return client.WaitForServerAsync(source.Token);
    }
 
@@ -32,9 +31,8 @@ public static class ClientExtensions
       if (client == null)
          throw new ArgumentNullException(nameof(client));
 
-      var source = new CancellationTokenSource();
+      using var source = new CancellationTokenSource();
       source.CancelAfter(timeout);
-
       return client.WaitForServerAsync(source.Token);
    }
 }

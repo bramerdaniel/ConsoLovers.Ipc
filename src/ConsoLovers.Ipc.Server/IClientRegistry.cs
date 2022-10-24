@@ -6,6 +6,7 @@
 
 namespace ConsoLovers.Ipc;
 
+// TODO Wait for a specific client (by name or by type)
 public interface IClientRegistry
 {
    #region Public Methods and Operators

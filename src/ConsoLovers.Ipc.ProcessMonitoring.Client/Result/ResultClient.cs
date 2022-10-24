@@ -153,25 +153,10 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    {
       try
       {
-         var streamingCall = ServiceClient.ResultChanged(new ResultChangedRequest());
-         await WaitForResult(streamingCall);
-
-         State = ClientState.Closed;
-      }
-      catch (Exception ex)
-      {
-         State = ClientState.Failed;
-         Exception = ex;
-      }
-   }
-
-   private async Task WaitForResult(AsyncServerStreamingCall<ResultChangedResponse> changed)
-   {
-      try
-      {
-         if (await changed.ResponseStream.MoveNext(CancellationToken.None))
+         var resultChanged = ServiceClient.ResultChanged(new ResultChangedRequest(), CreateLanguageHeader());
+         if (await resultChanged.ResponseStream.MoveNext(CancellationToken.None))
          {
-            var response = changed.ResponseStream.Current;
+            var response = resultChanged.ResponseStream.Current;
             Result = new ResultInfo(ExitCode: response.ExitCode, Message: response.Message, Data: response.Data);
          }
 
@@ -179,6 +164,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       }
       catch (RpcException ex)
       {
+         // This happens when the server was available and is disposed without reporting any results
          State = ClientState.Failed;
          Exception = ex;
       }

@@ -40,9 +40,8 @@ internal class ClientRegistry : IClientRegistry
 
    public void WaitForClient(TimeSpan timeout)
    {
-      var timeoutSource = new CancellationTokenSource();
+      using var timeoutSource = new CancellationTokenSource();
       timeoutSource.CancelAfter(timeout);
-
       WaitForClient(timeoutSource.Token);
    }
 
@@ -63,9 +62,8 @@ internal class ClientRegistry : IClientRegistry
 
    public Task WaitForClientAsync(TimeSpan timeout)
    {
-      var timeoutSource = new CancellationTokenSource();
+      using var timeoutSource = new CancellationTokenSource();
       timeoutSource.CancelAfter(timeout);
-
       return WaitForClientAsync(timeoutSource.Token);
    }
 
