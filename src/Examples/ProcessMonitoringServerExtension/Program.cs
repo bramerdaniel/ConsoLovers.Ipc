@@ -2,6 +2,7 @@
 {
    using ConsoLovers.ConsoleToolkit.Core;
    using ConsoLovers.Ipc;
+   using ConsoLovers.Toolkit.Ipc.ServerExtension;
 
    internal static class Program
    {
@@ -11,7 +12,7 @@
             .AddProcessMonitoringServer(config =>
             {
                config.ForName("server")
-                  .AddDiagnosticLogging(Console.WriteLine);
+                  .AddDiagnosticLogging(new ConsoleLogger(ServerLogLevel.Trace));
             })
             .RunAsync();
 

@@ -36,7 +36,7 @@ internal class RunCommand : IAsyncCommand<RunCommand.Args>
 
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
-      var initialDelay = 15000;
+      var initialDelay = 10000;
       Console.Title = server.Name;
 
       console.WriteLine($"Delaying for {initialDelay / 1000 } seconds");
