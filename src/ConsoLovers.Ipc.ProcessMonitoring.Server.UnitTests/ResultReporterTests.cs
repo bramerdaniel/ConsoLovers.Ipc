@@ -144,6 +144,7 @@ public class ResultReporterTests
       germanResult.Message.Should().Be("de-DE");
       englishResult.Message.Should().Be("en-US");
 
+      ipcTest.Dispose();
    }
 
    #endregion

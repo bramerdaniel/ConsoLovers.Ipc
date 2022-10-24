@@ -123,7 +123,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
          StateChanged += OnStateChanged;
 
          CheckForFinished(State);
-         resetEventSlim.Wait(cancellationToken);
+         resetEventSlim?.Wait(cancellationToken);
       }
       catch (OperationCanceledException)
       {
@@ -141,10 +141,14 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
 
       void CheckForFinished(ClientState stateToCheck)
       {
+         if (resetEventSlim == null)
+            return;
+
          if (stateToCheck == ClientState.Closed || stateToCheck == ClientState.Failed)
          {
             resetEventSlim.Set();
             resetEventSlim.Dispose();
+            resetEventSlim = null;
          }
       }
    }
