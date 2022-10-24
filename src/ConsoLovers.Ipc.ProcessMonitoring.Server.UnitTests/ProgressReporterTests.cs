@@ -63,7 +63,7 @@ public class ProgressReporterTests
       var waitingTask = client.WaitForCompletedAsync();
       reporter.Dispose();
 
-      await waitingTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
+      await waitingTask.WaitAsync(TimeSpan.FromMilliseconds(5000));
 
       client.State.Should().Be(ClientState.Closed);
    }
