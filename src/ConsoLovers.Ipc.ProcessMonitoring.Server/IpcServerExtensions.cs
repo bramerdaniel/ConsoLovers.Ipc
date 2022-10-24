@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="IpcServerExtensions.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="IpcServerExtensions.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -104,6 +104,66 @@ public static class IpcServerExtensions
 
       server.GetRequiredService<IResultReporter>().ReportSuccess();
       return server;
+   }
+
+   public static IIpcServer WaitForClient(this IIpcServer server, CancellationToken cancellationToken)
+   {
+      if (server == null)
+         throw new ArgumentNullException(nameof(server));
+
+      server.GetRequiredService<IClientRegistry>()
+         .WaitForClient(cancellationToken);
+
+      return server;
+   }
+
+   public static IIpcServer WaitForClient(this IIpcServer server, TimeSpan timeout)
+   {
+      if (server == null)
+         throw new ArgumentNullException(nameof(server));
+
+      server.GetRequiredService<IClientRegistry>()
+         .WaitForClient(timeout);
+
+      return server;
+   }
+
+   public static IIpcServer WaitForClient(this IIpcServer server, int timeoutInMilliseconds)
+   {
+      if (server == null)
+         throw new ArgumentNullException(nameof(server));
+
+      server.GetRequiredService<IClientRegistry>()
+         .WaitForClient(timeoutInMilliseconds);
+
+      return server;
+   }
+
+   public static async Task WaitForClientAsync(this IIpcServer server, CancellationToken cancellationToken)
+   {
+      if (server == null)
+         throw new ArgumentNullException(nameof(server));
+
+      await server.GetRequiredService<IClientRegistry>()
+         .WaitForClientAsync(cancellationToken);
+   }
+
+   public static async Task WaitForClientAsync(this IIpcServer server, TimeSpan timeout)
+   {
+      if (server == null)
+         throw new ArgumentNullException(nameof(server));
+
+      await server.GetRequiredService<IClientRegistry>()
+         .WaitForClientAsync(timeout);
+   }
+
+   public static async Task WaitForClientAsync(this IIpcServer server, int timeoutInMilliseconds)
+   {
+      if (server == null)
+         throw new ArgumentNullException(nameof(server));
+
+      await server.GetRequiredService<IClientRegistry>()
+         .WaitForClientAsync(timeoutInMilliseconds);
    }
 
    #endregion

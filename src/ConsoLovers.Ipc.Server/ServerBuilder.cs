@@ -34,6 +34,8 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       Name = string.Empty;
       WebApplicationBuilder = WebApplication.CreateBuilder(new WebApplicationOptions());
       AddGrpcService<SynchronizationService>();
+      AddService(s => s.AddSingleton<ClientRegistry>());
+      AddService(s => s.AddSingleton<IClientRegistry>(sp => sp.GetRequiredService<ClientRegistry>()));
    }
 
    #endregion
