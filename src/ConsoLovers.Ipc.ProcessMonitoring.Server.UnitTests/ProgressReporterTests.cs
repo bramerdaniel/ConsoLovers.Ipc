@@ -103,19 +103,25 @@ public class ProgressReporterTests
       var reporter = ipcTest.GetProgressReporter();
       reporter.ReportProgress(50, c => c.Name);
       
-      var eventSlim = new ManualResetEventSlim();
+      var germanRaised = new ManualResetEventSlim();
+      var englishRaised = new ManualResetEventSlim();
       var germanClient = ipcTest.CreateProgressClient("de-DE");
-      germanClient.ProgressChanged += (_, e) => germanMessage = e.Message;
+      germanClient.ProgressChanged += (_, e) =>
+      {
+         germanMessage = e.Message;
+         germanRaised.Set();
+      };
       
       var englishClient = ipcTest.CreateProgressClient("en-US");
       englishClient.ProgressChanged += (_, e) =>
       {
          englishMessage = e.Message;
-         eventSlim.Set();
+         englishRaised.Set();
       };
 
       await germanClient.WaitForServerAsync(1000);
-      eventSlim.Wait(1000);
+      WaitHandle.WaitAll(new[] { englishRaised.WaitHandle, germanRaised.WaitHandle }, 2000)
+         .Should().BeTrue();
 
       germanMessage.Should().Be("de-DE");
       englishMessage.Should().Be("en-US");
