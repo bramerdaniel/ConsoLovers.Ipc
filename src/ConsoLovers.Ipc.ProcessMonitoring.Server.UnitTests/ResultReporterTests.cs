@@ -8,6 +8,7 @@ namespace ConsoLovers.Ipc.ProcessMonitoring.Server.UnitTests;
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -62,6 +63,7 @@ public class ResultReporterTests
          .Done();
 
       var reporter = ipcTest.Server.GetResultReporter();
+      reporter.Should().NotBeNull();
 
       var client = ipcTest.CreateClient<IResultClient>();
       await client.WaitForServerAsync(CancellationToken.None);
@@ -73,6 +75,7 @@ public class ResultReporterTests
       var result = await resultTask;
       result.ExitCode.Should().Be(int.MaxValue);
       result.Message.Should().Be("Result not computed yet");
+
    }
 
    [TestMethod]
@@ -119,6 +122,29 @@ public class ResultReporterTests
       await task;
 
       client.State.Should().Be(ClientState.Closed);
+   }
+
+   [TestMethod]
+   public async Task EnsureResultCanBeLocalized()
+   {
+      var ipcTest = Setup.IpcTest().ForCurrentTest()
+         .AddProcessMonitoring()
+         .Done();
+
+      var reporter = ipcTest.Server.GetResultReporter();
+      reporter.ReportResult(0, c => c.Name);
+
+      var germanClient = ipcTest.CreateResultClient(CultureInfo.GetCultureInfo("de-DE"));
+      var englishClient = ipcTest.CreateResultClient(CultureInfo.GetCultureInfo("en-US"));
+      await germanClient.WaitForServerAsync(1000);
+
+      var germanResult = await germanClient.WaitForResultAsync();
+      var englishResult = await englishClient.WaitForResultAsync();
+
+      germanResult.Message.Should().Be("de-DE");
+      englishResult.Message.Should().Be("en-US");
+
+      ipcTest.Dispose();
    }
 
    #endregion

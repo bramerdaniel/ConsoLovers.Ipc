@@ -18,10 +18,13 @@ using global::Grpc.Net.Client;
 /// <seealso cref="ConsoLovers.Ipc.Grpc.SynchronizatioService.SynchronizatioServiceBase"/>
 internal class SynchronizationService : SynchronizatioService.SynchronizatioServiceBase
 {
+   private readonly ClientRegistry clientRegistry;
+
    private readonly IServerLogger logger;
 
-   public SynchronizationService(IServerLogger logger)
+   public SynchronizationService(ClientRegistry clientRegistry, IServerLogger logger)
    {
+      this.clientRegistry = clientRegistry ?? throw new ArgumentNullException(nameof(clientRegistry));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
    }
 
@@ -29,6 +32,7 @@ internal class SynchronizationService : SynchronizatioService.SynchronizatioServ
 
    public override Task<ConnectResponse> Connect(ConnectRequest request, ServerCallContext context)
    {
+      clientRegistry.NotifyClientConnected(request.ClientName);
       logger.Debug($"Client {request.ClientName} connected");
       return Task.FromResult(new ConnectResponse());
    }

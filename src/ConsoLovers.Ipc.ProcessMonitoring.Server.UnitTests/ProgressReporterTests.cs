@@ -63,7 +63,7 @@ public class ProgressReporterTests
       var waitingTask = client.WaitForCompletedAsync();
       reporter.Dispose();
 
-      await waitingTask.WaitAsync(TimeSpan.FromMilliseconds(1000));
+      await waitingTask.WaitAsync(TimeSpan.FromMilliseconds(5000));
 
       client.State.Should().Be(ClientState.Closed);
    }
@@ -88,6 +88,43 @@ public class ProgressReporterTests
       await waitingTask;
 
       client.State.Should().Be(ClientState.Closed);
+   }
+
+   [TestMethod]
+   public async Task EnsureProgressCanBeLocalized()
+   {
+      var ipcTest = Setup.IpcTest().ForCurrentTest()
+         .AddProcessMonitoring()
+         .Done();
+
+      string germanMessage = null;
+      string englishMessage = null;
+
+      var reporter = ipcTest.GetProgressReporter();
+      reporter.ReportProgress(50, c => c.Name);
+      
+      var germanRaised = new ManualResetEventSlim();
+      var englishRaised = new ManualResetEventSlim();
+      var germanClient = ipcTest.CreateProgressClient("de-DE");
+      germanClient.ProgressChanged += (_, e) =>
+      {
+         germanMessage = e.Message;
+         germanRaised.Set();
+      };
+      
+      var englishClient = ipcTest.CreateProgressClient("en-US");
+      englishClient.ProgressChanged += (_, e) =>
+      {
+         englishMessage = e.Message;
+         englishRaised.Set();
+      };
+
+      await germanClient.WaitForServerAsync(1000);
+      WaitHandle.WaitAll(new[] { englishRaised.WaitHandle, germanRaised.WaitHandle }, 2000)
+         .Should().BeTrue();
+
+      germanMessage.Should().Be("de-DE");
+      englishMessage.Should().Be("en-US");
    }
 
    #endregion

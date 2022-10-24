@@ -7,7 +7,6 @@
 namespace ConsoLovers.Toolkit.Ipc.ServerExtension;
 
 using ConsoLovers.ConsoleToolkit.Core;
-using ConsoLovers.Ipc;
 
 /// <summary><see cref="IAsyncShutdownHandler"/> that </summary>
 /// <seealso cref="ConsoLovers.ConsoleToolkit.Core.IAsyncShutdownHandler"/>
@@ -15,19 +14,17 @@ internal class IpcServerShutdownHandler : IAsyncShutdownHandler
 {
    #region Constants and Fields
 
-   private readonly IIpcServer? server;
+   private readonly IpcServerLifetime serverLifetime;
 
    #endregion
 
    #region Constructors and Destructors
 
    /// <summary>Initializes a new instance of the <see cref="IpcServerShutdownHandler"/> class.</summary>
-   /// <param name="server">The server.</param>
-   public IpcServerShutdownHandler(IIpcServer? server)
+   /// <param name="serverLifetime">The server lifetime.</param>
+   public IpcServerShutdownHandler(IpcServerLifetime serverLifetime)
    {
-      // TODO this injection would create the server if not happened yet
-      // this should be done smarter
-      this.server = server;
+      this.serverLifetime = serverLifetime ?? throw new ArgumentNullException(nameof(serverLifetime));
    }
 
    #endregion
@@ -36,10 +33,8 @@ internal class IpcServerShutdownHandler : IAsyncShutdownHandler
 
    public async Task NotifyShutdownAsync(IExecutionResult result)
    {
-      if (server == null)
-         return;
-
-      await server.DisposeAsync();
+      if (serverLifetime.GetServerWhenCreated(out var server))
+         await server.DisposeAsync();
    }
 
    #endregion

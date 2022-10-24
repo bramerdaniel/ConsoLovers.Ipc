@@ -41,28 +41,20 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
       ServerCallContext context)
    {
       var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, hostLifetime.ApplicationStopping);
+      var culture = context.GetCulture();
 
       try
       {
          logger.Debug("Result handler was attached");
-         var resultInfo = await resultReporter.GetResultAsync(tokenSource.Token);
+         var response = await resultReporter.GetResultAsync(culture, tokenSource.Token);
          
          logger.Debug("Result was available in result service");
-         var response = CreateResponse(resultInfo);
          await responseStream.WriteAsync(response, tokenSource.Token);
       }
       catch (OperationCanceledException)
       {
          logger.Debug("Waiting for result was canceled");
       }
-   }
-
-   private static ResultChangedResponse CreateResponse(ResultInfo resultInfo)
-   {
-      var response = new ResultChangedResponse { ExitCode = resultInfo.ExitCode, Message = resultInfo.Message };
-      if (resultInfo.Data.Count > 0)
-         response.Data.Add(resultInfo.Data);
-      return response;
    }
 
    #endregion

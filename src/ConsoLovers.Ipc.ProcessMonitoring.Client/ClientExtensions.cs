@@ -4,6 +4,7 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
+// ReSharper disable once CheckNamespace
 namespace ConsoLovers.Ipc;
 
 using ConsoLovers.Ipc.ProcessMonitoring;
@@ -50,7 +51,7 @@ public static class ClientExtensions
       if (clientFactoryBuilder == null)
          throw new ArgumentNullException(nameof(clientFactoryBuilder));
 
-      clientFactoryBuilder.AddService(s => s.AddSingleton<IProgressClient, ProgressClient>());
+      clientFactoryBuilder.AddService(s => s.AddTransient<IProgressClient, ProgressClient>());
       return clientFactoryBuilder;
    }
    
@@ -64,7 +65,7 @@ public static class ClientExtensions
       if (clientFactoryBuilder == null)
          throw new ArgumentNullException(nameof(clientFactoryBuilder));
 
-      clientFactoryBuilder.AddService(s => s.AddSingleton<IResultClient, ResultClient>());
+      clientFactoryBuilder.AddService(s => s.AddTransient<IResultClient, ResultClient>());
       return clientFactoryBuilder;
    }
 

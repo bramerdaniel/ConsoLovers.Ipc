@@ -6,6 +6,11 @@
 
 namespace ConsoLovers.Ipc.ProcessMonitoring.Result;
 
+using System.Collections.Concurrent;
+using System.Globalization;
+
+using ConsoLovers.Ipc.Grpc;
+
 /// <summary>The default implementation of the <see cref="IResultReporter"/> service</summary>
 /// <seealso cref="ConsoLovers.Ipc.IResultReporter"/>
 internal class ResultReporter : IResultReporter
@@ -13,8 +18,10 @@ internal class ResultReporter : IResultReporter
    #region Constants and Fields
 
    private readonly ManualResetEventSlim resetEvent;
+   
+   private readonly LocalizableResult result;
 
-   private readonly ResultInfo resultInfo;
+   private readonly ConcurrentDictionary<CultureInfo, ResultChangedResponse> localizedResponses;
 
    #endregion
 
@@ -24,7 +31,8 @@ internal class ResultReporter : IResultReporter
    public ResultReporter()
    {
       resetEvent = new ManualResetEventSlim();
-      resultInfo = new ResultInfo(-1, "NotExecuted");
+      result = new LocalizableResult(_ => "NotExecuted", int.MaxValue);
+      localizedResponses = new ConcurrentDictionary<CultureInfo, ResultChangedResponse>();
    }
 
    #endregion
@@ -39,6 +47,11 @@ internal class ResultReporter : IResultReporter
       ReportResult(exitCode, message);
    }
 
+   public void ReportError(int exitCode, Func<CultureInfo, string> message)
+   {
+      ReportResult(exitCode, message);
+   }
+
    /// <summary>Reports the result of the host process.</summary>
    /// <param name="exitCode">The exit code.</param>
    /// <param name="message">The message.</param>
@@ -48,8 +61,13 @@ internal class ResultReporter : IResultReporter
       if (message == null)
          throw new ArgumentNullException(nameof(message));
 
-      resultInfo.ExitCode = exitCode;
-      resultInfo.Message = message;
+      ReportResult(exitCode, _ => message);
+   }
+
+   public void ReportResult(int exitCode, Func<CultureInfo, string> message)
+   {
+      result.MessageResolver = message;
+      result.ExitCode = exitCode;
       resetEvent.Set();
    }
 
@@ -60,7 +78,7 @@ internal class ResultReporter : IResultReporter
       if (value == null)
          throw new ArgumentNullException(nameof(value));
 
-      resultInfo.Data.Add(key, value);
+      result.Data.Add(key, value);
    }
 
    public void ReportSuccess()
@@ -72,10 +90,11 @@ internal class ResultReporter : IResultReporter
 
    #region Methods
 
-   internal Task<ResultInfo> GetResultAsync(CancellationToken cancellationToken)
+   internal Task<ResultChangedResponse> GetResultAsync(CultureInfo culture, CancellationToken cancellationToken)
    {
       resetEvent.Wait(cancellationToken);
-      return Task.FromResult(resultInfo);
+      var response = localizedResponses.GetOrAdd(culture, c => result.Localize(c));
+      return Task.FromResult(response);
    }
 
    #endregion

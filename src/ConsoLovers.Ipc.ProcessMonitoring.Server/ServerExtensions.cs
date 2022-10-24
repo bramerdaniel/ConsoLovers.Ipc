@@ -9,8 +9,11 @@
 namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
+using System.Diagnostics.CodeAnalysis;
+
 using Microsoft.Extensions.DependencyInjection;
 
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class ServerExtensions
 {
    #region Public Methods and Operators

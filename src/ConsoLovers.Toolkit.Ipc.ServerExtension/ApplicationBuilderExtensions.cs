@@ -94,6 +94,8 @@ public static class ApplicationBuilderExtensions
       if (config == null)
          throw new ArgumentNullException(nameof(config));
 
+      builder.AddService(x => x.AddSingleton<IpcServerLifetime>());
+      builder.AddService(x => x.AddSingleton<IIpcServerLifetime>(sp => sp.GetRequiredService<IpcServerLifetime>()));
       builder.AddService(x => x.AddSingleton(_ => CreateServerBuilder(config, removeAspNetCoreLogging)));
       builder.AddService(x => x.AddSingleton(CreateIpcServer));
       builder.AddService(x => x.AddSingleton<IAsyncShutdownHandler, IpcServerShutdownHandler>());
@@ -128,8 +130,11 @@ public static class ApplicationBuilderExtensions
 
    private static IIpcServer CreateIpcServer(IServiceProvider services)
    {
+      var serverLifetime = services.GetRequiredService<IpcServerLifetime>();
       var builder = services.GetRequiredService<IServerBuilder>();
-      return builder.Start();
+      serverLifetime.Server = builder.Start();
+      
+      return serverLifetime.Server;
    }
 
    private static IServerBuilder CreateServerBuilder(Action<IServerBuilderWithoutName> config, bool removeAspLogging)

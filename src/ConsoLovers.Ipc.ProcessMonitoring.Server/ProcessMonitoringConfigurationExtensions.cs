@@ -8,13 +8,16 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Diagnostics.CodeAnalysis;
+
 using ConsoLovers.Ipc.ProcessMonitoring.Cancellation;
+using ConsoLovers.Ipc.ProcessMonitoring.Progress;
 using ConsoLovers.Ipc.ProcessMonitoring.Result;
-using ConsoLovers.Ipc.ProcessMonitoring.Services;
 
 using Microsoft.Extensions.DependencyInjection;
 
 /// <summary>A bunch of extensions for the <see cref="IServerConfiguration"/> interface</summary>
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class ProcessMonitoringConfigurationExtensions
 {
    #region Public Methods and Operators
