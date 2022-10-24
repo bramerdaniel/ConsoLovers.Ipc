@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ServerExtensions.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+// <copyright file="ServerExtensions.cs" company="KUKA Deutschland GmbH">
+//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -8,6 +8,7 @@ namespace ConsoLovers.Ipc;
 
 extern alias LoggingExtensions;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 using global::Grpc.Core;
@@ -18,6 +19,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Net.Http.Headers;
 
+[SuppressMessage("ReSharper", "UnusedMember.Global")]
 public static class ServerExtensions
 {
    #region Public Methods and Operators
@@ -28,6 +30,9 @@ public static class ServerExtensions
    public static T AddGrpcReflection<T>(this T builder)
       where T : IServerConfiguration
    {
+      if (builder == null)
+         throw new ArgumentNullException(nameof(builder));
+
       return builder.ConfigureWebApplication(app => app.Services.AddGrpcReflection());
    }
 
@@ -58,6 +63,9 @@ public static class ServerExtensions
    public static bool EnsureSingleton<TService, TImplementation>(this IServiceCollection serviceCollection)
       where TImplementation : TService where TService : class
    {
+      if (serviceCollection == null)
+         throw new ArgumentNullException(nameof(serviceCollection));
+
       if (TryAddSingleton<TImplementation>(serviceCollection))
       {
          serviceCollection.AddSingleton<TService>(x => x.GetRequiredService<TImplementation>());
@@ -84,6 +92,9 @@ public static class ServerExtensions
    /// <returns>The requested culture</returns>
    public static CultureInfo GetCulture(this ServerCallContext context)
    {
+      if (context == null)
+         throw new ArgumentNullException(nameof(context));
+
       var languageHeader = context.RequestHeaders.Get(HeaderNames.AcceptLanguage);
       if (languageHeader != null)
       {

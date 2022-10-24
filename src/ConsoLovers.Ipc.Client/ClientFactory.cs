@@ -48,9 +48,8 @@ internal class ClientFactory : IClientFactory
    public T CreateClient<T>(CultureInfo? culture)
       where T : class, IConfigurableClient
    {
-      // TODO shouldn't we use Culture here if the parameter culture is null ?
       var client = ServiceProvider.GetService<T>() ?? CreateInstance<T>();
-      var configuration = new ClientConfiguration(ChannelFactory, culture);
+      var configuration = new ClientConfiguration(ChannelFactory, culture ?? Culture);
       client.Configure(configuration);
       
       return client;
@@ -70,9 +69,10 @@ internal class ClientFactory : IClientFactory
 
    #region Properties
 
-   /// <summary>Gets the culture info of the factory.</summary>
+   /// <summary>Gets the default culture the factory will use to create clients.</summary>
    private CultureInfo? Culture { get; }
 
+   /// <summary>Gets the service provider.</summary>
    private IServiceProvider ServiceProvider { get; }
 
    #endregion

@@ -105,6 +105,12 @@ public static class ClientFactoryExtensions
       return clientFactory.SynchronizationClient.WaitForServerAsync(timeout);
    }
 
+   /// <summary>Waits for the ipc server to be available</summary>
+   /// <param name="clientFactory">The client factory.</param>
+   /// <param name="timeout">The timeout after the waiting will be canceled.</param>
+   /// <param name="cancellationToken">The cancellation token that cancels the waiting.</param>
+   /// <returns></returns>
+   /// <exception cref="System.ArgumentNullException">clientFactory</exception>
    public static Task WaitForServerAsync(this IClientFactory clientFactory, TimeSpan timeout, CancellationToken cancellationToken)
    {
       if (clientFactory == null)

@@ -63,6 +63,7 @@ public class ResultReporterTests
          .Done();
 
       var reporter = ipcTest.Server.GetResultReporter();
+      reporter.Should().NotBeNull();
 
       var client = ipcTest.CreateClient<IResultClient>();
       await client.WaitForServerAsync(CancellationToken.None);
@@ -74,6 +75,7 @@ public class ResultReporterTests
       var result = await resultTask;
       result.ExitCode.Should().Be(int.MaxValue);
       result.Message.Should().Be("Result not computed yet");
+
    }
 
    [TestMethod]
