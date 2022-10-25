@@ -36,10 +36,6 @@ public interface IResultClient : IConfigurableClient, IDisposable
    #region Public Methods and Operators
 
    /// <summary>Waits for the result to be available.</summary>
-   /// <returns>The <see cref="ResultInfo"/></returns>
-   Task<ResultInfo> WaitForResultAsync();
-
-   /// <summary>Waits for the result to be available.</summary>
    /// <param name="cancellationToken">The cancellation token.</param>
    /// <returns>The <see cref="ResultInfo"/></returns>
    Task<ResultInfo> WaitForResultAsync(CancellationToken cancellationToken);

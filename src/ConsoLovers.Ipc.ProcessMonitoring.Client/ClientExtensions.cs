@@ -5,6 +5,7 @@
 // --------------------------------------------------------------------------------------------------------------------
 
 // ReSharper disable once CheckNamespace
+
 namespace ConsoLovers.Ipc;
 
 using ConsoLovers.Ipc.ProcessMonitoring;
@@ -54,7 +55,6 @@ public static class ClientExtensions
       clientFactoryBuilder.AddService(s => s.AddTransient<IProgressClient, ProgressClient>());
       return clientFactoryBuilder;
    }
-   
 
    /// <summary>Adds the <see cref="IResultClient"/>.</summary>
    /// <param name="clientFactoryBuilder">The client factory builder.</param>
@@ -67,6 +67,34 @@ public static class ClientExtensions
 
       clientFactoryBuilder.AddService(s => s.AddTransient<IResultClient, ResultClient>());
       return clientFactoryBuilder;
+   }
+
+   /// <summary>Waits for the result to be available.</summary>
+   /// <param name="resultClient">The result client.</param>
+   /// <returns>The <see cref="ResultInfo"/></returns>
+   public static Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient)
+   {
+      return resultClient.WaitForResultAsync(CancellationToken.None);
+   }
+
+   /// <summary>Waits for the result to be available.</summary>
+   /// <param name="resultClient">The result client.</param>
+   /// <param name="timeout">The timeout after the waiting should be canceled.</param>
+   /// <returns>The <see cref="ResultInfo"/></returns>
+   public static Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient, TimeSpan timeout)
+   {
+      var tokenSource = new CancellationTokenSource();
+      tokenSource.CancelAfter(timeout);
+      return resultClient.WaitForResultAsync(tokenSource.Token);
+   }
+
+   /// <summary>Waits for the result to be available.</summary>
+   /// <param name="resultClient">The result client.</param>
+   /// <param name="timeoutInMilliseconds">The timeout in milliseconds after the waiting should be canceled.</param>
+   /// <returns>The <see cref="ResultInfo"/></returns>
+   public static Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient, int timeoutInMilliseconds)
+   {
+      return resultClient.WaitForResultAsync(TimeSpan.FromMilliseconds(timeoutInMilliseconds));
    }
 
    #endregion

@@ -72,11 +72,6 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       return Result;
    }
 
-   public Task<ResultInfo> WaitForResultAsync()
-   {
-      return WaitForResultAsync(CancellationToken.None);
-   }
-
    public void Dispose()
    {
    }
