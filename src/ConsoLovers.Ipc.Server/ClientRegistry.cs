@@ -60,11 +60,11 @@ internal class ClientRegistry : IClientRegistry
       await Task.Run(() => WaitForClient(cancellationToken), cancellationToken);
    }
 
-   public Task WaitForClientAsync(TimeSpan timeout)
+   public async Task WaitForClientAsync(TimeSpan timeout)
    {
       using var timeoutSource = new CancellationTokenSource();
       timeoutSource.CancelAfter(timeout);
-      return WaitForClientAsync(timeoutSource.Token);
+      await WaitForClientAsync(timeoutSource.Token);
    }
 
    public Task WaitForClientAsync(int timeoutInMilliseconds)
