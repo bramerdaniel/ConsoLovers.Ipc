@@ -157,7 +157,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    {
       try
       {
-         var resultChanged = ServiceClient.ResultChanged(new ResultChangedRequest(), CreateLanguageHeader());
+         var resultChanged = ServiceClient.ResultChanged(new ResultChangedRequest{ ClientName = SynchronizationClient.Name }, CreateLanguageHeader());
          if (await resultChanged.ResponseStream.MoveNext(CancellationToken.None))
          {
             var response = resultChanged.ResponseStream.Current;

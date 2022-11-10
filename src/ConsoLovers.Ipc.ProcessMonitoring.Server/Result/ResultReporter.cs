@@ -15,24 +15,33 @@ using ConsoLovers.Ipc.Grpc;
 /// <seealso cref="ConsoLovers.Ipc.IResultReporter"/>
 internal class ResultReporter : IResultReporter
 {
+   private readonly IServerLogger logger;
+
    #region Constants and Fields
 
    private readonly ManualResetEventSlim resetEvent;
-   
+
    private readonly LocalizableResult result;
 
    private readonly ConcurrentDictionary<CultureInfo, ResultChangedResponse> localizedResponses;
+
+   private readonly ConcurrentQueue<ResultRequest> resultRequests;
+
+   private readonly TimeSpan waitTimeout = TimeSpan.FromSeconds(3);
 
    #endregion
 
    #region Constructors and Destructors
 
    /// <summary>Initializes a new instance of the <see cref="ResultReporter"/> class.</summary>
-   public ResultReporter()
+   public ResultReporter(IServerLogger logger)
    {
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
       resetEvent = new ManualResetEventSlim();
       result = new LocalizableResult(_ => "NotExecuted", int.MaxValue);
       localizedResponses = new ConcurrentDictionary<CultureInfo, ResultChangedResponse>();
+      resultRequests = new ConcurrentQueue<ResultRequest>();
    }
 
    #endregion
@@ -69,6 +78,9 @@ internal class ResultReporter : IResultReporter
       result.MessageResolver = message;
       result.ExitCode = exitCode;
       resetEvent.Set();
+
+      while (resultRequests.TryDequeue(out var resultRequest))
+         resultRequest.Wait();
    }
 
    public void AddData(string key, string value)
@@ -98,4 +110,52 @@ internal class ResultReporter : IResultReporter
    }
 
    #endregion
+
+
+   public IDisposable RegisterRequest(string clientName)
+   {
+      var request = new ResultRequest(clientName, logger, waitTimeout);
+      resultRequests.Enqueue(request);
+
+      logger.Debug($"ResultRequest for client {clientName} was registered");
+      return request;
+   }
+
+   private class ResultRequest : IDisposable
+   {
+      private readonly ManualResetEvent source;
+
+      private readonly string clientName;
+
+      private readonly IServerLogger logger;
+
+      private readonly TimeSpan waitTimeout;
+
+      public ResultRequest(string clientName, IServerLogger logger, TimeSpan waitTimeout)
+      {
+         this.clientName = clientName;
+         this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+         this.waitTimeout = waitTimeout;
+         source = new ManualResetEvent(false);
+      }
+
+      public void Dispose()
+      {
+         source.Set();
+         logger.Debug("ResultRequest was disposed");
+      }
+
+      public void Wait()
+      {
+         if (source.WaitOne(waitTimeout))
+         {
+            logger.Debug($"ResultRequest for client '{clientName}' was processed successfully");
+         }
+         else
+         {
+            logger.Debug($"ResultRequest for client '{clientName}' was not be processed after {waitTimeout.TotalMilliseconds}ms.");
+         }
+      }
+   }
 }
+

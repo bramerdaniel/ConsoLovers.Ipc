@@ -75,6 +75,8 @@ public class SynchronizationClient : ISynchronizationClient
       }
    }
 
+   public string Name => clientName;
+
    private string CreateClientName()
    {
       return Process.GetCurrentProcess().ProcessName;

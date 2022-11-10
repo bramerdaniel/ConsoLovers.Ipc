@@ -33,7 +33,7 @@ internal class SynchronizationService : SynchronizatioService.SynchronizatioServ
    public override Task<ConnectResponse> Connect(ConnectRequest request, ServerCallContext context)
    {
       clientRegistry.NotifyClientConnected(request.ClientName);
-      logger.Debug($"Client {request.ClientName} connected");
+      logger.Debug($"Client {request.ClientName} ({Thread.CurrentThread.ManagedThreadId}) connected.");
       return Task.FromResult(new ConnectResponse());
    }
 
