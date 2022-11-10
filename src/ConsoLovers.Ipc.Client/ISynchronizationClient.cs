@@ -11,6 +11,9 @@ public interface ISynchronizationClient
 {
    #region Public Methods and Operators
 
+   /// <summary>Gets the name of the client.</summary>
+   string Name { get; }
+
    /// <summary>Connects the asynchronous.</summary>
    /// <param name="cancellationToken">The cancellation token.</param>
    /// <returns>The waiting task</returns>

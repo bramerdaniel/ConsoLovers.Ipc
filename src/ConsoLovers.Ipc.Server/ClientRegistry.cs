@@ -6,17 +6,19 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Collections.Concurrent;
+
 internal class ClientRegistry : IClientRegistry
 {
    private readonly IServerLogger logger;
 
    #region Constants and Fields
 
-   private static readonly HashSet<string> AttachedClients = new();
+   private static readonly ConcurrentDictionary<string, bool> AttachedClients = new();
 
    private readonly ManualResetEventSlim clientConnected;
 
-   private readonly object connectionLock = new ();
+   private readonly object connectionLock = new();
 
    #endregion
 
@@ -92,8 +94,7 @@ internal class ClientRegistry : IClientRegistry
       if (string.IsNullOrWhiteSpace(name))
          return;
 
-      if (!AttachedClients.Contains(name))
-         AttachedClients.Add(name);
+      AttachedClients.TryAdd(name, true);
    }
 
    private void NotifyInternal(string name)

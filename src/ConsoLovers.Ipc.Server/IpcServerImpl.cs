@@ -79,7 +79,7 @@ internal sealed class IpcServerImpl : IIpcServer
 
       await webApplication.DisposeAsync();
       Logger.Debug("Disposing the web application");
-      
+
       await ServerTask;
 
       stopwatch.Stop();

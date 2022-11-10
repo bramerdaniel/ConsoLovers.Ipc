@@ -43,17 +43,32 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
       var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, hostLifetime.ApplicationStopping);
       var culture = context.GetCulture();
 
+      // we register every client is interested in the result 
+      var disposable = resultReporter.RegisterRequest(request.ClientName);
+
       try
       {
-         logger.Debug("Result handler was attached");
          var response = await resultReporter.GetResultAsync(culture, tokenSource.Token);
-         
-         logger.Debug("Result was available in result service");
+         logger.Debug("Reported result is available in result service");
+
          await responseStream.WriteAsync(response, tokenSource.Token);
       }
       catch (OperationCanceledException)
       {
-         logger.Debug("Waiting for result was canceled");
+         if (context.CancellationToken.IsCancellationRequested)
+         {
+            logger.Debug($"ResultRequest for client '{request.ClientName}' was canceled");
+         }
+         else
+         {
+            logger.Debug($"ResultRequest for client '{request.ClientName}' was canceled as the server application is shutting down");
+         }
+      }
+      finally
+      {
+         //  now the registered client got the result,
+         // or is no longer interested in it. 
+         disposable.Dispose();
       }
    }
 

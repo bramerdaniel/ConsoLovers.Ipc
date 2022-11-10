@@ -43,6 +43,7 @@ internal class RunCommand : IAsyncCommand<RunCommand.Args>
       await Task.Delay(initialDelay, cancellationToken);
 
       resultReporter.ReportResult(Arguments.ExitCode, Arguments.Message);
+      return;
       console.WriteLine($"Reported result ExitCode={Arguments.ExitCode}, Message={Arguments.Message}");
 
       console.WriteLine("Delaying for 2 seconds");
