@@ -13,22 +13,36 @@ using ConsoLovers.Ipc.Grpc;
 
 internal sealed class ClientProgressHandler
 {
-   internal CultureInfo Culture { get; }
+   #region Constants and Fields
 
-   public ClientProgressHandler(CultureInfo culture)
+   private readonly IServerLogger logger;
+
+   #endregion
+
+   #region Constructors and Destructors
+
+   public ClientProgressHandler(CultureInfo culture, IServerLogger logger)
    {
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
       Culture = culture ?? throw new ArgumentNullException(nameof(culture));
       ProgressChannel = Channel.CreateUnbounded<ProgressInfo>();
    }
 
+   #endregion
+
+   #region Properties
+
+   internal CultureInfo Culture { get; }
+
    private Channel<ProgressInfo> ProgressChannel { get; }
 
-   public void ReportProgress(ProgressInfo progressInfo)
+   #endregion
+
+   #region Public Methods and Operators
+
+   public void Complete()
    {
-      if (progressInfo == null)
-         throw new ArgumentNullException(nameof(progressInfo));
-      
-      ProgressChannel.Writer.TryWrite(progressInfo);
+      ProgressChannel.Writer.Complete();
    }
 
    public async Task<ProgressInfo> ReadNextAsync(CancellationToken cancellationToken)
@@ -36,8 +50,14 @@ internal sealed class ClientProgressHandler
       return await ProgressChannel.Reader.ReadAsync(cancellationToken);
    }
 
-   public void Complete()
+   public void ReportProgress(ProgressInfo progressInfo)
    {
-      ProgressChannel.Writer.Complete();
+      if (progressInfo == null)
+         throw new ArgumentNullException(nameof(progressInfo));
+
+      if (!ProgressChannel.Writer.TryWrite(progressInfo))
+         logger.Warn("Could not write to progress channel");
    }
+
+   #endregion
 }

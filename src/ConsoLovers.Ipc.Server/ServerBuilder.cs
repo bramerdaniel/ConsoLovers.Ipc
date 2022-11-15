@@ -148,7 +148,11 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
          if (File.Exists(socketFile))
             File.Delete(socketFile);
 
-         options.ListenUnixSocket(socketFile, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
+         Logger.Debug($"Using domain socket endpoint {socketFile}");
+         options.ListenUnixSocket(socketFile, listenOptions =>
+         {
+            listenOptions.Protocols = HttpProtocols.Http2;
+         });
       });
 
       if (string.IsNullOrWhiteSpace(Name))
