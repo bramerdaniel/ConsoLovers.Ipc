@@ -31,6 +31,7 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
       this.resultReporter = resultReporter ?? throw new ArgumentNullException(nameof(resultReporter));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
       this.hostLifetime = hostLifetime ?? throw new ArgumentNullException(nameof(hostLifetime));
+      logger.Debug("ResultService was created");
    }
 
    #endregion
@@ -43,7 +44,7 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
       var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, hostLifetime.ApplicationStopping);
       var culture = context.GetCulture();
 
-      // we register every client is interested in the result 
+      // we register every client that is interested in the result 
       var disposable = resultReporter.RegisterRequest(request.ClientName);
 
       try

@@ -22,7 +22,11 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    private ResultInfo? result;
 
    private ClientState state = ClientState.Uninitialized;
-   
+
+   private Task? synchronizeTask;
+
+   private readonly ManualResetEventSlim synchronizeTaskWaitHandle;
+
    #endregion
 
    #region Constructors and Destructors
@@ -30,6 +34,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    public ResultClient()
    {
       resultWaitHandle = new ManualResetEventSlim();
+      synchronizeTaskWaitHandle = new ManualResetEventSlim();
    }
 
    #endregion
@@ -62,14 +67,32 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
          StateChanged?.Invoke(this, new StateChangedEventArgs(oldState, state));
       }
    }
-
+   
    public async Task<ResultInfo> WaitForResultAsync(CancellationToken cancellationToken)
    {
       if (result != null)
          return result;
 
-      await Task.Run(() => WaitForFinished(cancellationToken), cancellationToken);
+      if (!synchronizeTaskWaitHandle.IsSet || synchronizeTask == null)
+         synchronizeTaskWaitHandle.Wait(cancellationToken);
+      
+      await SynchronizationTask;
+      
+      // await SynchronizationClient.SynchronizeAsync(cancellationToken, c => Task.Run(() => WaitForFinished(c), c));
+      // await Task.Run(() => WaitForFinished(cancellationToken), cancellationToken);
       return Result;
+   }
+
+   private Task<Task> GetSyncTask(CancellationToken cancellationToken)
+   {
+      
+
+      while (SynchronizationTask == null)
+      {
+         
+      }
+
+      return Task.FromResult(SynchronizationTask);
    }
 
    public Task<ResultInfo> WaitForResultAsync()
@@ -96,60 +119,57 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       }
    }
 
+   public Task SynchronizationTask
+   {
+      get => synchronizeTask;
+      set
+      {
+         if (synchronizeTask != null)
+            throw new InvalidOperationException("SynchronizeTask already specified");
+
+         synchronizeTask = value;
+         synchronizeTaskWaitHandle.Set();
+      }
+   }
+
    #endregion
 
    #region Methods
 
    protected override void OnConfigured()
    {
-      Task.Run(ConnectAsync);
+      SynchronizationClient.SynchronizeAsync(CancellationToken.None, OnConnectionEstablished);
    }
 
-   private async Task ConnectAsync()
+   private void OnConnectionEstablished(CancellationToken cancellationToken)
    {
-      State = ClientState.Connecting;
-      await WaitForServerAsync(CancellationToken.None);
-
-      State = ClientState.Active;
-      await WaitForResult();
+      var resultChangedStream = ServiceClient.ResultChanged(new ResultChangedRequest { ClientName = SynchronizationClient.Id }, CreateLanguageHeader());
+      SynchronizationTask = ListenToResult(resultChangedStream);
    }
 
-   private void WaitForFinished(CancellationToken cancellationToken)
+   private async Task ListenToResult(AsyncServerStreamingCall<ResultChangedResponse> resultChanged)
    {
-      var resetEventSlim = new ManualResetEventSlim();
-
       try
       {
-         StateChanged += OnStateChanged;
-
-         CheckForFinished(State);
-         resetEventSlim?.Wait(cancellationToken);
-      }
-      catch (OperationCanceledException)
-      {
-         // Waiting was canceled
-      }
-      finally
-      {
-         StateChanged -= OnStateChanged;
-      }
-
-      void OnStateChanged(object? sender, StateChangedEventArgs e)
-      {
-         CheckForFinished(e.NewState);
-      }
-
-      void CheckForFinished(ClientState stateToCheck)
-      {
-         if (resetEventSlim == null)
-            return;
-
-         if (stateToCheck == ClientState.Closed || stateToCheck == ClientState.Failed)
+         if (await resultChanged.ResponseStream.MoveNext(CancellationToken.None))
          {
-            resetEventSlim.Set();
-            resetEventSlim.Dispose();
-            resetEventSlim = null;
+            var response = resultChanged.ResponseStream.Current;
+            Result = new ResultInfo(ExitCode: response.ExitCode, Message: response.Message, Data: response.Data);
          }
+
+         State = ClientState.Closed;
+      }
+      catch (RpcException ex)
+      {
+         // This happens when the server was available and is disposed without reporting any results
+         State = ClientState.Failed;
+         Exception = ex;
+      }
+      catch (Exception ex)
+      {
+         State = ClientState.Failed;
+         Exception = ex;
+         result = new ResultInfo(ExitCode: int.MaxValue, Message: ex.Message, Data: new Dictionary<string, string>());
       }
    }
 
@@ -157,7 +177,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    {
       try
       {
-         var resultChanged = ServiceClient.ResultChanged(new ResultChangedRequest{ ClientName = SynchronizationClient.Name }, CreateLanguageHeader());
+         var resultChanged = ServiceClient.ResultChanged(new ResultChangedRequest{ ClientName = SynchronizationClient.Id }, CreateLanguageHeader());
          if (await resultChanged.ResponseStream.MoveNext(CancellationToken.None))
          {
             var response = resultChanged.ResponseStream.Current;

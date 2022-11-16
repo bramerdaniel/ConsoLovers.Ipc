@@ -7,6 +7,7 @@
 namespace Server;
 
 using ConsoLovers.ConsoleToolkit.Core;
+using ConsoLovers.Ipc;
 
 internal class Program
 {
@@ -14,8 +15,45 @@ internal class Program
 
    public static async Task Main()
    {
+      try
+      {
+         await DoIt();
+      }
+      catch (Exception e)
+      {
+         Console.WriteLine(e);
+      }
+      
+      Console.ReadLine();
+
+
       await ConsoleApplication.WithArguments<ServerArgs>()
          .RunAsync();
+   }
+
+   private static async Task DoIt()
+   {
+      await Task.Delay(3000);
+      var server = IpcServer.CreateServer()
+         .ForName("server")
+         .RemoveAspNetCoreLogging()
+         .AddResultReporter()
+         .AddDiagnosticLogging(new ConsoleLogger(ServerLogLevel.Trace))
+         .Start();
+      
+      var reporter = server.GetResultReporter();
+      await server.WaitForClientAsync(CancellationToken.None);
+      await Task.Delay(3000);
+      reporter.ReportSuccess();
+      // await server.DisposeAsync();
+      await Task.Delay(TimeSpan.FromMinutes(10));
+      Environment.Exit(0);
+   }
+
+   private static void LogFunction(string message)
+   {
+      Console.WriteLine("{0} : {1}", DateTime.Now, message);
+
    }
 
    #endregion

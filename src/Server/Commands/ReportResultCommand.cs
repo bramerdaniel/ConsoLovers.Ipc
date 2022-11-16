@@ -16,8 +16,6 @@ internal class ReportResultCommand : ServerCommand, IAsyncCommand<ReportResultCo
 {
    #region Constants and Fields
 
-   private readonly CancellationTokenSource tokenSource = new();
-
    #endregion
 
    #region Constructors and Destructors
@@ -34,8 +32,13 @@ internal class ReportResultCommand : ServerCommand, IAsyncCommand<ReportResultCo
    public async Task ExecuteAsync(CancellationToken cancellationToken)
    {
       await using var server = StartServer(Arguments.ServerName, c => c.AddResultReporter());
-      var result = server.GetResultReporter();
+      Console.WriteLine("Waiting for client");
+      await server.WaitForClientAsync(cancellationToken);
 
+      var result = server.GetResultReporter();
+      result.ReportSuccess();
+      //await Task.Delay(3000);
+      Environment.Exit(0);
       try
       {
          Console.WriteLine($"Waiting for {Arguments.Timeout} to report the result");

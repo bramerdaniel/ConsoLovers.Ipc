@@ -12,7 +12,7 @@ public interface ISynchronizationClient
    #region Public Methods and Operators
 
    /// <summary>Gets the name of the client.</summary>
-   string Name { get; }
+   string Id { get; }
 
    /// <summary>Connects the asynchronous.</summary>
    /// <param name="cancellationToken">The cancellation token.</param>
@@ -29,6 +29,8 @@ public interface ISynchronizationClient
    /// <param name="cancellationToken">The cancellation token.</param>
    /// <returns>The waiting task</returns>
    Task WaitForServerAsync(TimeSpan timeout, CancellationToken cancellationToken);
+
+   Task SynchronizeAsync(CancellationToken cancellationToken, Action<CancellationToken> onConnectionEstablished);
 
    #endregion
 }
