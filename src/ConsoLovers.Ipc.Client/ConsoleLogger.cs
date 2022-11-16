@@ -6,33 +6,33 @@
 
 namespace ConsoLovers.Ipc;
 
-/// <summary><see cref="IServerLogger"/> implementation that logs to the console</summary>
-/// <seealso cref="ConsoLovers.Ipc.IServerLogger"/>
-public class ConsoleLogger : IServerLogger
+/// <summary><see cref="IClientLogger"/> implementation that logs to the console</summary>
+/// <seealso cref="ConsoLovers.Ipc.IClientLogger"/>
+public class ConsoleLogger : IClientLogger
 {
    #region Constructors and Destructors
 
-   public ConsoleLogger(ServerLogLevel logLevel)
+   public ConsoleLogger(ClientLogLevel logLevel)
    {
       LogLevel = logLevel;
    }
 
    #endregion
 
-   #region IServerLogger Members
+   #region IClientLogger Members
 
-   public bool IsEnabled(ServerLogLevel logLevel)
+   public bool IsEnabled(ClientLogLevel logLevel)
    {
       return logLevel <= LogLevel;
    }
 
-   public void Log(ServerLogLevel level, string message)
+   public void Log(ClientLogLevel level, string message)
    {
       if (IsEnabled(level))
          LogToConsole(level, message);
    }
 
-   public void Log(ServerLogLevel level, Func<string> messageFunc)
+   public void Log(ClientLogLevel level, Func<string> messageFunc)
    {
       if (IsEnabled(level))
          LogToConsole(level, messageFunc());
@@ -41,47 +41,47 @@ public class ConsoleLogger : IServerLogger
    #endregion
 
    #region Public Properties
-   
-   public ServerLogLevel LogLevel { get; }
+
+   public ClientLogLevel LogLevel { get; }
 
    #endregion
 
    #region Methods
 
-   private void LogToConsole(ServerLogLevel logLevel, string message)
+   private static void WriteLine(ClientLogLevel logLevel, string message, ConsoleColor foregroundColor)
+   {
+      Console.ForegroundColor = foregroundColor;
+      Console.WriteLine($"[{logLevel,-5}] {message}");
+      Console.ResetColor();
+   }
+
+   private void LogToConsole(ClientLogLevel logLevel, string message)
    {
       switch (logLevel)
       {
-         case ServerLogLevel.Off:
+         case ClientLogLevel.Off:
             break;
-         case ServerLogLevel.Fatal:
+         case ClientLogLevel.Fatal:
             WriteLine(logLevel, message, ConsoleColor.DarkRed);
             break;
-         case ServerLogLevel.Error:
+         case ClientLogLevel.Error:
             WriteLine(logLevel, message, ConsoleColor.Red);
             break;
-         case ServerLogLevel.Warn:
+         case ClientLogLevel.Warn:
             WriteLine(logLevel, message, ConsoleColor.Yellow);
             break;
-         case ServerLogLevel.Info:
+         case ClientLogLevel.Info:
             WriteLine(logLevel, message, ConsoleColor.White);
             break;
-         case ServerLogLevel.Debug:
+         case ClientLogLevel.Debug:
             WriteLine(logLevel, message, ConsoleColor.Gray);
             break;
-         case ServerLogLevel.Trace:
+         case ClientLogLevel.Trace:
             WriteLine(logLevel, message, ConsoleColor.DarkGray);
             break;
          default:
             throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
       }
-   }
-
-   private static void WriteLine(ServerLogLevel logLevel, string message, ConsoleColor foregroundColor)
-   {
-      Console.ForegroundColor = foregroundColor;
-      Console.WriteLine($"[{logLevel,-5}] {message}");
-      Console.ResetColor();
    }
 
    #endregion

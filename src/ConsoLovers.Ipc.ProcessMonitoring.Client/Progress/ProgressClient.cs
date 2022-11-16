@@ -10,12 +10,26 @@ using System.Diagnostics.CodeAnalysis;
 
 using ConsoLovers.Ipc.Grpc;
 
+using global::Grpc.Core;
+
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public sealed class ProgressClient : ConfigurableClient<ProgressService.ProgressServiceClient>, IProgressClient
 {
    #region Constants and Fields
 
    private ClientState state = ClientState.Uninitialized;
+
+   private readonly CancellationTokenSource clientDisposedSource;
+
+   private Task? synchronizeTask;
+
+   private readonly ManualResetEventSlim progressTaskWaitHandle;
+
+   public ProgressClient()
+   {
+      clientDisposedSource = new CancellationTokenSource();
+      progressTaskWaitHandle = new ManualResetEventSlim();
+   }
 
    #endregion
 
@@ -49,7 +63,8 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
    public void Dispose()
    {
-      // Noting to dispose
+      clientDisposedSource.Cancel();
+      clientDisposedSource.Dispose();
    }
 
    /// <summary>Gets the exception that occurred when the state is failed.</summary>
@@ -57,12 +72,15 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
 
    public Task WaitForCompletedAsync()
    {
-      return WaitForCompletedAsync(CancellationToken.None);
+      return WaitForCompletedAsync(clientDisposedSource.Token);
    }
 
-   public Task WaitForCompletedAsync(CancellationToken cancellationToken)
+   public async Task WaitForCompletedAsync(CancellationToken cancellationToken)
    {
-      return Task.Run(() => WaitForFinished(cancellationToken), cancellationToken);
+      if (!progressTaskWaitHandle.IsSet || synchronizeTask == null)
+         progressTaskWaitHandle.Wait(cancellationToken);
+
+      await ProgressTask.WaitAsync(cancellationToken);
    }
 
    #endregion
@@ -71,7 +89,27 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
 
    protected override void OnConfigured()
    {
-      Task.Run(ConnectAsync);
+      State = ClientState.Connecting;
+      SynchronizationClient.SynchronizeAsync(clientDisposedSource.Token, OnConnectionEstablished);
+   }
+
+   private void OnConnectionEstablished(CancellationToken cancellationToken)
+   {
+      var progressChangedCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
+      ProgressTask = UpdateProgressAsync(progressChangedCall);
+   }
+
+   public Task ProgressTask
+   {
+      get => synchronizeTask ?? throw new InvalidOperationException("ProgressTask was not created yet");
+      set
+      {
+         if (synchronizeTask != null)
+            throw new InvalidOperationException("ProgressTask already specified");
+
+         synchronizeTask = value;
+         progressTaskWaitHandle.Set();
+      }
    }
 
    protected override Task OnServerConnectedAsync()
@@ -80,22 +118,13 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
       return Task.CompletedTask;
    }
 
-   private async Task ConnectAsync()
-   {
-      State = ClientState.Connecting;
-      await WaitForServerAsync(CancellationToken.None);
-      await UpdateProgressAsync();
-   }
-
-   private async Task UpdateProgressAsync()
+   private async Task UpdateProgressAsync(AsyncServerStreamingCall<ProgressChangedResponse> progressCall)
    {
       try
       {
-         var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
-         
-         while (await streamingCall.ResponseStream.MoveNext(CancellationToken.None))
+         while (await progressCall.ResponseStream.MoveNext(CancellationToken.None))
          {
-            var currentResponse = streamingCall.ResponseStream.Current;
+            var currentResponse = progressCall.ResponseStream.Current;
             ProgressChanged?.Invoke(this, new ProgressEventArgs
             {
                Percentage = currentResponse.Progress.Percentage, 

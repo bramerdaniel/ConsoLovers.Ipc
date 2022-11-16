@@ -31,7 +31,7 @@ public static class Program
       {
          var factory = IpcClient.CreateClientFactory()
             .ForName("server")
-            .WithLogger(ClientLogLevel.Trace, Log)
+            .WithLogger(new ConsoleLogger(ClientLogLevel.Trace))
             .AddResultClient()
             .Build();
 

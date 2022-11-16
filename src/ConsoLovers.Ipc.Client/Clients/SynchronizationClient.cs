@@ -59,7 +59,10 @@ public class SynchronizationClient : ISynchronizationClient
 
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
-      await Task.Run(WaitForEstablishedConnection, cancellationToken);
+      if (connectingTask == null)
+         throw new InvalidOperationException("Connection task was no created yet");
+
+      await connectingTask.WaitAsync(cancellationToken);
    }
 
    public async Task WaitForServerAsync(TimeSpan timeout)
@@ -85,13 +88,6 @@ public class SynchronizationClient : ISynchronizationClient
 
    internal SyncState State { get; set; }
 
-   private async Task WaitForEstablishedConnection()
-   {
-      if (connectingTask == null)
-         throw new InvalidOperationException("Connection task was no created yet");
-
-      await connectingTask;
-   }
 
    public async Task SynchronizeAsync(CancellationToken cancellationToken, Action<CancellationToken> onConnectionEstablished)
    {
