@@ -52,10 +52,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    #endregion
 
    #region IResultClient Members
-
-   /// <summary>Gets the <see cref="Exception"/> that occurred when the state goes to <see cref="ClientState.Failed"/>.</summary>
-   public Exception? Exception { get; private set; }
-
+   
    /// <summary>Gets the state state of the client.</summary>
    public ClientState State
    {
@@ -80,12 +77,9 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
          synchronizeTaskWaitHandle.Wait(cancellationToken);
 
       await SynchronizationTask.WaitAsync(cancellationToken);
-
-      if (Exception != null)
-         throw new IpcException("An error occurred while waiting for the result", Exception);
-
       return Result;
    }
+
 
    public void Dispose()
    {
@@ -153,13 +147,12 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       {
          // This happens when the server was available and is disposed without reporting any results
          State = ClientState.ConnectionClosed;
-         Exception = ex;
+         throw new IpcException(ex.Status.Detail);
       }
       catch (Exception ex)
       {
          State = ClientState.ConnectionClosed;
-         Exception = ex;
-         result = new ResultInfo(ExitCode: int.MaxValue, Message: ex.Message, Data: new Dictionary<string, string>());
+         throw new IpcException(ex.Message);
       }
    }
 

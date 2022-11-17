@@ -56,29 +56,6 @@ public class ResultReporterTests
    }
 
    [TestMethod]
-   public async Task EnsureCorrectResultWhenServerIsDisposedCorrectly()
-   {
-      var ipcTest = Setup.IpcTest().ForCurrentTest()
-         .AddProcessMonitoring()
-         .Done();
-
-      var reporter = ipcTest.Server.GetResultReporter();
-      reporter.Should().NotBeNull();
-
-      var client = ipcTest.CreateClient<IResultClient>();
-      await client.WaitForServerAsync(CancellationToken.None);
-
-      var resultTask = client.WaitForResultAsync();
-
-      ipcTest.Dispose();
-
-      var result = await resultTask;
-      result.ExitCode.Should().Be(int.MaxValue);
-      result.Message.Should().Be("Result not computed yet");
-
-   }
-
-   [TestMethod]
    public async Task EnsureWaitingIsCanceledWhenServerApplicationIsStopped()
    {
       var ipcTest = Setup.IpcTest().ForCurrentTest()
@@ -90,14 +67,10 @@ public class ResultReporterTests
       var client = ipcTest.CreateResultClient();
       await client.WaitForServerAsync(CancellationToken.None);
 
-      var task = Task.Delay(500).ContinueWith(_ => ipcTest.StopServerApplication());
-      var result = await client.WaitForResultAsync()
-         .WaitAsync(TimeSpan.FromMilliseconds(5000));
+      await Task.Delay(500).ContinueWith(_ => ipcTest.StopServerApplication());
 
-      await task;
-
-      result.ExitCode.Should().Be(int.MaxValue);
-      result.Message.Should().Be("Result not computed yet");
+      await client.Invoking(async rc => await rc.WaitForResultAsync(10000))
+         .Should().ThrowAsync<IpcException>().WithMessage("Server was shut down");
    }
 
 
@@ -116,8 +89,16 @@ public class ResultReporterTests
       client.State.Should().Be(ClientState.Connected);
 
       var task = Task.Delay(500).ContinueWith(_ => ipcTest.Dispose());
-      await client.WaitForResultAsync()
-         .WaitAsync(TimeSpan.FromMilliseconds(5000));
+
+      try
+      {
+         await client.WaitForResultAsync()
+            .WaitAsync(TimeSpan.FromMilliseconds(5000));
+      }
+      catch (IpcException)
+      {
+         // client waiting was canceled
+      }
 
       await task;
 
@@ -176,7 +157,7 @@ public class ResultReporterTests
          .ForName("RR0001")
          .AddResultClient()
          .Build();
-      
+
       var resultClient = clientFactory.CreateResultClient();
 
       await resultClient.Invoking(async rc => await rc.WaitForResultAsync(100))
@@ -215,8 +196,9 @@ public class ResultReporterTests
       server.DisposeAfter(500);
 
       var resultClient = clientFactory.CreateResultClient();
-      var resultInfo = await resultClient.WaitForResultAsync(10000);
-      Assert.Fail();
+
+      await resultClient.Invoking(async rc => await rc.WaitForResultAsync(10000))
+         .Should().ThrowAsync<IpcException>().WithMessage("Server was shut down");
    }
 
    #endregion

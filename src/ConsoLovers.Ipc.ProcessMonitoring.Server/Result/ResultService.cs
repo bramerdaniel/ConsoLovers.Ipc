@@ -63,6 +63,7 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
          else
          {
             logger.Debug($"ResultRequest for client '{request.ClientName}' was canceled as the server application is shutting down");
+            throw new RpcException(new Status(StatusCode.Aborted, "Server was shut down"));
          }
       }
       finally
