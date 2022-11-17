@@ -39,7 +39,6 @@ public class ConfigurableClient<T> : IConfigurableClient
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
       await SynchronizationClient.WaitForServerAsync(cancellationToken);
-      await OnServerConnectedAsync();
    }
 
    #endregion

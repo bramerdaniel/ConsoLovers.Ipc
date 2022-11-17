@@ -8,9 +8,8 @@ namespace ConsoLovers.Ipc;
 
 public enum ClientState
 {
-   Uninitialized,
+   NotConnected,
    Connecting,
-   Active,
-   Failed,
-   Closed
+   Connected,
+   ConnectionClosed,
 }

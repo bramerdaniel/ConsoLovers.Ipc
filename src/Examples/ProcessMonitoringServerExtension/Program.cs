@@ -12,7 +12,7 @@
             .AddProcessMonitoringServer(config =>
             {
                config.ForName("server")
-                  .AddDiagnosticLogging(new ConsoleLogger(ServerLogLevel.Trace));
+                  .AddDiagnosticLogging(new ConsoleProxyLogger(ServerLogLevel.Trace));
             })
             .RunAsync();
 

@@ -6,15 +6,23 @@ import "google/protobuf/wrappers.proto";
 
 service SynchronizatioService
 {
-	rpc Connect(ConnectRequest) returns (ConnectResponse);
+	rpc Synchronize(stream SynchronizeRequest) returns (stream SynchronizeResponse);
 }
 
-message ConnectRequest 
+message SynchronizeRequest 
 {      
-	.google.protobuf.StringValue client_name = 1;
+	.google.protobuf.StringValue client_id = 1;
+
+	SyncRequestAction action = 2;
 }
 
-message ConnectResponse 
-{    
+enum SyncRequestAction 
+{
+	CONFIRM_CONNECTION = 0;
+	SYNCHRONIZATION_COMPLETED = 1;
+}
+
+message SynchronizeResponse 
+{      
 }
 

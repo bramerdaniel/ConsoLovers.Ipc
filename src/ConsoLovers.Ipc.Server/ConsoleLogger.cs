@@ -4,13 +4,10 @@
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
-namespace ConsoLovers.Toolkit.Ipc.ServerExtension;
-
-using ConsoLovers.ConsoleToolkit.Core;
-using ConsoLovers.Ipc;
+namespace ConsoLovers.Ipc;
 
 /// <summary><see cref="IServerLogger"/> implementation that logs to the console</summary>
-/// <seealso cref="ConsoLovers.Ipc.IServerLogger" />
+/// <seealso cref="ConsoLovers.Ipc.IServerLogger"/>
 public class ConsoleLogger : IServerLogger
 {
    #region Constructors and Destructors
@@ -18,7 +15,6 @@ public class ConsoleLogger : IServerLogger
    public ConsoleLogger(ServerLogLevel logLevel)
    {
       LogLevel = logLevel;
-      Console = new ConsoleProxy();
    }
 
    #endregion
@@ -45,9 +41,7 @@ public class ConsoleLogger : IServerLogger
    #endregion
 
    #region Public Properties
-
-   public IConsole Console { get; set; }
-
+   
    public ServerLogLevel LogLevel { get; }
 
    #endregion
@@ -61,26 +55,33 @@ public class ConsoleLogger : IServerLogger
          case ServerLogLevel.Off:
             break;
          case ServerLogLevel.Fatal:
-            Console.WriteLine(message, ConsoleColor.DarkRed);
+            WriteLine(logLevel, message, ConsoleColor.DarkRed);
             break;
          case ServerLogLevel.Error:
-            Console.WriteLine(message, ConsoleColor.Red);
+            WriteLine(logLevel, message, ConsoleColor.Red);
             break;
          case ServerLogLevel.Warn:
-            Console.WriteLine(message, ConsoleColor.Yellow);
+            WriteLine(logLevel, message, ConsoleColor.Yellow);
             break;
          case ServerLogLevel.Info:
-            Console.WriteLine(message, ConsoleColor.White);
+            WriteLine(logLevel, message, ConsoleColor.White);
             break;
          case ServerLogLevel.Debug:
-            Console.WriteLine(message, ConsoleColor.Gray);
+            WriteLine(logLevel, message, ConsoleColor.Gray);
             break;
          case ServerLogLevel.Trace:
-            Console.WriteLine(message, ConsoleColor.DarkGray);
+            WriteLine(logLevel, message, ConsoleColor.DarkGray);
             break;
          default:
             throw new ArgumentOutOfRangeException(nameof(logLevel), logLevel, null);
       }
+   }
+
+   private static void WriteLine(ServerLogLevel logLevel, string message, ConsoleColor foregroundColor)
+   {
+      Console.ForegroundColor = foregroundColor;
+      Console.WriteLine($"[{logLevel,-5}] {message}");
+      Console.ResetColor();
    }
 
    #endregion
