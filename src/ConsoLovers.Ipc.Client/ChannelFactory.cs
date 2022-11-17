@@ -61,7 +61,13 @@ internal class ChannelFactory : IChannelFactory
    {
       var udsEndPoint = new UnixDomainSocketEndPoint(socketPath);
       var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
-      var socketsHttpHandler = new SocketsHttpHandler { ConnectCallback = connectionFactory.ConnectAsync, Proxy = new WebProxy() };
+      logger.Debug($"Created UnixDomainSocketConnectionFactory for endpoint {socketPath}");
+
+      var socketsHttpHandler = new SocketsHttpHandler
+      {
+         ConnectCallback = connectionFactory.ConnectAsync, 
+         Proxy = new WebProxy()
+      };
 
       var grpcChannel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions { HttpHandler = socketsHttpHandler });
 

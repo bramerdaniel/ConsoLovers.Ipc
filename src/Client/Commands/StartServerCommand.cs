@@ -13,7 +13,7 @@ using ConsoLovers.ConsoleToolkit.Core.Exceptions;
 using ConsoLovers.Ipc;
 using ConsoLovers.Ipc.ProcessMonitoring;
 
-internal class StartServerCommand : IAsyncCommand<StartServerCommand.StartServerArgs>
+internal class StartServerCommand : IAsyncCommand<StartServerCommand.StartServerArgs>, IAsyncMenuCommand
 {
    private readonly IConsole console;
 
@@ -28,31 +28,34 @@ internal class StartServerCommand : IAsyncCommand<StartServerCommand.StartServer
    {
       console.WriteLine($"Starting server {Arguments.ServerPath}");
 
-      var process = Process.Start(new ProcessStartInfo(Arguments.ServerPath) { UseShellExecute = true });
+      var process = Process.Start(new ProcessStartInfo(Arguments.ServerPath)
+      {
+         UseShellExecute = true,
+         Arguments = Arguments.ServerArguments
+      });
+
       if (process == null)
          throw new CommandLineArgumentException("Server could not be started");
-
+      
       var clientFactory = IpcClient.CreateClientFactory()
          .ForProcess(process)
-         .AddProgressClient()
+         .WithLogger(ClientLogLevel.Trace,Log)
+         .AddResultClient()
          .Build();
 
-      console.WriteLine($"Created client factory for server {process.ProcessName}.{process.Id}");
-
-      IProgressClient? progressClient = null;
+      IResultClient? progressClient = null;
       try
       {
-         console.WriteLine("Waiting for ipc server");
-         await clientFactory.WaitForServerAsync(cancellationToken);
+         //console.WriteLine("Waiting for ipc server");
+         //await clientFactory.WaitForServerAsync(cancellationToken);
 
-         progressClient = clientFactory.CreateProgressClient();
-         await progressClient.WaitForServerAsync(cancellationToken);
+         progressClient = clientFactory.CreateResultClient();
+         //await progressClient.Wa(cancellationToken);
 
-         progressClient.ProgressChanged += (s, e) => Console.WriteLine(e.Message);
          try
          {
             console.WriteLine("Waiting for server result");
-            await progressClient.WaitForCompletedAsync(cancellationToken);
+            await progressClient.WaitForResultAsync(cancellationToken);
          }
          catch (Exception e)
          {
@@ -66,6 +69,11 @@ internal class StartServerCommand : IAsyncCommand<StartServerCommand.StartServer
       }
    }
 
+   private void Log(string s)
+   {
+      Console.WriteLine("{0} : {1}", DateTime.Now, s);
+   }
+
    public StartServerArgs Arguments { get; set; } = null!;
 
    #endregion
@@ -77,7 +85,17 @@ internal class StartServerCommand : IAsyncCommand<StartServerCommand.StartServer
       [Argument("serverPath", Index = 0)]
       [HelpText("The path to the server executable")]
       public string ServerPath { get; set; } = null!;
+     
+      [Argument("arguments", Index = 1)]
+      [HelpText("The server arguments")]
+      public string ServerArguments { get; set; } = null!;
 
       #endregion
+   }
+
+   public async Task ExecuteAsync(IMenuExecutionContext context, CancellationToken cancellationToken)
+   {
+      await ExecuteAsync(cancellationToken);
+      Console.ReadLine();
    }
 }

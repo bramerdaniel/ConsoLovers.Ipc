@@ -69,33 +69,59 @@ public static class ClientExtensions
       return clientFactoryBuilder;
    }
 
-   /// <summary>Waits for the result to be available.</summary>
-   /// <param name="resultClient">The result client.</param>
-   /// <returns>The <see cref="ResultInfo"/></returns>
-   public static Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient)
+   public static async Task WaitForCompletedAsync(this IProgressClient progressClient)
    {
-      return resultClient.WaitForResultAsync(CancellationToken.None);
+      if (progressClient == null)
+         throw new ArgumentNullException(nameof(progressClient));
+      
+      await progressClient.WaitForCompletedAsync(CancellationToken.None);
    }
 
-   /// <summary>Waits for the result to be available.</summary>
-   /// <param name="resultClient">The result client.</param>
-   /// <param name="timeout">The timeout after the waiting should be canceled.</param>
-   /// <returns>The <see cref="ResultInfo"/></returns>
-   public static Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient, TimeSpan timeout)
+   public static async Task WaitForCompletedAsync(this IProgressClient progressClient, int timeoutInMilliseconds)
    {
-      var tokenSource = new CancellationTokenSource();
-      tokenSource.CancelAfter(timeout);
-      return resultClient.WaitForResultAsync(tokenSource.Token);
+      if (progressClient == null)
+         throw new ArgumentNullException(nameof(progressClient));
+      
+      var tokenSource = new CancellationTokenSource(timeoutInMilliseconds);
+      await progressClient.WaitForCompletedAsync(tokenSource.Token);
    }
 
-   /// <summary>Waits for the result to be available.</summary>
-   /// <param name="resultClient">The result client.</param>
-   /// <param name="timeoutInMilliseconds">The timeout in milliseconds after the waiting should be canceled.</param>
-   /// <returns>The <see cref="ResultInfo"/></returns>
-   public static Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient, int timeoutInMilliseconds)
+   public static async Task WaitForCompletedAsync(this IProgressClient progressClient, TimeSpan timeout)
    {
-      return resultClient.WaitForResultAsync(TimeSpan.FromMilliseconds(timeoutInMilliseconds));
+      if (progressClient == null)
+         throw new ArgumentNullException(nameof(progressClient));
+      
+      var tokenSource = new CancellationTokenSource(timeout);
+      await progressClient.WaitForCompletedAsync(tokenSource.Token);
    }
+
+
+   public static async Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient)
+   {
+      if (resultClient == null)
+         throw new ArgumentNullException(nameof(resultClient));
+      
+      return await resultClient.WaitForResultAsync(CancellationToken.None);
+   }
+
+   public static async Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient, int timeoutInMilliseconds)
+   {
+      if (resultClient == null)
+         throw new ArgumentNullException(nameof(resultClient));
+
+      var tokenSource = new CancellationTokenSource(timeoutInMilliseconds);
+      return await resultClient.WaitForResultAsync(tokenSource.Token);
+   }
+
+   public static async Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient, TimeSpan timeout)
+   {
+      if (resultClient == null)
+         throw new ArgumentNullException(nameof(resultClient));
+
+      var tokenSource = new CancellationTokenSource(timeout);
+      return await resultClient.WaitForResultAsync(tokenSource.Token);
+   }
+
 
    #endregion
 }

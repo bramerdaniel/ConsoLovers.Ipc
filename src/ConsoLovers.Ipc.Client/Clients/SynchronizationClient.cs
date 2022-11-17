@@ -23,9 +23,11 @@ public class SynchronizationClient : ISynchronizationClient
 
    private readonly SynchronizatioService.SynchronizatioServiceClient connectionService;
 
-   private bool wasConnected;
+   private readonly string id;
 
-   private readonly string clientName;
+   private readonly int pollingDelay = 100;
+
+   private Task<AsyncDuplexStreamingCall<SynchronizeRequest, SynchronizeResponse>>? connectingTask;
 
    #endregion
 
@@ -37,49 +39,36 @@ public class SynchronizationClient : ISynchronizationClient
          throw new ArgumentNullException(nameof(channel));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-      clientName = CreateClientName();
-      logger.Debug($"SynchronizationClient with name {clientName} was created");
+      id = GenerateId();
+      logger.Debug($"SynchronizationClient with name {id} was created");
       connectionService = new SynchronizatioService.SynchronizatioServiceClient(channel);
-      wasConnected = false;
+      State = SyncState.NotConnected;
    }
 
    #endregion
 
    #region ISynchronizationClient Members
 
+   public string Id => id;
+
+   private string GenerateId()
+   {
+      return $"{Process.GetCurrentProcess().ProcessName}-{Guid.NewGuid()}";
+   }
+   
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
-      while (!wasConnected)
+      if (connectingTask == null)
       {
-         cancellationToken.ThrowIfCancellationRequested();
-
-         try
-         {
-            await connectionService.ConnectAsync(new ConnectRequest { ClientName = clientName });
-            logger.Debug($"{nameof(ISynchronizationClient)} could connect successfully");
-            wasConnected = true;
-            return;
-         }
-         catch (RpcException e)
-         {
-            logger.Trace($"{nameof(ISynchronizationClient)} connection failed");
-            if (e.StatusCode == StatusCode.Unavailable)
-            {
-               await Task.Delay(100, cancellationToken);
-            }
-            else
-            {
-               return;
-            }
-         }
+         // This means no real client was created yet, so we just try to establish a connection to the server
+         await SynchronizeAsync(cancellationToken, _ => { });
       }
-   }
-
-   public string Name => clientName;
-
-   private string CreateClientName()
-   {
-      return Process.GetCurrentProcess().ProcessName;
+      else
+      {
+         // This means that a real client already initiated the connection
+         // and we can wait for this task to finish here
+         await connectingTask.WaitAsync(cancellationToken);
+      }
    }
 
    public async Task WaitForServerAsync(TimeSpan timeout)
@@ -103,5 +92,74 @@ public class SynchronizationClient : ISynchronizationClient
       await WaitForServerAsync(linkedTokenSource.Token);
    }
 
+   internal SyncState State { get; set; }
+
+
+   public async Task SynchronizeAsync(CancellationToken cancellationToken, Action<CancellationToken> onConnectionEstablished)
+   {
+      connectingTask = EstablishConnection(cancellationToken);
+      var streamingCall = await connectingTask.WaitAsync(cancellationToken);
+
+      onConnectionEstablished(cancellationToken);
+
+      await CompleteSync(streamingCall, cancellationToken);
+      await streamingCall.RequestStream.CompleteAsync();
+   }
+
+   private Task CompleteSync(AsyncDuplexStreamingCall<SynchronizeRequest, SynchronizeResponse> streamingCall, CancellationToken cancellationToken)
+   {
+      var request = new SynchronizeRequest
+      {
+         ClientId = Id,
+         Action = SyncRequestAction.SynchronizationCompleted
+      };
+
+      return streamingCall.RequestStream.WriteAsync(request, cancellationToken);
+   }
+
+   private async Task<AsyncDuplexStreamingCall<SynchronizeRequest, SynchronizeResponse>> EstablishConnection(CancellationToken cancellationToken)
+   {
+      logger.Debug("SynchronizationClient is trying to establish a connection to server");
+      while (State != SyncState.ConnectionEstablished)
+      {
+         cancellationToken.ThrowIfCancellationRequested();
+
+         try
+         {
+            var streamingCall = connectionService.Synchronize();
+            State = SyncState.Connecting;
+            var connectRequest = new SynchronizeRequest { ClientId = Id, Action = SyncRequestAction.ConfirmConnection };
+
+            await streamingCall.RequestStream.WriteAsync(connectRequest, cancellationToken);
+            logger.Debug($"{nameof(ISynchronizationClient)} could connect successfully");
+            State = SyncState.ConnectionEstablished;
+            return streamingCall;
+         }
+         catch (RpcException e)
+         {
+            logger.Trace($"{nameof(ISynchronizationClient)} connection failed");
+            if (e.StatusCode == StatusCode.Unavailable)
+            {
+               await Task.Delay(pollingDelay, cancellationToken);
+            }
+            else
+            {
+               throw;
+            }
+         }
+      }
+
+      // TODO
+      throw new InvalidOperationException();
+   }
+
+
    #endregion
+}
+
+public enum SyncState
+{
+   NotConnected,
+   Connecting,
+   ConnectionEstablished
 }

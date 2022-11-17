@@ -106,7 +106,7 @@ internal class ProgressReporter : IProgressReporter
 
       var cultureHandlers = clients.GetOrAdd(culture, _ => new List<ClientProgressHandler>());
 
-      var clientProgress = new ClientProgressHandler(culture);
+      var clientProgress = new ClientProgressHandler(culture, logger);
       cultureHandlers.Add(clientProgress);
 
       if (lastProgress != null)
@@ -130,6 +130,8 @@ internal class ProgressReporter : IProgressReporter
 
       foreach (var handler in clients.SelectMany(x => x.Value))
          handler.Complete();
+
+      logger.Debug("ProgressReporter completed progress");
    }
 
    private IEnumerable<(CultureInfo, List<ClientProgressHandler>)> GetGroupedHandlers()
@@ -142,7 +144,7 @@ internal class ProgressReporter : IProgressReporter
    {
       if (IsCompleted())
       {
-         logger.Warn($"{nameof(ReportProgress)} was called, on a completed progress reporter");
+         logger.Warn($"{nameof(ReportProgress)} was called on a completed progress reporter");
          return;
       }
 

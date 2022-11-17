@@ -3,10 +3,6 @@
     "Client": {
       "commandName": "Project"
     },
-    "start server": {
-      "commandName": "Project",
-      "commandLineArgs": "start serverPath=server.exe "
-    },
     "wait for Peter": {
       "commandName": "Project",
       "commandLineArgs": "wait name=Peter"
@@ -14,6 +10,14 @@
     "cancel": {
       "commandName": "Project",
       "commandLineArgs": "cancel name=Hans"
+    },
+    "start Setup.exe": {
+      "commandName": "Project",
+      "commandLineArgs": "start serverPath=\"D:\\__TFS\\KRC\\Devs\\dev9xArgon\\I_Setup\\IS_ReleaseSetupV9\\bin\\Debug\\Net6.0\\SetupV9.exe\" arguments=\"waitForClient=10000 i c ll=Trace\""
+    },
+    "start server": {
+      "commandName": "Project",
+      "commandLineArgs": "start serverPath=server.exe arguments=\"reportResult timeout=0\""
     }
   }
 }

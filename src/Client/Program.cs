@@ -7,6 +7,7 @@
 namespace Client;
 
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.ConsoleToolkit.Core.Builders;
@@ -17,21 +18,60 @@ using Microsoft.Extensions.DependencyInjection;
 
 using Spectre.Console;
 
+[SuppressMessage("ReSharper", "UnusedMember.Local")]
 public static class Program
 {
+   #region Constants and Fields
+
+   private static readonly IConsole console = new ConsoleProxy();
+
+   #endregion
+
    #region Public Methods and Operators
 
-   public static async Task Main()
+   public static async Task Main(string[] args)
    {
-      await ConsoleApplication.WithArguments<ClientArgs>()
-         .AddService(x => x.AddSingleton(CreateClientFactory))
-         .UseExceptionHandler(typeof(SpectreHandler))
-         .UseMenuWithoutArguments(c =>
-         {
-            c.MenuOptions.CloseKeys = new[] { ConsoleKey.Escape };
-            c.MenuOptions.Header = new ClientArgs();
-         })
-         .RunAsync();
+      try
+      {
+         await ProgressClient();
+      }
+      catch (Exception e)
+      {
+         AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
+      }
+
+      Console.WriteLine("Finished");
+      Console.ReadLine();
+   }
+
+   public static async Task ProgressClient()
+   {
+      await Task.Delay(1000);
+
+      var factory = IpcClient.CreateClientFactory()
+         .ForName("server")
+         .WithLogger(new ConsoleLogger(ClientLogLevel.Trace))
+         .AddProgressClient()
+         .Build();
+
+      var progressClient = factory.CreateProgressClient();
+      progressClient.ProgressChanged += (s, e) => Console.Write(".");
+
+      try
+      {
+         console.WriteLine("Waiting for server");
+         await progressClient.WaitForServerAsync(CancellationToken.None);
+
+         console.WriteLine("Waiting for progress to finish");
+         await progressClient.WaitForCompletedAsync(TimeSpan.FromMinutes(10));
+      }
+      finally
+      {
+         console.WriteLine();
+      }
+      
+      console.WriteLine("Progress has finished");
+      console.WaitForEscapeOrNewline();
    }
 
    #endregion
@@ -60,6 +100,22 @@ public static class Program
       return SelectProcess(processes);
    }
 
+   private static async Task GenericMenu(string[] args)
+   {
+      await ConsoleApplication.WithArguments<ClientArgs>()
+         .AddService(x => x.AddSingleton(CreateClientFactory))
+         .UseExceptionHandler(typeof(SpectreHandler))
+         .UseMenuWithoutArguments(c =>
+         {
+            c.MenuOptions.CloseKeys = new[] { ConsoleKey.Escape };
+            c.MenuOptions.Header = new ClientArgs();
+         })
+         .RunAsync(args, CancellationToken.None);
+
+      Console.WriteLine("Finished");
+      Console.ReadLine();
+   }
+
    private static void Initialize(int startupDelay)
    {
       Console.Title = "client";
@@ -77,6 +133,28 @@ public static class Program
       });
 
       Console.Clear();
+   }
+
+   private static void Log(string message)
+   {
+      Console.WriteLine("{0} : {1}", DateTime.Now, message);
+   }
+
+   private static async Task ResultClient()
+   {
+      var factory = IpcClient.CreateClientFactory()
+         .ForName("server")
+         .WithLogger(new ConsoleLogger(ClientLogLevel.Trace))
+         .AddResultClient()
+         .Build();
+
+      var resultClient = factory.CreateResultClient();
+      console.WriteLine("Waiting for server");
+      await resultClient.WaitForServerAsync(CancellationToken.None);
+
+      console.WriteLine("Waiting for result");
+      var resultInfo = await resultClient.WaitForResultAsync();
+      console.WriteLine($"Result: {resultInfo.ExitCode}, {resultInfo.Message}", ConsoleColor.Green);
    }
 
    private static Process SelectProcess(Process[] processes)

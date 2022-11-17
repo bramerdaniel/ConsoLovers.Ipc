@@ -10,12 +10,30 @@ using System.Diagnostics.CodeAnalysis;
 
 using ConsoLovers.Ipc.Grpc;
 
+using global::Grpc.Core;
+
 [SuppressMessage("ReSharper", "UnusedType.Global")]
 public sealed class ProgressClient : ConfigurableClient<ProgressService.ProgressServiceClient>, IProgressClient
 {
    #region Constants and Fields
 
-   private ClientState state = ClientState.Uninitialized;
+   private readonly CancellationTokenSource clientDisposedSource;
+
+   private readonly ManualResetEventSlim progressTaskWaitHandle;
+
+   private ClientState state = ClientState.NotConnected;
+
+   private Task? synchronizeTask;
+
+   #endregion
+
+   #region Constructors and Destructors
+
+   public ProgressClient()
+   {
+      clientDisposedSource = new CancellationTokenSource();
+      progressTaskWaitHandle = new ManualResetEventSlim();
+   }
 
    #endregion
 
@@ -49,20 +67,36 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
    /// <summary>Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.</summary>
    public void Dispose()
    {
-      // Noting to dispose
+      clientDisposedSource.Cancel();
+      clientDisposedSource.Dispose();
    }
 
    /// <summary>Gets the exception that occurred when the state is failed.</summary>
    public Exception? Exception { get; private set; }
 
-   public Task WaitForCompletedAsync()
+   public async Task WaitForCompletedAsync(CancellationToken cancellationToken)
    {
-      return WaitForCompletedAsync(CancellationToken.None);
+      if (!progressTaskWaitHandle.IsSet || synchronizeTask == null)
+         progressTaskWaitHandle.Wait(cancellationToken);
+
+      await ProgressTask.WaitAsync(cancellationToken);
    }
 
-   public Task WaitForCompletedAsync(CancellationToken cancellationToken)
+   #endregion
+
+   #region Public Properties
+
+   public Task ProgressTask
    {
-      return Task.Run(() => WaitForFinished(cancellationToken), cancellationToken);
+      get => synchronizeTask ?? throw new InvalidOperationException("ProgressTask was not created yet");
+      set
+      {
+         if (synchronizeTask != null)
+            throw new InvalidOperationException("ProgressTask already specified");
+
+         synchronizeTask = value;
+         progressTaskWaitHandle.Set();
+      }
    }
 
    #endregion
@@ -71,83 +105,38 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
 
    protected override void OnConfigured()
    {
-      Task.Run(ConnectAsync);
-   }
-
-   protected override Task OnServerConnectedAsync()
-   {
-      State = ClientState.Active;
-      return Task.CompletedTask;
-   }
-
-   private async Task ConnectAsync()
-   {
       State = ClientState.Connecting;
-      await WaitForServerAsync(CancellationToken.None);
-      await UpdateProgressAsync();
+      SynchronizationClient.SynchronizeAsync(clientDisposedSource.Token, OnConnectionEstablished);
    }
 
-   private async Task UpdateProgressAsync()
+   private void OnConnectionEstablished(CancellationToken cancellationToken)
+   {
+      State = ClientState.Connected;
+      var progressChangedCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
+      ProgressTask = UpdateProgressAsync(progressChangedCall);
+   }
+
+   private async Task UpdateProgressAsync(AsyncServerStreamingCall<ProgressChangedResponse> progressCall)
    {
       try
       {
-         var streamingCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
-         
-         while (await streamingCall.ResponseStream.MoveNext(CancellationToken.None))
+         while (await progressCall.ResponseStream.MoveNext(CancellationToken.None))
          {
-            var currentResponse = streamingCall.ResponseStream.Current;
-            ProgressChanged?.Invoke(this, new ProgressEventArgs
-            {
-               Percentage = currentResponse.Progress.Percentage, 
-               Message = currentResponse.Progress.Message
-            });
+            var currentResponse = progressCall.ResponseStream.Current;
+            ProgressChanged?.Invoke(this,
+               new ProgressEventArgs { Percentage = currentResponse.Progress.Percentage, Message = currentResponse.Progress.Message });
          }
 
-         State = ClientState.Closed;
+         State = ClientState.ConnectionClosed;
+      }
+      catch (RpcException ex)
+      {
+         throw IpcException.FromRpcException(ex);
       }
       catch (Exception ex)
       {
-         State = ClientState.Failed;
+         State = ClientState.ConnectionClosed;
          Exception = ex;
-      }
-   }
-
-   private void WaitForFinished(CancellationToken cancellationToken)
-   {
-      var resetEventSlim = new ManualResetEventSlim();
-
-      try
-      {
-         StateChanged += OnStateChanged;
-         CheckForFinished(State);
-
-         resetEventSlim?.Wait(cancellationToken);
-      }
-      catch (OperationCanceledException)
-      {
-         // Waiting was canceled
-      }
-      finally
-      {
-         StateChanged -= OnStateChanged;
-      }
-
-      void OnStateChanged(object? sender, StateChangedEventArgs e)
-      {
-         CheckForFinished(e.NewState);
-      }
-
-      void CheckForFinished(ClientState stateToCheck)
-      {
-         if (resetEventSlim == null)
-            return;
-
-         if (stateToCheck == ClientState.Closed || stateToCheck == ClientState.Failed)
-         {
-            resetEventSlim.Set();
-            resetEventSlim.Dispose();
-            resetEventSlim = null;
-         }
       }
    }
 

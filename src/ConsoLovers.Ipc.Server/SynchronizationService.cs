@@ -30,11 +30,32 @@ internal class SynchronizationService : SynchronizatioService.SynchronizatioServ
 
    #region Public Methods and Operators
 
-   public override Task<ConnectResponse> Connect(ConnectRequest request, ServerCallContext context)
+   public override async Task Synchronize(IAsyncStreamReader<SynchronizeRequest> requestStream, IServerStreamWriter<SynchronizeResponse> responseStream, ServerCallContext context)
    {
-      clientRegistry.NotifyClientConnected(request.ClientName);
-      logger.Debug($"Client {request.ClientName} ({Thread.CurrentThread.ManagedThreadId}) connected.");
-      return Task.FromResult(new ConnectResponse());
+      while (await requestStream.MoveNext())
+      {
+         var request = requestStream.Current;
+         switch (request.Action)
+         {
+            case SyncRequestAction.ConfirmConnection:
+               await ProcessConfirmConnectionAsync(request.ClientId, responseStream);
+               break;
+            case SyncRequestAction.SynchronizationCompleted:
+               logger.Debug($"Synchronization with client {request.ClientId} completed");
+               clientRegistry.NotifyClientConnected(request.ClientId);
+               await responseStream.WriteAsync(new SynchronizeResponse());
+               break;
+            default:
+               throw new ArgumentOutOfRangeException();
+         }
+      }
+   }
+
+   private async Task ProcessConfirmConnectionAsync(string clientId, IServerStreamWriter<SynchronizeResponse> responseStream)
+   {
+      logger.Debug($"Client {clientId} connected");
+      await responseStream.WriteAsync(new SynchronizeResponse());
+
    }
 
    #endregion

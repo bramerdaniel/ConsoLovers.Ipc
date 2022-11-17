@@ -38,9 +38,15 @@ internal class ServerCommand
       return IpcServer
          .CreateServer()
          .ForName(serverName)
-         .AddDiagnosticLogging(System.Console.WriteLine)
+         .AddDiagnosticLogging(ServerLogLevel.Trace, LogFunction)
          .RemoveAspNetCoreLogging()
          .AddGrpcReflection();
+   }
+
+   private void LogFunction(string message)
+   {
+      Console.WriteLine("{0} : {1}", DateTime.Now.ToString(""), message);
+
    }
 
    protected string GetServerName(string? serverName)

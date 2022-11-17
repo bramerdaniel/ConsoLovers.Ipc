@@ -16,23 +16,23 @@ public static class ClientExtensions
       return client.WaitForServerAsync(CancellationToken.None);
    }
 
-   public static Task WaitForServerAsync(this IConfigurableClient client, TimeSpan timeout)
+   public static async Task WaitForServerAsync(this IConfigurableClient client, TimeSpan timeout)
    {
       if (client == null)
          throw new ArgumentNullException(nameof(client));
 
       using var source = new CancellationTokenSource();
       source.CancelAfter(timeout);
-      return client.WaitForServerAsync(source.Token);
+      await client.WaitForServerAsync(source.Token);
    }
 
-   public static Task WaitForServerAsync(this IConfigurableClient client, int timeout)
+   public async static Task WaitForServerAsync(this IConfigurableClient client, int timeout)
    {
       if (client == null)
          throw new ArgumentNullException(nameof(client));
 
       using var source = new CancellationTokenSource();
       source.CancelAfter(timeout);
-      return client.WaitForServerAsync(source.Token);
+      await client.WaitForServerAsync(source.Token);
    }
 }

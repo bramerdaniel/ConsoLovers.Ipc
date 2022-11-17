@@ -68,7 +68,15 @@ internal class ProgressService : Grpc.ProgressService.ProgressServiceBase
       catch (OperationCanceledException)
       {
          // call was canceled or console/web application is shutting down
-         logger.Debug("Progress was canceled");
+         if (context.CancellationToken.IsCancellationRequested)
+         {
+            logger.Debug("Progress was canceled");
+         }
+         else
+         {
+            logger.Debug("Progress was canceled as the server application is shutting down");
+            throw new RpcException(new Status(StatusCode.Aborted, "Server was shut down"));
+         }
       }
       finally
       {

@@ -25,9 +25,6 @@ public interface IResultClient : IConfigurableClient, IDisposable
 
    #region Public Properties
 
-   /// <summary>Gets the <see cref="Exception"/> that occurred when the state goes to <see cref="ClientState.Failed"/>.</summary>
-   Exception? Exception { get; }
-
    /// <summary>Gets the state state of the client.</summary>
    ClientState State { get; }
 
