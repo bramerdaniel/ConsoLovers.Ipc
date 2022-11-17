@@ -21,7 +21,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
 
    private ResultInfo? result;
 
-   private ClientState state = ClientState.Uninitialized;
+   private ClientState state = ClientState.NotConnected;
 
    private Task? synchronizeTask;
 
@@ -80,12 +80,11 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
          synchronizeTaskWaitHandle.Wait(cancellationToken);
 
       await SynchronizationTask.WaitAsync(cancellationToken);
-      return Result;
-   }
 
-   public Task<ResultInfo> WaitForResultAsync()
-   {
-      return WaitForResultAsync(CancellationToken.None);
+      if (Exception != null)
+         throw new IpcException("An error occurred while waiting for the result", Exception);
+
+      return Result;
    }
 
    public void Dispose()
@@ -135,29 +134,30 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    {
       var resultChangedStream = ServiceClient.ResultChanged(new ResultChangedRequest { ClientName = SynchronizationClient.Id }, CreateLanguageHeader());
       SynchronizationTask = ListenToResult(resultChangedStream);
+      State = ClientState.Connected;
    }
 
    private async Task ListenToResult(AsyncServerStreamingCall<ResultChangedResponse> resultChanged)
    {
       try
       {
-         if (await resultChanged.ResponseStream.MoveNext(CancellationToken.None))
+         if (await resultChanged.ResponseStream.MoveNext())
          {
             var response = resultChanged.ResponseStream.Current;
             Result = new ResultInfo(ExitCode: response.ExitCode, Message: response.Message, Data: response.Data);
          }
 
-         State = ClientState.Closed;
+         State = ClientState.ConnectionClosed;
       }
       catch (RpcException ex)
       {
          // This happens when the server was available and is disposed without reporting any results
-         State = ClientState.Failed;
+         State = ClientState.ConnectionClosed;
          Exception = ex;
       }
       catch (Exception ex)
       {
-         State = ClientState.Failed;
+         State = ClientState.ConnectionClosed;
          Exception = ex;
          result = new ResultInfo(ExitCode: int.MaxValue, Message: ex.Message, Data: new Dictionary<string, string>());
       }

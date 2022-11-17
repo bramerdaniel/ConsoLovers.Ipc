@@ -1,15 +1,24 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClientState.cs" company="ConsoLovers">
+// <copyright file="IpcException.cs" company="ConsoLovers">
 //    Copyright (c) ConsoLovers  2015 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
 namespace ConsoLovers.Ipc;
 
-public enum ClientState
+public class IpcException : Exception
 {
-   NotConnected,
-   Connecting,
-   Connected,
-   ConnectionClosed,
+   public IpcException()
+   {
+   }
+
+   public IpcException(string? message)
+      : base(message)
+   {
+   }
+
+   public IpcException(string? message, Exception? innerException)
+      : base(message, innerException)
+   {
+   }
 }

@@ -111,9 +111,9 @@ public class ResultReporterTests
       ipcTest.Server.GetResultReporter();
 
       var client = ipcTest.CreateResultClient();
-      await client.WaitForServerAsync(CancellationToken.None);
+      await client.WaitForServerAsync(500);
 
-      client.State.Should().Be(ClientState.Active);
+      client.State.Should().Be(ClientState.Connected);
 
       var task = Task.Delay(500).ContinueWith(_ => ipcTest.Dispose());
       await client.WaitForResultAsync()
@@ -121,7 +121,7 @@ public class ResultReporterTests
 
       await task;
 
-      client.State.Should().Be(ClientState.Closed);
+      client.State.Should().Be(ClientState.ConnectionClosed);
    }
 
    [TestMethod]
@@ -145,6 +145,78 @@ public class ResultReporterTests
       englishResult.Message.Should().Be("en-US");
 
       ipcTest.Dispose();
+   }
+
+   [TestMethod]
+   public async Task EnsureResultReportingWorksCorrectly()
+   {
+      var ipcTest = Setup.IpcTest().ForCurrentTest()
+         .AddProcessMonitoring()
+         .Done();
+
+#pragma warning disable CS4014
+      Task.Delay(500).ContinueWith(_ =>
+      {
+         var reporter = ipcTest.Server.GetResultReporter();
+         reporter.ReportResult(5, "Five");
+      });
+#pragma warning restore CS4014
+
+      var client = ipcTest.ClientFactory.CreateResultClient();
+      var result = await client.WaitForResultAsync();
+
+      result.ExitCode.Should().Be(5);
+      result.Message.Should().Be("Five");
+   }
+
+   [TestMethod]
+   public async Task EnsureCorrectExceptionWhenWaitingHasTimedOut()
+   {
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName("RR0001")
+         .AddResultClient()
+         .Build();
+      
+      var resultClient = clientFactory.CreateResultClient();
+
+      await resultClient.Invoking(async rc => await rc.WaitForResultAsync(100))
+         .Should().ThrowAsync<OperationCanceledException>();
+   }
+
+   [TestMethod]
+   public async Task EnsureCorrectExceptionWhenWaitingIsCanceled()
+   {
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName("RR0002")
+         .AddResultClient()
+         .Build();
+
+      var resultClient = clientFactory.CreateResultClient();
+      var timeoutSource = new CancellationTokenSource(200);
+
+      await resultClient.Invoking(async rc => await rc.WaitForResultAsync(timeoutSource.Token))
+         .Should().ThrowAsync<OperationCanceledException>();
+   }
+
+
+   [TestMethod]
+   public async Task EnsureWaitingForResultWorksCorrectlyWhenServerIsDisposed()
+   {
+      var server = IpcServer.CreateServer()
+         .ForName("RR0003")
+         .AddResultReporter()
+         .Start();
+
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName("RR0003")
+         .AddResultClient()
+         .Build();
+
+      server.DisposeAfter(500);
+
+      var resultClient = clientFactory.CreateResultClient();
+      var resultInfo = await resultClient.WaitForResultAsync(10000);
+      Assert.Fail();
    }
 
    #endregion

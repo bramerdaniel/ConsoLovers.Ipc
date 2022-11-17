@@ -33,7 +33,7 @@ internal class Program
 
    private static async Task DoIt()
    {
-      await Task.Delay(3000);
+      await Task.Delay(1000);
       var server = IpcServer.CreateServer()
          .ForName("server")
          .RemoveAspNetCoreLogging()
@@ -43,17 +43,10 @@ internal class Program
       
       var reporter = server.GetResultReporter();
       await server.WaitForClientAsync(CancellationToken.None);
-      await Task.Delay(3000);
       reporter.ReportSuccess();
       // await server.DisposeAsync();
       await Task.Delay(TimeSpan.FromMinutes(10));
       Environment.Exit(0);
-   }
-
-   private static void LogFunction(string message)
-   {
-      Console.WriteLine("{0} : {1}", DateTime.Now, message);
-
    }
 
    #endregion

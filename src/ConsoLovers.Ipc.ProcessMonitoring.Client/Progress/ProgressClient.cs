@@ -17,7 +17,7 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
 {
    #region Constants and Fields
 
-   private ClientState state = ClientState.Uninitialized;
+   private ClientState state = ClientState.NotConnected;
 
    private readonly CancellationTokenSource clientDisposedSource;
 
@@ -95,6 +95,7 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
 
    private void OnConnectionEstablished(CancellationToken cancellationToken)
    {
+      State = ClientState.Connected;
       var progressChangedCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
       ProgressTask = UpdateProgressAsync(progressChangedCall);
    }
@@ -112,12 +113,6 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
       }
    }
 
-   protected override Task OnServerConnectedAsync()
-   {
-      State = ClientState.Active;
-      return Task.CompletedTask;
-   }
-
    private async Task UpdateProgressAsync(AsyncServerStreamingCall<ProgressChangedResponse> progressCall)
    {
       try
@@ -132,51 +127,12 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
             });
          }
 
-         State = ClientState.Closed;
+         State = ClientState.ConnectionClosed;
       }
       catch (Exception ex)
       {
-         State = ClientState.Failed;
+         State = ClientState.ConnectionClosed;
          Exception = ex;
-      }
-   }
-
-   private void WaitForFinished(CancellationToken cancellationToken)
-   {
-      var resetEventSlim = new ManualResetEventSlim();
-
-      try
-      {
-         StateChanged += OnStateChanged;
-         CheckForFinished(State);
-
-         resetEventSlim?.Wait(cancellationToken);
-      }
-      catch (OperationCanceledException)
-      {
-         // Waiting was canceled
-      }
-      finally
-      {
-         StateChanged -= OnStateChanged;
-      }
-
-      void OnStateChanged(object? sender, StateChangedEventArgs e)
-      {
-         CheckForFinished(e.NewState);
-      }
-
-      void CheckForFinished(ClientState stateToCheck)
-      {
-         if (resetEventSlim == null)
-            return;
-
-         if (stateToCheck == ClientState.Closed || stateToCheck == ClientState.Failed)
-         {
-            resetEventSlim.Set();
-            resetEventSlim.Dispose();
-            resetEventSlim = null;
-         }
       }
    }
 

@@ -65,7 +65,7 @@ public class ProgressReporterTests
 
       await waitingTask.WaitAsync(TimeSpan.FromMilliseconds(5000));
 
-      client.State.Should().Be(ClientState.Closed);
+      client.State.Should().Be(ClientState.ConnectionClosed);
    }
 
    [TestMethod]
@@ -87,7 +87,7 @@ public class ProgressReporterTests
 
       await waitingTask;
 
-      client.State.Should().Be(ClientState.Closed);
+      client.State.Should().Be(ClientState.ConnectionClosed);
    }
 
    [TestMethod]

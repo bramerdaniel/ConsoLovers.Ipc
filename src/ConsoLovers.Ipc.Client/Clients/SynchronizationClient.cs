@@ -151,7 +151,7 @@ public class SynchronizationClient : ISynchronizationClient
    #endregion
 }
 
-internal enum SyncState
+public enum SyncState
 {
    NotConnected,
    Connecting,
