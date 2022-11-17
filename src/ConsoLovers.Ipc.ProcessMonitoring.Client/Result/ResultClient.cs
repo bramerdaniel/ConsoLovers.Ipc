@@ -7,6 +7,7 @@
 namespace ConsoLovers.Ipc.ProcessMonitoring;
 
 using System.Diagnostics.CodeAnalysis;
+using System.Security.Cryptography.X509Certificates;
 
 using ConsoLovers.Ipc.Grpc;
 
@@ -52,7 +53,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    #endregion
 
    #region IResultClient Members
-   
+
    /// <summary>Gets the state state of the client.</summary>
    public ClientState State
    {
@@ -67,7 +68,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
          StateChanged?.Invoke(this, new StateChangedEventArgs(oldState, state));
       }
    }
-   
+
    public async Task<ResultInfo> WaitForResultAsync(CancellationToken cancellationToken)
    {
       if (result != null)
@@ -140,19 +141,27 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
             var response = resultChanged.ResponseStream.Current;
             Result = new ResultInfo(ExitCode: response.ExitCode, Message: response.Message, Data: response.Data);
          }
-
-         State = ClientState.ConnectionClosed;
       }
       catch (RpcException ex)
       {
+         // This happens when the server was available and is killed without result or being disposed
+         if (ex.StatusCode == StatusCode.Unavailable)
+            throw new IpcException("Server was terminated");
+
          // This happens when the server was available and is disposed without reporting any results
-         State = ClientState.ConnectionClosed;
-         throw new IpcException(ex.Status.Detail);
+         if (ex.StatusCode == StatusCode.Aborted)
+            throw new IpcException("Server was shut down gracefully");
+
+         // Should not happen 
+         throw new IpcException("Unknown error while waiting for the result", ex);
       }
       catch (Exception ex)
       {
+         throw new IpcException("Unknown error while waiting for the result", ex);
+      }
+      finally
+      {
          State = ClientState.ConnectionClosed;
-         throw new IpcException(ex.Message);
       }
    }
 

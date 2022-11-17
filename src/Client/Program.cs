@@ -45,7 +45,7 @@ public static class Program
       }
       catch (Exception e)
       {
-         console.WriteLine(e.ToString(), ConsoleColor.Red);
+         AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
       }
       
       Console.WriteLine("Finished");

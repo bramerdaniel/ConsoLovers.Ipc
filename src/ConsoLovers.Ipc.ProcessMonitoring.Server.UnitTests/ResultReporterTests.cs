@@ -70,7 +70,7 @@ public class ResultReporterTests
       await Task.Delay(500).ContinueWith(_ => ipcTest.StopServerApplication());
 
       await client.Invoking(async rc => await rc.WaitForResultAsync(10000))
-         .Should().ThrowAsync<IpcException>().WithMessage("Server was shut down");
+         .Should().ThrowAsync<IpcException>().WithMessage("Server was shut down gracefully");
    }
 
 
@@ -198,7 +198,7 @@ public class ResultReporterTests
       var resultClient = clientFactory.CreateResultClient();
 
       await resultClient.Invoking(async rc => await rc.WaitForResultAsync(10000))
-         .Should().ThrowAsync<IpcException>().WithMessage("Server was shut down");
+         .Should().ThrowAsync<IpcException>().WithMessage("Server was shut down gracefully");
    }
 
    #endregion

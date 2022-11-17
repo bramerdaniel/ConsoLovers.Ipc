@@ -43,8 +43,9 @@ internal class Program
       
       var reporter = server.GetResultReporter();
       await server.WaitForClientAsync(CancellationToken.None);
-      reporter.ReportSuccess();
-      // await server.DisposeAsync();
+      // reporter.ReportSuccess();
+      Console.ReadLine();
+      await server.DisposeAsync();
       await Task.Delay(TimeSpan.FromMinutes(10));
       Environment.Exit(0);
    }
