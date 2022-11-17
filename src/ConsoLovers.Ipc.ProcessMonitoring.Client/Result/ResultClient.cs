@@ -144,16 +144,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       }
       catch (RpcException ex)
       {
-         // This happens when the server was available and is killed without result or being disposed
-         if (ex.StatusCode == StatusCode.Unavailable)
-            throw new IpcException("Server was terminated");
-
-         // This happens when the server was available and is disposed without reporting any results
-         if (ex.StatusCode == StatusCode.Aborted)
-            throw new IpcException("Server was shut down gracefully");
-
-         // Should not happen 
-         throw new IpcException("Unknown error while waiting for the result", ex);
+         throw IpcException.FromRpcException(ex);
       }
       catch (Exception ex)
       {

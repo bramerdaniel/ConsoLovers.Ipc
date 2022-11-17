@@ -17,13 +17,17 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
 {
    #region Constants and Fields
 
-   private ClientState state = ClientState.NotConnected;
-
    private readonly CancellationTokenSource clientDisposedSource;
+
+   private readonly ManualResetEventSlim progressTaskWaitHandle;
+
+   private ClientState state = ClientState.NotConnected;
 
    private Task? synchronizeTask;
 
-   private readonly ManualResetEventSlim progressTaskWaitHandle;
+   #endregion
+
+   #region Constructors and Destructors
 
    public ProgressClient()
    {
@@ -70,17 +74,29 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
    /// <summary>Gets the exception that occurred when the state is failed.</summary>
    public Exception? Exception { get; private set; }
 
-   public Task WaitForCompletedAsync()
-   {
-      return WaitForCompletedAsync(clientDisposedSource.Token);
-   }
-
    public async Task WaitForCompletedAsync(CancellationToken cancellationToken)
    {
       if (!progressTaskWaitHandle.IsSet || synchronizeTask == null)
          progressTaskWaitHandle.Wait(cancellationToken);
 
       await ProgressTask.WaitAsync(cancellationToken);
+   }
+
+   #endregion
+
+   #region Public Properties
+
+   public Task ProgressTask
+   {
+      get => synchronizeTask ?? throw new InvalidOperationException("ProgressTask was not created yet");
+      set
+      {
+         if (synchronizeTask != null)
+            throw new InvalidOperationException("ProgressTask already specified");
+
+         synchronizeTask = value;
+         progressTaskWaitHandle.Set();
+      }
    }
 
    #endregion
@@ -100,19 +116,6 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
       ProgressTask = UpdateProgressAsync(progressChangedCall);
    }
 
-   public Task ProgressTask
-   {
-      get => synchronizeTask ?? throw new InvalidOperationException("ProgressTask was not created yet");
-      set
-      {
-         if (synchronizeTask != null)
-            throw new InvalidOperationException("ProgressTask already specified");
-
-         synchronizeTask = value;
-         progressTaskWaitHandle.Set();
-      }
-   }
-
    private async Task UpdateProgressAsync(AsyncServerStreamingCall<ProgressChangedResponse> progressCall)
    {
       try
@@ -120,14 +123,15 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
          while (await progressCall.ResponseStream.MoveNext(CancellationToken.None))
          {
             var currentResponse = progressCall.ResponseStream.Current;
-            ProgressChanged?.Invoke(this, new ProgressEventArgs
-            {
-               Percentage = currentResponse.Progress.Percentage, 
-               Message = currentResponse.Progress.Message
-            });
+            ProgressChanged?.Invoke(this,
+               new ProgressEventArgs { Percentage = currentResponse.Progress.Percentage, Message = currentResponse.Progress.Message });
          }
 
          State = ClientState.ConnectionClosed;
+      }
+      catch (RpcException ex)
+      {
+         throw IpcException.FromRpcException(ex);
       }
       catch (Exception ex)
       {

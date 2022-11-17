@@ -22,7 +22,7 @@ public class SynchronizationClient : ISynchronizationClient
    #region Constants and Fields
 
    private readonly SynchronizatioService.SynchronizatioServiceClient connectionService;
-   
+
    private readonly string id;
 
    private readonly int pollingDelay = 100;
@@ -56,13 +56,19 @@ public class SynchronizationClient : ISynchronizationClient
       return $"{Process.GetCurrentProcess().ProcessName}-{Guid.NewGuid()}";
    }
    
-
    public async Task WaitForServerAsync(CancellationToken cancellationToken)
    {
       if (connectingTask == null)
-         throw new InvalidOperationException("Connection task was no created yet");
-
-      await connectingTask.WaitAsync(cancellationToken);
+      {
+         // This means no real client was created yet, so we just try to establish a connection to the server
+         await SynchronizeAsync(cancellationToken, _ => { });
+      }
+      else
+      {
+         // This means that a real client already initiated the connection
+         // and we can wait for this task to finish here
+         await connectingTask.WaitAsync(cancellationToken);
+      }
    }
 
    public async Task WaitForServerAsync(TimeSpan timeout)
@@ -92,7 +98,7 @@ public class SynchronizationClient : ISynchronizationClient
    public async Task SynchronizeAsync(CancellationToken cancellationToken, Action<CancellationToken> onConnectionEstablished)
    {
       connectingTask = EstablishConnection(cancellationToken);
-      var streamingCall = await connectingTask;
+      var streamingCall = await connectingTask.WaitAsync(cancellationToken);
 
       onConnectionEstablished(cancellationToken);
 

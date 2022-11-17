@@ -9,6 +9,8 @@ namespace Server;
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.Ipc;
 
+using Spectre.Console;
+
 internal class Program
 {
    #region Public Methods and Operators
@@ -17,21 +19,51 @@ internal class Program
    {
       try
       {
-         await DoIt();
+         await ReportProgress();
       }
       catch (Exception e)
       {
-         Console.WriteLine(e);
+         AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything);
       }
-      
-      Console.ReadLine();
 
+      Console.ReadLine();
 
       await ConsoleApplication.WithArguments<ServerArgs>()
          .RunAsync();
    }
 
-   private static async Task DoIt()
+   public static async Task ReportProgress()
+   {
+      //await Task.Delay(1000);
+      var server = IpcServer.CreateServer()
+         .ForName("server")
+         .RemoveAspNetCoreLogging()
+         .AddProgressReporter()
+         .AddDiagnosticLogging(new ConsoleLogger(ServerLogLevel.Debug))
+         .Start();
+
+      var reporter = server.GetProgressReporter();
+      await server.WaitForClientAsync(CancellationToken.None);
+      Task.Run(() =>
+      {
+         for (int i = 0; i <= 100; i++)
+         {
+            reporter.ReportProgress(i, $"Finished {i,3}%");
+            Task.Delay(100).GetAwaiter().GetResult();
+         }
+      });
+
+      var dispose = AnsiConsole.Confirm("Dispose server");
+      if (dispose)
+      {
+         await server.DisposeAsync();
+      }
+
+      Console.ReadLine();
+      await Task.Delay(TimeSpan.FromMinutes(10));
+      Environment.Exit(0);
+   }
+   private static async Task ReportResult()
    {
       await Task.Delay(1000);
       var server = IpcServer.CreateServer()
@@ -40,7 +72,7 @@ internal class Program
          .AddResultReporter()
          .AddDiagnosticLogging(new ConsoleLogger(ServerLogLevel.Trace))
          .Start();
-      
+
       var reporter = server.GetResultReporter();
       await server.WaitForClientAsync(CancellationToken.None);
       // reporter.ReportSuccess();

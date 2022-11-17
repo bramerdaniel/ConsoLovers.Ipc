@@ -127,5 +127,67 @@ public class ProgressReporterTests
       englishMessage.Should().Be("en-US");
    }
 
+   [TestMethod]
+   public async Task EnsureWaitingForResultWorksCorrectlyWhenServerIsDisposed()
+   {
+      var server = IpcServer.CreateServer()
+         .ForName("PR0001")
+         .AddProgressReporter()
+         .Start();
+
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName("PR0001")
+         .AddProgressClient()
+         .Build();
+
+      server.DisposeAfter(500);
+
+      var progressClient = clientFactory.CreateProgressClient();
+
+      await progressClient.Invoking(async rc => await rc.WaitForCompletedAsync(10000))
+         .Should().ThrowAsync<IpcException>().WithMessage("Server was shut down gracefully");
+   }
+
+   [TestMethod]
+   public async Task EnsureWaitingForServerCanBeCanceledWithTimespanTimeout()
+   {
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName("PR0001")
+         .AddProgressClient()
+         .Build();
+
+      var progressClient = clientFactory.CreateProgressClient();
+      
+      await progressClient.Invoking(async client => await client.WaitForServerAsync(TimeSpan.FromMilliseconds(300)))
+         .Should().ThrowAsync<OperationCanceledException>();
+   }
+
+   [TestMethod]
+   public async Task EnsureWaitingForServerCanBeCanceledWithIntegerTimeout()
+   {
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName("PR0002")
+         .AddProgressClient()
+         .Build();
+
+      var progressClient = clientFactory.CreateProgressClient();
+      
+      await progressClient.Invoking(async client => await client.WaitForServerAsync(300))
+         .Should().ThrowAsync<OperationCanceledException>();
+   }
+
+   [TestMethod]
+   public async Task EnsureWaitingForServerCanBeDoneWithFactory()
+   {
+      var clientFactory = IpcClient.CreateClientFactory()
+         .ForName("PR0002")
+         .AddProgressClient()
+         .Build();
+      
+      
+      await clientFactory.Invoking(async cf => await cf.WaitForServerAsync(TimeSpan.FromMilliseconds(300)))
+         .Should().ThrowAsync<OperationCanceledException>();
+   }
+
    #endregion
 }

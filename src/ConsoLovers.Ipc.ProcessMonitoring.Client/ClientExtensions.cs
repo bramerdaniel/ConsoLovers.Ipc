@@ -69,6 +69,33 @@ public static class ClientExtensions
       return clientFactoryBuilder;
    }
 
+   public static async Task WaitForCompletedAsync(this IProgressClient progressClient)
+   {
+      if (progressClient == null)
+         throw new ArgumentNullException(nameof(progressClient));
+      
+      await progressClient.WaitForCompletedAsync(CancellationToken.None);
+   }
+
+   public static async Task WaitForCompletedAsync(this IProgressClient progressClient, int timeoutInMilliseconds)
+   {
+      if (progressClient == null)
+         throw new ArgumentNullException(nameof(progressClient));
+      
+      var tokenSource = new CancellationTokenSource(timeoutInMilliseconds);
+      await progressClient.WaitForCompletedAsync(tokenSource.Token);
+   }
+
+   public static async Task WaitForCompletedAsync(this IProgressClient progressClient, TimeSpan timeout)
+   {
+      if (progressClient == null)
+         throw new ArgumentNullException(nameof(progressClient));
+      
+      var tokenSource = new CancellationTokenSource(timeout);
+      await progressClient.WaitForCompletedAsync(tokenSource.Token);
+   }
+
+
    public static async Task<ResultInfo> WaitForResultAsync(this IResultClient resultClient)
    {
       if (resultClient == null)
