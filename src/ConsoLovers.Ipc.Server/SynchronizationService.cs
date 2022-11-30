@@ -37,8 +37,8 @@ internal class SynchronizationService : SynchronizatioService.SynchronizatioServ
          var request = requestStream.Current;
          switch (request.Action)
          {
-            case SyncRequestAction.ConfirmConnection:
-               await ProcessConfirmConnectionAsync(request.ClientId, responseStream);
+            case SyncRequestAction.EstablishConnection:
+               await EstablishConnectionAsync(request.ClientId, responseStream);
                break;
             case SyncRequestAction.SynchronizationCompleted:
                logger.Debug($"Synchronization with client {request.ClientId} completed");
@@ -51,7 +51,7 @@ internal class SynchronizationService : SynchronizatioService.SynchronizatioServ
       }
    }
 
-   private async Task ProcessConfirmConnectionAsync(string clientId, IServerStreamWriter<SynchronizeResponse> responseStream)
+   private async Task EstablishConnectionAsync(string clientId, IServerStreamWriter<SynchronizeResponse> responseStream)
    {
       logger.Debug($"Client {clientId} connected");
       await responseStream.WriteAsync(new SynchronizeResponse());

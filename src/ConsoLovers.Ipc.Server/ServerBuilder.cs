@@ -135,7 +135,12 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
       EnsureValidFileName(name);
       Name = name;
-      return WithSocketFile(() => Path.Combine(Path.GetTempPath(), $"{name}.uds"));
+      return WithSocketFile(() => Path.Combine(GetSocketDirectory(), $"{name}.uds"));
+   }
+   
+   private string GetSocketDirectory()
+   {
+      return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
    }
 
    public IServerBuilder WithSocketFile(Func<string> computeSocketFile)

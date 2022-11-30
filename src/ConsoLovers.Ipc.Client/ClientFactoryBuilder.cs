@@ -21,8 +21,8 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
    private CultureInfo? clientCulture;
 
    private IClientLogger? loggerToUse;
-
-   private string? socketFile;
+   
+   private Func<string> resolveSocketFile;
 
    #endregion
 
@@ -93,6 +93,9 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    public IClientFactory Build()
    {
+      var socketFile = resolveSocketFile();
+      EnsureValidFilePath(socketFile, "ResolvedSocketFile");
+
       if (socketFile == null)
          throw new InvalidOperationException($"The {nameof(socketFile)} was not specified yet");
       
@@ -120,7 +123,14 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
          throw new ArgumentNullException(nameof(name));
 
       EnsureValidFileName(name);
-      return WithSocketFile(() => Path.Combine(Path.GetTempPath(), $"{name}.uds"));
+      return WithSocketFile(() => Path.Combine(GetSocketDirectory(), $"{name}.uds"));
+   }
+
+   private string GetSocketDirectory()
+   {
+      var socketDirectory = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+      loggerToUse?.Debug($"Using socket directory {socketDirectory}");
+      return socketDirectory;
    }
 
    public IClientFactoryBuilder ForProcess(Process process)
@@ -133,13 +143,10 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
    public IClientFactoryBuilder WithSocketFile(Func<string> computeSocketFile)
    {
-      if (computeSocketFile == null)
-         throw new ArgumentNullException(nameof(computeSocketFile));
-
-      socketFile = computeSocketFile();
-      EnsureValidFilePath(socketFile);
+      resolveSocketFile = computeSocketFile ?? throw new ArgumentNullException(nameof(computeSocketFile));
       return this;
    }
+   
 
    public IClientFactoryBuilder WithSocketFile(string file)
    {

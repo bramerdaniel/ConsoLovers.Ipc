@@ -128,7 +128,7 @@ public class SynchronizationClient : ISynchronizationClient
          {
             var streamingCall = connectionService.Synchronize();
             State = SyncState.Connecting;
-            var connectRequest = new SynchronizeRequest { ClientId = Id, Action = SyncRequestAction.ConfirmConnection };
+            var connectRequest = new SynchronizeRequest { ClientId = Id, Action = SyncRequestAction.EstablishConnection };
 
             await streamingCall.RequestStream.WriteAsync(connectRequest, cancellationToken);
             logger.Debug($"{nameof(ISynchronizationClient)} could connect successfully");
