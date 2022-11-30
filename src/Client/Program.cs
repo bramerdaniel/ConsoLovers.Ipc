@@ -31,14 +31,16 @@ public static class Program
 
    public static async Task Main(string[] args)
    {
-      try
-      {
-         await ProgressClient();
-      }
-      catch (Exception e)
-      {
-         AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
-      }
+      await GenericMenu(args);
+
+      //try
+      //{
+      //   await ProgressClient();
+      //}
+      //catch (Exception e)
+      //{
+      //   AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
+      //}
 
       Console.WriteLine("Finished");
       Console.ReadLine();

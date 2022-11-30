@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net6.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<SignAssembly>False</SignAssembly>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\..\ConsoLovers.Ipc.Client\ConsoLovers.Ipc.Client.csproj" />
+		<ProjectReference Include="..\..\ConsoLovers.Ipc.ProcessMonitoring.Client\ConsoLovers.Ipc.ProcessMonitoring.Client.csproj" />
+		<ProjectReference Include="..\..\ConsoLovers.Ipc.ProcessMonitoring.Server\ConsoLovers.Ipc.ProcessMonitoring.Server.csproj" />
+	</ItemGroup>
+
+</Project>

@@ -1,7 +1,7 @@
 <Project>
 
 	<PropertyGroup>
-		<NugetPackageVersion>0.3.0-rc003</NugetPackageVersion>
+		<NugetPackageVersion>0.3.0-rc004</NugetPackageVersion>
 		<SignAssembly>True</SignAssembly>
 		<AssemblyOriginatorKeyFile>..\..\certificate\ConsoleToolkit.Core.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>

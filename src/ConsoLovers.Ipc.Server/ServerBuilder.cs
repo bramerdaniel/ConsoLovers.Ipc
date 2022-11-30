@@ -35,7 +35,6 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
    /// <summary>Initializes a new instance of the <see cref="ServerBuilder"/> class.</summary>
    internal ServerBuilder()
    {
-      Name = string.Empty;
       WebApplicationBuilder = WebApplication.CreateBuilder(new WebApplicationOptions());
       AddGrpcService<SynchronizationService>();
       AddService(s => s.AddSingleton<ClientRegistry>());
@@ -128,11 +127,8 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       foreach (var action in applicationActions)
          action(application);
 
-      if (string.IsNullOrWhiteSpace(Name))
-         Name = Path.GetFileNameWithoutExtension(socketFile);
-
       Logger.Debug("The web application was created");
-      return new IpcServerImpl(application, Name, Logger);
+      return new IpcServerImpl(application, Logger, socketFile);
 
       void ConfigureKestrel(KestrelServerOptions options)
       {
@@ -193,9 +189,7 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    /// <summary>Gets or sets the logger.</summary>
    internal IServerLogger Logger { get; set; } = new DelegateLogger(_ => { });
-
-   internal string Name { get; private set; }
-
+   
    /// <summary>Gets the web application builder.</summary>
    /// <value>The web application builder.</value>
    internal WebApplicationBuilder WebApplicationBuilder { get; }

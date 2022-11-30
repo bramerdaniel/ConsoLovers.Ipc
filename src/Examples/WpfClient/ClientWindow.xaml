@@ -1,0 +1,24 @@
+﻿<Window x:Class="WpfClient.ClientWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Client" Height="450" Width="800" >
+    <DockPanel>
+        <StackPanel Orientation="Horizontal" DockPanel.Dock="Top">
+
+            <Button DockPanel.Dock="Top" Margin="5" Click="ConnectToServer">Create client factory</Button>
+            <Button DockPanel.Dock="Top" Margin="5" Click="WaitForServer">Wait for server</Button>
+            <Button DockPanel.Dock="Top" Margin="5" Click="CreateClients">Create clients</Button>
+            <Button DockPanel.Dock="Top" Margin="5" Click="WaitForProgress" Name="waitForProgress">Wait for progress</Button>
+            <Button DockPanel.Dock="Top" Margin="5" Click="WaitForResult" Name="waitForResult">Wait for result</Button>
+            <Button DockPanel.Dock="Top" Margin="5" Click="OnDisposeClients" Name="disposeClients">Dispose clients</Button>
+        </StackPanel>
+        <DockPanel DockPanel.Dock="Bottom" Height="50" >
+            <TextBlock Margin="10,0,0,0" DockPanel.Dock="Left" VerticalAlignment="Center" Name="progressLabel" Text="  NyA" />
+            <ProgressBar Margin="10" Name="progressBar" Height="20" />
+        </DockPanel>
+        <TextBox Name="textBox"/>
+    </DockPanel>
+</Window>

@@ -6,6 +6,8 @@
 
 namespace ConsoLovers.Ipc;
 
+using System.Collections.Concurrent;
+
 using ConsoLovers.Ipc.Grpc;
 
 using global::Grpc.Core;
@@ -22,32 +24,66 @@ internal class SynchronizationService : SynchronizatioService.SynchronizatioServ
 
    private readonly IServerLogger logger;
 
+   private readonly ConcurrentDictionary<string, string> handles;
+
    public SynchronizationService(ClientRegistry clientRegistry, IServerLogger logger)
    {
       this.clientRegistry = clientRegistry ?? throw new ArgumentNullException(nameof(clientRegistry));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+      handles = new ConcurrentDictionary<string, string>();
+   }
+
+   public override Task<EstablishConnectionResponse> EstablishConnection(EstablishConnectionRequest request, ServerCallContext context)
+   {
+      var handle = Guid.NewGuid().ToString();
+      if (handles.TryAdd(handle, request.ClientId))
+      {
+         logger.Debug($"{request.ClientId} established the connection {handle} ({Thread.CurrentThread.ManagedThreadId})");
+         return Task.FromResult(new EstablishConnectionResponse { Handle = handle });
+      }
+
+      return Task.FromResult(new EstablishConnectionResponse { Handle = string.Empty });
+   }
+
+   public override Task<ConfirmConnectionResponse> ConfirmConnection(ConfirmConnectionRequest request, ServerCallContext context)
+   {
+      if (handles.TryRemove(request.Handle, out var client))
+      {
+         logger.Debug($"{client} confirmed the connection {request.Handle} ({Thread.CurrentThread.ManagedThreadId})");
+         clientRegistry.NotifyClientConnected(client);
+         return Task.FromResult(new ConfirmConnectionResponse());
+      }
+
+      throw new RpcException(new Status(StatusCode.NotFound, $"Handle {request.Handle} not found."));
    }
 
    #region Public Methods and Operators
 
-   public override async Task Synchronize(IAsyncStreamReader<SynchronizeRequest> requestStream, IServerStreamWriter<SynchronizeResponse> responseStream, ServerCallContext context)
+   public async Task Synchronize(IAsyncStreamReader<SynchronizeRequest> requestStream, IServerStreamWriter<SynchronizeResponse> responseStream, ServerCallContext context)
    {
-      while (await requestStream.MoveNext())
+      await requestStream.MoveNext();
+      var request = requestStream.Current;
+      switch (request.Action)
       {
-         var request = requestStream.Current;
-         switch (request.Action)
-         {
-            case SyncRequestAction.EstablishConnection:
-               await EstablishConnectionAsync(request.ClientId, responseStream);
-               break;
-            case SyncRequestAction.SynchronizationCompleted:
-               logger.Debug($"Synchronization with client {request.ClientId} completed");
-               clientRegistry.NotifyClientConnected(request.ClientId);
-               await responseStream.WriteAsync(new SynchronizeResponse());
-               break;
-            default:
-               throw new ArgumentOutOfRangeException();
-         }
+         case SyncRequestAction.EstablishConnection:
+            await EstablishConnectionAsync(request.ClientId, responseStream);
+            break;
+         default:
+            throw new ArgumentOutOfRangeException();
+      }
+
+      await requestStream.MoveNext();
+
+      request = requestStream.Current;
+      switch (request.Action)
+      {
+         case SyncRequestAction.SynchronizationCompleted:
+            logger.Debug($"Synchronization with client {request.ClientId} completed");
+            clientRegistry.NotifyClientConnected(request.ClientId);
+            await responseStream.WriteAsync(new SynchronizeResponse());
+            break;
+         default:
+            throw new ArgumentOutOfRangeException();
       }
    }
 

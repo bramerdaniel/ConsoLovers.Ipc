@@ -36,9 +36,10 @@ internal class Program
    {
       //await Task.Delay(1000);
       var server = IpcServer.CreateServer()
-         .ForName("server")
+         .ForCurrentProcess()
          .RemoveAspNetCoreLogging()
          .AddProgressReporter()
+         .AddResultReporter()
          .AddDiagnosticLogging(new ConsoleLogger(ServerLogLevel.Debug))
          .Start();
 
@@ -53,11 +54,8 @@ internal class Program
          }
       });
 
-      var dispose = AnsiConsole.Confirm("Dispose server");
-      if (dispose)
-      {
-         await server.DisposeAsync();
-      }
+      server.GetResultReporter().ReportSuccess();
+
 
       Console.ReadLine();
       await Task.Delay(TimeSpan.FromMinutes(10));

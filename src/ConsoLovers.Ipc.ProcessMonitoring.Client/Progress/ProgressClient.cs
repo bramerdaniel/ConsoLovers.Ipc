@@ -13,7 +13,7 @@ using ConsoLovers.Ipc.Grpc;
 using global::Grpc.Core;
 
 [SuppressMessage("ReSharper", "UnusedType.Global")]
-public sealed class ProgressClient : ConfigurableClient<ProgressService.ProgressServiceClient>, IProgressClient
+public sealed class ProgressClient : ConfigurableClient<ProgressService.ProgressServiceClient>, IProgressClient, ISynchronizedClient
 {
    #region Constants and Fields
 
@@ -106,21 +106,32 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
    protected override void OnConfigured()
    {
       State = ClientState.Connecting;
-      SynchronizationClient.SynchronizeAsync(clientDisposedSource.Token, OnConnectionEstablished);
+      SynchronizationClient.SynchronizeAsync(clientDisposedSource.Token, this);
    }
 
-   private void OnConnectionEstablished(CancellationToken cancellationToken)
+   public string Id => $"{SynchronizationClient.Id}.{nameof(ProgressClient)}";
+
+   public void OnConnectionEstablished(CancellationToken cancellationToken)
    {
       State = ClientState.Connected;
       var progressChangedCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
-      ProgressTask = UpdateProgressAsync(progressChangedCall);
+      ProgressTask = Task.Run(() => UpdateProgressAsync(progressChangedCall, cancellationToken), cancellationToken);
    }
 
-   private async Task UpdateProgressAsync(AsyncServerStreamingCall<ProgressChangedResponse> progressCall)
+   public void OnConnectionConfirmed(CancellationToken cancellationToken)
+   {
+   }
+
+   public void OnConnectionAborted(CancellationToken cancellationToken)
+   {
+      clientDisposedSource.Cancel();
+   }
+
+   private async Task UpdateProgressAsync(AsyncServerStreamingCall<ProgressChangedResponse> progressCall, CancellationToken cancellationToken)
    {
       try
       {
-         while (await progressCall.ResponseStream.MoveNext(CancellationToken.None))
+         while (await progressCall.ResponseStream.MoveNext(cancellationToken))
          {
             var currentResponse = progressCall.ResponseStream.Current;
             ProgressChanged?.Invoke(this,

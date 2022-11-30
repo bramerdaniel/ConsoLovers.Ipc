@@ -43,19 +43,19 @@ internal class StartServerCommand : IAsyncCommand<StartServerCommand.StartServer
          .AddResultClient()
          .Build();
 
-      IResultClient? progressClient = null;
+      IResultClient? resultClient = null;
       try
       {
-         //console.WriteLine("Waiting for ipc server");
-         //await clientFactory.WaitForServerAsync(cancellationToken);
+         resultClient = clientFactory.CreateResultClient();
+         console.WriteLine("Waiting for ipc server");
+         await clientFactory.WaitForServerAsync(cancellationToken);
 
-         progressClient = clientFactory.CreateResultClient();
-         //await progressClient.Wa(cancellationToken);
 
          try
          {
             console.WriteLine("Waiting for server result");
-            await progressClient.WaitForResultAsync(cancellationToken);
+            var resultInfo = await resultClient.WaitForResultAsync(cancellationToken);
+            console.WriteLine($"Result = {resultInfo.ExitCode}, Message = {resultInfo.Message}", ConsoleColor.Green);
          }
          catch (Exception e)
          {
@@ -65,7 +65,7 @@ internal class StartServerCommand : IAsyncCommand<StartServerCommand.StartServer
       }
       finally
       {
-         progressClient?.Dispose();
+         resultClient?.Dispose();
       }
    }
 

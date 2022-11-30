@@ -24,14 +24,15 @@ internal sealed class IpcServerImpl : IIpcServer
 
    /// <summary>Initializes a new instance of the <see cref="IpcServerImpl"/> class.</summary>
    /// <param name="webApplication">The web application.</param>
-   /// <param name="name">The name of the server.</param>
    /// <param name="logger">The logger.</param>
+   /// <param name="socketFile"></param>
    /// <exception cref="System.ArgumentNullException">name or webApplication</exception>
    /// <exception cref="ArgumentNullException">webApplication</exception>
-   internal IpcServerImpl(WebApplication webApplication, string name, IServerLogger logger)
+   internal IpcServerImpl(WebApplication webApplication, IServerLogger logger, string socketFile)
    {
       this.webApplication = webApplication ?? throw new ArgumentNullException(nameof(webApplication));
-      Name = name ?? throw new ArgumentNullException(nameof(name));
+      SocketFile = socketFile ?? throw new ArgumentNullException(nameof(socketFile));
+      Name = Path.GetFileNameWithoutExtension(socketFile);
       Logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
       ServerTask = webApplication.RunAsync();
@@ -80,10 +81,24 @@ internal sealed class IpcServerImpl : IIpcServer
       await webApplication.DisposeAsync();
       Logger.Debug("Disposing the web application");
 
+      TryDeleteSocketFile();
+
       await ServerTask;
 
       stopwatch.Stop();
       Logger.Info($"Ipc server '{Name}' disposed successfully after {stopwatch.ElapsedMilliseconds} ms.");
+   }
+
+   private void TryDeleteSocketFile()
+   {
+      try
+      {
+         File.Delete(SocketFile);
+      }
+      catch (Exception exception)
+      {
+         Logger.Warn($"Failed to delete socket file {SocketFile}: {exception.Message}");
+      }
    }
 
    /// <summary>Gets the name of the server.</summary>
@@ -94,6 +109,8 @@ internal sealed class IpcServerImpl : IIpcServer
    #region Public Properties
 
    public IServerLogger Logger { get; }
+
+   public string SocketFile { get; }
 
    #endregion
 

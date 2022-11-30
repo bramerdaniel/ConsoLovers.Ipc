@@ -30,7 +30,18 @@ public interface ISynchronizationClient
    /// <returns>The waiting task</returns>
    Task WaitForServerAsync(TimeSpan timeout, CancellationToken cancellationToken);
 
-   Task SynchronizeAsync(CancellationToken cancellationToken, Action<CancellationToken> onConnectionEstablished);
+   Task SynchronizeAsync(CancellationToken cancellationToken, ISynchronizedClient client);
 
    #endregion
+}
+
+public interface ISynchronizedClient
+{
+   string Id { get; }
+
+   void OnConnectionEstablished(CancellationToken cancellationToken);
+   
+   void OnConnectionConfirmed(CancellationToken cancellationToken);
+   
+   void OnConnectionAborted(CancellationToken cancellationToken);
 }

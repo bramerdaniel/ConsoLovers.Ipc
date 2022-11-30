@@ -6,7 +6,30 @@ import "google/protobuf/wrappers.proto";
 
 service SynchronizatioService
 {
-	rpc Synchronize(stream SynchronizeRequest) returns (stream SynchronizeResponse);
+	// rpc Synchronize(stream SynchronizeRequest) returns (stream SynchronizeResponse);
+	
+	rpc EstablishConnection(EstablishConnectionRequest) returns (EstablishConnectionResponse);
+
+	rpc ConfirmConnection(ConfirmConnectionRequest) returns (ConfirmConnectionResponse);
+}
+
+message EstablishConnectionRequest 
+{      
+	.google.protobuf.StringValue client_id = 1;
+}
+
+message EstablishConnectionResponse 
+{      
+	.google.protobuf.StringValue handle = 1;
+}
+
+message ConfirmConnectionRequest 
+{      
+	.google.protobuf.StringValue handle = 1;
+}
+
+message ConfirmConnectionResponse 
+{      
 }
 
 message SynchronizeRequest 
@@ -21,6 +44,7 @@ enum SyncRequestAction
 	ESTABLISH_CONNECTION = 0;
 	SYNCHRONIZATION_COMPLETED = 1;
 }
+
 
 message SynchronizeResponse 
 {      

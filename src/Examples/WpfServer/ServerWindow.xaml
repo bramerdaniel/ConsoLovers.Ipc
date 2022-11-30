@@ -1,0 +1,17 @@
+﻿<Window x:Class="WpfServer.ServerWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Server" Height="450" Width="800">
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal">
+            <Button Margin="5" Click="OnStartServer" Name="startServer">Start server</Button>
+            <Button Margin="5" Click="OnReportProgress" Name="reportProgress" IsEnabled="False">Report progress</Button>
+            <Button Margin="5" Click="OnReportResult" Name="reportResult" IsEnabled="False">Report result</Button>
+            <Button Margin="5" Click="OnDisposeServer" Name="disposeServer" IsEnabled="False">Dispose server</Button>
+        </StackPanel>
+        <TextBox Name="textBox"></TextBox>
+    </DockPanel>
+</Window>

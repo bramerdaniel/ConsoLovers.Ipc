@@ -7,18 +7,23 @@
 namespace ConsoLovers.Ipc.ProcessMonitoring;
 
 using System.Diagnostics.CodeAnalysis;
-using System.Security.Cryptography.X509Certificates;
 
 using ConsoLovers.Ipc.Grpc;
 
 using global::Grpc.Core;
 
 [SuppressMessage("ReSharper", "UnusedType.Global")]
-public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient>, IResultClient
+public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient>, IResultClient, ISynchronizedClient
 {
    #region Constants and Fields
 
+   private readonly CancellationTokenSource clientDisposedSource;
+
+   private readonly IClientLogger logger;
+
    private readonly ManualResetEventSlim resultWaitHandle;
+
+   private readonly ManualResetEventSlim synchronizeTaskWaitHandle;
 
    private ResultInfo? result;
 
@@ -26,16 +31,14 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
 
    private Task? synchronizeTask;
 
-   private readonly ManualResetEventSlim synchronizeTaskWaitHandle;
-
-   private readonly CancellationTokenSource clientDisposedSource;
-
    #endregion
 
    #region Constructors and Destructors
 
-   public ResultClient()
+   public ResultClient(IClientLogger logger)
    {
+      this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
       clientDisposedSource = new CancellationTokenSource();
       resultWaitHandle = new ManualResetEventSlim();
       synchronizeTaskWaitHandle = new ManualResetEventSlim();
@@ -77,10 +80,9 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       if (!synchronizeTaskWaitHandle.IsSet || synchronizeTask == null)
          synchronizeTaskWaitHandle.Wait(cancellationToken);
 
-      await SynchronizationTask.WaitAsync(cancellationToken);
+      await ResultWaitingTask.WaitAsync(cancellationToken);
       return Result;
    }
-
 
    public void Dispose()
    {
@@ -90,7 +92,33 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
 
    #endregion
 
+   #region ISynchronizedClient Members
+
+   public string Id => $"{SynchronizationClient.Id}.{nameof(ResultClient)}";
+
+   public void OnConnectionConfirmed(CancellationToken cancellationToken)
+   {
+      logger.Info($"{Id} has connected to server successfully.");
+   }
+
+   public void OnConnectionAborted(CancellationToken cancellationToken)
+   {
+      logger.Info($"{Id} could not connect to server.");
+   }
+
+   public void OnConnectionEstablished(CancellationToken cancellationToken)
+   {
+      var resultChangedStream =
+         ServiceClient.ResultChanged(new ResultChangedRequest { ClientName = SynchronizationClient.Id }, CreateLanguageHeader());
+      ResultWaitingTask = Task.Run(() => ListenToResult(resultChangedStream), cancellationToken);
+      State = ClientState.Connected;
+   }
+
+   #endregion
+
    #region Properties
+
+   private Task ConnectionTask { get; set; }
 
    private ResultInfo Result
    {
@@ -103,7 +131,8 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       }
    }
 
-   public Task SynchronizationTask
+   /// <summary>Gets or sets the <see cref="Task"/> that is created for waiting for the result.</summary>
+   private Task ResultWaitingTask
    {
       get => synchronizeTask ?? throw new InvalidOperationException("SynchronizationTask was not created yet");
       set
@@ -122,23 +151,19 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
 
    protected override void OnConfigured()
    {
-      SynchronizationClient.SynchronizeAsync(clientDisposedSource.Token, OnConnectionEstablished);
-   }
-
-   private void OnConnectionEstablished(CancellationToken cancellationToken)
-   {
-      var resultChangedStream = ServiceClient.ResultChanged(new ResultChangedRequest { ClientName = SynchronizationClient.Id }, CreateLanguageHeader());
-      SynchronizationTask = ListenToResult(resultChangedStream);
-      State = ClientState.Connected;
+      ConnectionTask = Task.Run(() => SynchronizationClient.SynchronizeAsync(clientDisposedSource.Token, this), clientDisposedSource.Token);
    }
 
    private async Task ListenToResult(AsyncServerStreamingCall<ResultChangedResponse> resultChanged)
    {
       try
       {
+         logger.Debug($"{Id} is waiting for the server result");
          if (await resultChanged.ResponseStream.MoveNext())
          {
             var response = resultChanged.ResponseStream.Current;
+            logger.Debug($"{Id} got result from server");
+
             Result = new ResultInfo(ExitCode: response.ExitCode, Message: response.Message, Data: response.Data);
          }
       }
