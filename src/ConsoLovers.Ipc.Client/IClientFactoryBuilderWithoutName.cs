@@ -22,7 +22,12 @@ public interface IClientFactoryBuilderWithoutName
    /// <param name="process">The process of the server to create a <see cref="IClientFactoryBuilder"/> for.</param>
    /// <returns>The created <see cref="IClientFactoryBuilder"/></returns>
    IClientFactoryBuilder ForProcess(Process process);
-   
+
+   /// <summary>The function that computes the path directory where socket files a placed. This is only used when no socket file is specified directly</summary>
+   /// <param name="computeSocketDirectory">A function that computes the socket file path.</param>
+   /// <returns>The server builder</returns>
+   IClientFactoryBuilder WithSocketDirectory(Func<string> computeSocketDirectory);
+
    /// <summary>The function that computes the path to the socket file the client factory will use.</summary>
    /// <param name="computeSocketFile">A function that computes the socket file path.</param>
    /// <returns>The server builder</returns>

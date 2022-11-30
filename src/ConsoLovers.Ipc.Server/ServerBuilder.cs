@@ -24,6 +24,10 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    private readonly List<Action<WebApplication>> applicationActions = new();
 
+   private Func<string> resolveSocketDirectory = ResolveSocketDirectory;
+
+   private Func<string> resolveSocketFile = () => throw new InvalidOperationException("No socket file could be resolved");
+
    #endregion
 
    #region Constructors and Destructors
@@ -113,6 +117,10 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
    public IIpcServer Start()
    {
+      var socketFile = resolveSocketFile();
+      EnsureValidFilePath(socketFile);
+
+      WebApplicationBuilder.WebHost.ConfigureKestrel(ConfigureKestrel);
       WebApplicationBuilder.Services.AddSingleton(Logger);
       WebApplicationBuilder.Services.AddGrpc();
 
@@ -120,8 +128,20 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
       foreach (var action in applicationActions)
          action(application);
 
+      if (string.IsNullOrWhiteSpace(Name))
+         Name = Path.GetFileNameWithoutExtension(socketFile);
+
       Logger.Debug("The web application was created");
       return new IpcServerImpl(application, Name, Logger);
+
+      void ConfigureKestrel(KestrelServerOptions options)
+      {
+         if (File.Exists(socketFile))
+            File.Delete(socketFile);
+
+         Logger.Debug($"Using domain socket endpoint {socketFile}");
+         options.ListenUnixSocket(socketFile, listenOptions => { listenOptions.Protocols = HttpProtocols.Http2; });
+      }
    }
 
    #endregion
@@ -134,34 +154,18 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
          throw new ArgumentNullException(nameof(name));
 
       EnsureValidFileName(name);
-      Name = name;
-      return WithSocketFile(() => Path.Combine(GetSocketDirectory(), $"{name}.uds"));
+      return WithSocketFile(() => Path.Combine(resolveSocketDirectory(), $"{name}.uds"));
    }
-   
-   private string GetSocketDirectory()
+
+   public IServerBuilder WithSocketDirectory(Func<string> computeSocketDirectory)
    {
-      return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+      resolveSocketDirectory = computeSocketDirectory;
+      return this;
    }
 
    public IServerBuilder WithSocketFile(Func<string> computeSocketFile)
    {
-      var socketFile = computeSocketFile();
-      EnsureValidFilePath(socketFile);
-
-      WebApplicationBuilder.WebHost.ConfigureKestrel(options =>
-      {
-         if (File.Exists(socketFile))
-            File.Delete(socketFile);
-
-         Logger.Debug($"Using domain socket endpoint {socketFile}");
-         options.ListenUnixSocket(socketFile, listenOptions =>
-         {
-            listenOptions.Protocols = HttpProtocols.Http2;
-         });
-      });
-
-      if (string.IsNullOrWhiteSpace(Name))
-         Name = Path.GetFileNameWithoutExtension(socketFile);
+      resolveSocketFile = computeSocketFile;
       return this;
    }
 
@@ -222,6 +226,11 @@ internal class ServerBuilder : IServerBuilder, IServerBuilderWithoutName
 
       if (filePath.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
          throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
+   }
+
+   private static string ResolveSocketDirectory()
+   {
+      return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
    }
 
    #endregion

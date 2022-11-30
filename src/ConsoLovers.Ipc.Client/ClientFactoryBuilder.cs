@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ClientFactoryBuilder.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="ClientFactoryBuilder.cs" company="ConsoLovers">
+//    Copyright (c) ConsoLovers  2015 - 2022
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -17,12 +17,14 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
    #region Constants and Fields
 
    private readonly ServiceCollection serviceCollection;
-   
+
    private CultureInfo? clientCulture;
 
    private IClientLogger? loggerToUse;
-   
-   private Func<string> resolveSocketFile;
+
+   private Func<string> resolveSocketDirectory = ResolveDefaultSocketDirectory;
+
+   private Func<string> resolveSocketFile = () => throw new InvalidOperationException("No socket file could be resolved");
 
    #endregion
 
@@ -98,7 +100,7 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
       if (socketFile == null)
          throw new InvalidOperationException($"The {nameof(socketFile)} was not specified yet");
-      
+
       var logger = loggerToUse ?? new ClientDelegateLogger(_ => { });
       serviceCollection.AddSingleton(logger);
 
@@ -123,14 +125,7 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
          throw new ArgumentNullException(nameof(name));
 
       EnsureValidFileName(name);
-      return WithSocketFile(() => Path.Combine(GetSocketDirectory(), $"{name}.uds"));
-   }
-
-   private string GetSocketDirectory()
-   {
-      var socketDirectory = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
-      loggerToUse?.Debug($"Using socket directory {socketDirectory}");
-      return socketDirectory;
+      return WithSocketFile(() => Path.Combine(resolveSocketDirectory(), $"{name}.uds"));
    }
 
    public IClientFactoryBuilder ForProcess(Process process)
@@ -141,12 +136,17 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
       return ForName($"{process.ProcessName}.{process.Id}");
    }
 
+   public IClientFactoryBuilder WithSocketDirectory(Func<string> computeSocketDirectory)
+   {
+      resolveSocketDirectory = computeSocketDirectory ?? throw new ArgumentNullException(nameof(computeSocketDirectory));
+      return this;
+   }
+
    public IClientFactoryBuilder WithSocketFile(Func<string> computeSocketFile)
    {
       resolveSocketFile = computeSocketFile ?? throw new ArgumentNullException(nameof(computeSocketFile));
       return this;
    }
-   
 
    public IClientFactoryBuilder WithSocketFile(string file)
    {
@@ -179,6 +179,11 @@ internal class ClientFactoryBuilder : IClientFactoryBuilder, IClientFactoryBuild
 
       if (fileName.IndexOfAny(Path.GetInvalidPathChars()) >= 0)
          throw new ArgumentNullException(callerExpression, $"{callerExpression} is not a valid file name.");
+   }
+
+   private static string ResolveDefaultSocketDirectory()
+   {
+      return Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
    }
 
    #endregion
