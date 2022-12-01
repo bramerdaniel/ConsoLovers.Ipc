@@ -101,9 +101,6 @@ internal class ProgressReporter : IProgressReporter
 
    internal ClientProgressHandler CreateClientHandler(CultureInfo culture)
    {
-      if (IsCompleted())
-         throw new ChannelClosedException();
-
       var cultureHandlers = clients.GetOrAdd(culture, _ => new List<ClientProgressHandler>());
 
       var clientProgress = new ClientProgressHandler(culture, logger);
@@ -114,6 +111,9 @@ internal class ProgressReporter : IProgressReporter
          var progressInfo = lastProgress.Localize(culture);
          clientProgress.ReportProgress(progressInfo);
       }
+
+      if (IsCompleted())
+         clientProgress.Complete();
 
       return clientProgress;
    }

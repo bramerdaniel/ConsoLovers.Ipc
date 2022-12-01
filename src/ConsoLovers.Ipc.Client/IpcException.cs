@@ -33,6 +33,10 @@ public class IpcException : Exception
       // This happens when the server was available and is disposed without reporting any results
       if (ex.StatusCode == StatusCode.Aborted)
          return new IpcException("Server was shut down gracefully");
+      
+      // This happens when a requested streaming call was canceled
+      if (ex.StatusCode == StatusCode.Cancelled)
+         return new IpcException(ex.Message);
 
       // Should not happen 
       return new IpcException("Unknown error while waiting for the result", ex);

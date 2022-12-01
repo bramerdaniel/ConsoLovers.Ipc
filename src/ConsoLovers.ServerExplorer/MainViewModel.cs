@@ -36,6 +36,7 @@ public class MainViewModel : INotifyPropertyChanged
       var path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
       serverWatcher = new ServerWatcher(path, Dispatcher.CurrentDispatcher);
       serverWatcher.ServerAdded += OnServerAdded;
+      serverWatcher.ServerRemoved += OnServerRemoved;
       serverWatcher.Start();
 
       RefreshCommand = new AsyncCommand(Refresh, _ => true);
@@ -44,6 +45,23 @@ public class MainViewModel : INotifyPropertyChanged
       OpenServers = new ObservableCollection<object>();
       OpenServers.Add(this);
       Refresh();
+   }
+
+   private void OnServerRemoved(object? sender, ServerEventArgs e)
+   {
+      var serversToRemove = Servers.Where(x => string.Equals(x.SocketFile, e.SocketFile, StringComparison.OrdinalIgnoreCase)).ToArray();
+      foreach (var serverViewModel in serversToRemove)
+         RemoveServer(serverViewModel);
+   }
+
+   private void RemoveServer(ServerViewModel server)
+   {
+      if (server == null)
+         throw new ArgumentNullException(nameof(server));
+      
+      server.OpenRequest -= OnOpenRequested;
+      Servers.Remove(server);
+      server.NotifyRemoved();
    }
 
    private void OnServerAdded(object? sender, ServerEventArgs e)

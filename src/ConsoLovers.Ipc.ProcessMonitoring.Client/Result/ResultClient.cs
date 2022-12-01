@@ -110,7 +110,7 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
    {
       var resultChangedStream =
          ServiceClient.ResultChanged(new ResultChangedRequest { ClientName = SynchronizationClient.Id }, CreateLanguageHeader());
-      ResultWaitingTask = Task.Run(() => ListenToResult(resultChangedStream), cancellationToken);
+      ResultWaitingTask = Task.Run(() => ListenToResult(resultChangedStream , cancellationToken), cancellationToken);
       State = ClientState.Connected;
    }
 
@@ -154,12 +154,12 @@ public class ResultClient : ConfigurableClient<ResultService.ResultServiceClient
       ConnectionTask = Task.Run(() => SynchronizationClient.SynchronizeAsync(clientDisposedSource.Token, this), clientDisposedSource.Token);
    }
 
-   private async Task ListenToResult(AsyncServerStreamingCall<ResultChangedResponse> resultChanged)
+   private async Task ListenToResult(AsyncServerStreamingCall<ResultChangedResponse> resultChanged, CancellationToken cancellationToken)
    {
       try
       {
          logger.Debug($"{Id} is waiting for the server result");
-         if (await resultChanged.ResponseStream.MoveNext())
+         if (await resultChanged.ResponseStream.MoveNext(cancellationToken))
          {
             var response = resultChanged.ResponseStream.Current;
             logger.Debug($"{Id} got result from server");

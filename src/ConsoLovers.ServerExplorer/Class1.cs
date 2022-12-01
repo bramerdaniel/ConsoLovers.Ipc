@@ -7,17 +7,51 @@
 namespace ConsoLovers.ServerExplorer;
 
 using System;
-using System.Windows;
+using System.Windows.Controls;
 
-public class TypeTemplateDefinition
+using ConsoLovers.Ipc;
+
+public class TextBoxLogger : IClientLogger
 {
-   #region Public Properties
+   private readonly TextBox textBox;
 
-   /// <summary>Gets or sets the DataTemplate to select for this item type.</summary>
-   public DataTemplate Template { get; set; }
+   private readonly ClientLogLevel level;
 
-   /// <summary>Gets or sets the item type to define the template for.</summary>
-   public Type Type { get; set; }
+   public TextBoxLogger(TextBox textBox, ClientLogLevel level)
+   {
+      this.textBox = textBox ?? throw new ArgumentNullException(nameof(textBox));
+      this.level = level;
+   }
 
-   #endregion
+   public bool IsEnabled(ClientLogLevel logLevel)
+   {
+      if (level >= logLevel)
+         return true;
+      return false;
+   }
+
+   private void AppendLine(string message)
+   {
+      if (textBox.Dispatcher.CheckAccess())
+      {
+         textBox.AppendText($"{message}{Environment.NewLine}");
+         textBox.ScrollToEnd();
+      }
+      else
+      {
+         textBox.Dispatcher.BeginInvoke(() => AppendLine(message));
+      }
+   }
+
+   public void Log(ClientLogLevel level, string message)
+   {
+      if (IsEnabled(level))
+         AppendLine($"[{level}] {message}");
+   }
+
+   public void Log(ClientLogLevel level, Func<string> messageFunc)
+   {
+      if (IsEnabled(level))
+         AppendLine($"[{level}] {messageFunc()}");
+   }
 }

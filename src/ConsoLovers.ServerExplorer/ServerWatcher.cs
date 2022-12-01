@@ -65,7 +65,6 @@ public class ServerWatcher
 
    public void Start()
    {
-
       fileSystemWatcher.EnableRaisingEvents = true;
    }
 }

@@ -12,6 +12,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Input;
 
@@ -20,7 +22,7 @@ using ConsoLovers.Ipc.ProcessMonitoring;
 using ConsoLovers.ServerExplorer.Annotations;
 using ConsoLovers.ServerExplorer.Commands;
 
-public class ServerViewModel : INotifyPropertyChanged
+public class ServerViewModel : IClientLogger, INotifyPropertyChanged
 {
    #region Constants and Fields
 
@@ -28,11 +30,16 @@ public class ServerViewModel : INotifyPropertyChanged
 
    private int exitCode;
 
+   private StringBuilder messageBuilder = new();
+
    private int progress;
 
    private string progressText;
 
    private string resultMessage;
+
+   private CancellationTokenSource? resultTokenSource;
+   private CancellationTokenSource? progressTokenSource;
 
    private bool showProgress;
 
@@ -60,7 +67,9 @@ public class ServerViewModel : INotifyPropertyChanged
 
       OpenCommand = new RelayCommand(_ => Open(), _ => CanOpen());
       ProgressCommand = new AsyncCommand(AwaitProgress, _ => CanAwaitProgress());
-      ResultCommand = new AsyncCommand(AwaitResult);
+      ResultCommand = new AsyncCommand(AwaitResult, _ => CanAwaitResult());
+      CancelResultCommand = new RelayCommand(_ => CancelResult());
+      CancelProgressCommand = new RelayCommand(_ => CancelProgress());
    }
 
    #endregion
@@ -73,9 +82,39 @@ public class ServerViewModel : INotifyPropertyChanged
 
    #endregion
 
+   #region IClientLogger Members
+
+   public bool IsEnabled(ClientLogLevel logLevel)
+   {
+      return true;
+   }
+
+   public void Log(ClientLogLevel level, string message)
+   {
+      if (!IsEnabled(level))
+         return;
+
+      messageBuilder.Append($"[{level}]".PadRight(10));
+      messageBuilder.AppendLine(message);
+      RaisePropertyChanged(nameof(Messages));
+   }
+
+   public void Log(ClientLogLevel level, Func<string> messageFunc)
+   {
+      if (!IsEnabled(level))
+         return;
+
+      messageBuilder.Append($"[{level}]".PadRight(10));
+      messageBuilder.AppendLine(messageFunc());
+      RaisePropertyChanged(nameof(Messages));
+   }
+
+   #endregion
+
    #region Public Properties
 
-   public IAsyncCommand ProgressCommand { get; }
+   public ICommand CancelResultCommand { get; }
+   public ICommand CancelProgressCommand { get; }
 
    public int ExitCode
    {
@@ -88,6 +127,8 @@ public class ServerViewModel : INotifyPropertyChanged
          RaisePropertyChanged();
       }
    }
+
+   public string Messages => messageBuilder.ToString();
 
    public string Name { get; }
 
@@ -110,6 +151,8 @@ public class ServerViewModel : INotifyPropertyChanged
          RaisePropertyChanged();
       }
    }
+
+   public IAsyncCommand ProgressCommand { get; }
 
    public string ProgressText
    {
@@ -167,6 +210,14 @@ public class ServerViewModel : INotifyPropertyChanged
 
    #endregion
 
+   #region Public Methods and Operators
+
+   public void NotifyRemoved()
+   {
+   }
+
+   #endregion
+
    #region Methods
 
    [NotifyPropertyChangedInvocator]
@@ -178,37 +229,83 @@ public class ServerViewModel : INotifyPropertyChanged
    private async Task AwaitProgress()
    {
       ShowProgress = true;
+      progressTokenSource = new CancellationTokenSource();
 
       var factory = GetOrCreateClientFactory();
-
       var progressClient = factory.CreateProgressClient();
-      ProgressText = "Waiting for server";
-      await progressClient.WaitForServerAsync();
 
-      progressClient.ProgressChanged += OnProgressChanged;
-      await progressClient.WaitForCompletedAsync();
+      try
+      {
+         ProgressText = "Waiting for server";
+         await progressClient.WaitForServerAsync(progressTokenSource.Token);
+
+         progressClient.ProgressChanged += OnProgressChanged;
+         await progressClient.WaitForCompletedAsync(progressTokenSource.Token);
+      }
+      catch (OperationCanceledException)
+      {
+      }
+      finally
+      {
+         ShowProgress = false;
+         progressClient.Dispose();
+      }
    }
 
    private async Task AwaitResult()
    {
-      ShowResult = true;
+      resultTokenSource = new CancellationTokenSource();
 
       var factory = GetOrCreateClientFactory();
+      var resultClient = factory.CreateResultClient();
+      ShowResult = true;
 
-      using (var resultClient = factory.CreateResultClient())
+      try
       {
-         ProgressText = "Waiting for server";
-         await resultClient.WaitForServerAsync();
+         await resultClient.WaitForServerAsync(resultTokenSource.Token);
 
-         var resultInfo = await resultClient.WaitForResultAsync();
+         var resultInfo = await resultClient.WaitForResultAsync(resultTokenSource.Token);
          ResultMessage = resultInfo.Message;
          ExitCode = resultInfo.ExitCode;
+      }
+      catch (OperationCanceledException)
+      {
+      }
+      finally
+      {
+         ShowResult = false;
+         resultClient.Dispose();
       }
    }
 
    private bool CanAwaitProgress()
    {
       return !ShowProgress;
+   }
+
+   private bool CanAwaitResult()
+   {
+      if (ShowResult)
+         return false;
+      return true;
+   }
+
+   private void CancelResult()
+   {
+      if (resultTokenSource == null)
+         return;
+
+      resultTokenSource.Cancel();
+      resultTokenSource = null;
+   }
+
+   private void CancelProgress()
+   {
+      if (progressTokenSource == null)
+         return;
+
+      progressTokenSource.Cancel();
+      progressTokenSource = null;
    }
 
    private bool CanOpen()
@@ -224,6 +321,7 @@ public class ServerViewModel : INotifyPropertyChanged
       clientFactory = IpcClient.CreateClientFactory()
          .WithSocketFile(SocketFile)
          .WithDefaultCulture("de-DE")
+         .WithLogger(this)
          .AddProcessMonitoringClients()
          .Build();
 

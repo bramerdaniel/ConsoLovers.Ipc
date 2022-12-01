@@ -10,32 +10,27 @@
         <DockPanel.Resources>
             <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
             <DataTemplate x:Key="serverTemplate" DataType="local:ServerViewModel">
-                <DockPanel LastChildFill="False">
+                <DockPanel LastChildFill="True">
                     <Menu DockPanel.Dock="Top">
                         <MenuItem Header="Progress" Command="{Binding ProgressCommand}"/>
                         <MenuItem Header="Result" Command="{Binding ResultCommand}"/>
                     </Menu>
-                    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="5"
+                    <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="3" DockPanel.Dock="Top" Margin="5"
                         Visibility="{Binding ShowProgress, Converter={StaticResource booleanToVisibility}}">
-                        <TextBlock Text="{Binding ProgressText}" DockPanel.Dock="Top"/>
-                        <ProgressBar DockPanel.Dock="Top" Height="20" Value="{Binding Progress}"/>
-                    </DockPanel>
-                    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="5"
-                        Visibility="{Binding ShowResult, Converter={StaticResource booleanToVisibility}}">
-                        <DockPanel DockPanel.Dock="Top">
-                            <TextBlock Text="ExitCode = " DockPanel.Dock="Left"/>
-                            <TextBlock Text="{Binding ExitCode}"/>
-                        </DockPanel>
-                        <DockPanel DockPanel.Dock="Top">
-                            <TextBlock Text="Result message = " DockPanel.Dock="Left"/>
-                            <TextBlock Text="{Binding ResultMessage}"/>
+                        <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="5" >
+                            <TextBlock Text="{Binding ProgressText}" DockPanel.Dock="Top"/>
+                            <ProgressBar DockPanel.Dock="Top" Height="20" Value="{Binding Progress}"/>
+                            <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+                                <Hyperlink Command="{Binding CancelProgressCommand}" >
+                                    <TextBlock Text="Cancel"/>
+                                </Hyperlink>
+                            </TextBlock>
                         </DockPanel>
 
-                    </DockPanel>
-
-                    <local:ClientDisplay DockPanel.Dock="Top" Background="Red">
-                        <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="5"
+                    </Border>
+                    <Border BorderBrush="LightGray" BorderThickness="1" CornerRadius="3" DockPanel.Dock="Top" Margin="5"
                             Visibility="{Binding ShowResult, Converter={StaticResource booleanToVisibility}}">
+                        <DockPanel LastChildFill="False" Margin="5" >
                             <DockPanel DockPanel.Dock="Top">
                                 <TextBlock Text="ExitCode = " DockPanel.Dock="Left"/>
                                 <TextBlock Text="{Binding ExitCode}"/>
@@ -44,9 +39,14 @@
                                 <TextBlock Text="Result message = " DockPanel.Dock="Left"/>
                                 <TextBlock Text="{Binding ResultMessage}"/>
                             </DockPanel>
-
+                            <TextBlock DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+                                <Hyperlink Command="{Binding CancelResultCommand}" >
+                                    <TextBlock Text="Cancel"/>
+                                </Hyperlink>
+                            </TextBlock>
                         </DockPanel>
-                    </local:ClientDisplay>
+                    </Border>
+                    <TextBox Name="logTextBox" Text="{Binding Messages, Mode=OneWay}" IsReadOnly="True"/>
                 </DockPanel>
             </DataTemplate>
 
@@ -90,30 +90,12 @@
             <MenuItem Header="Refresh" Command="{Binding RefreshCommand}"/>
             <MenuItem Header="Clean" Command="{Binding CleanCommand}"/>
         </Menu>
-        <TabControl ItemsSource="{Binding OpenServers}" SelectedIndex="{ Binding SelectedIndex}"
-            ContentTemplateSelector="{StaticResource contentTemplateSelector}">
+        <TabControl ItemsSource="{Binding OpenServers}" SelectedIndex="{ Binding SelectedIndex}" ContentTemplateSelector="{StaticResource contentTemplateSelector}">
             <TabControl.ItemTemplate>
                 <DataTemplate>
                     <TextBlock Text="{Binding Title}"/>
                 </DataTemplate>
             </TabControl.ItemTemplate>
-            <!--<TabItem Header="Servers">
-                <ListBox ItemsSource="{Binding Servers}" >
-                    <ListBox.ItemTemplate>
-                        <DataTemplate DataType="local:ServerViewModel">
-                            <DockPanel>
-                                <DockPanel.ContextMenu>
-                                    <ContextMenu>
-                                        <MenuItem Header="Open" Command="{Binding OpenCommand}" />
-                                    </ContextMenu>
-                                </DockPanel.ContextMenu>
-                                <TextBlock Text="{Binding ProcessName}" Margin="10,0" />
-                                <TextBlock Text="{Binding ProcessId}"></TextBlock>
-                            </DockPanel>
-                        </DataTemplate>
-                    </ListBox.ItemTemplate>
-                </ListBox>
-            </TabItem>-->
         </TabControl>
 
     </DockPanel>

@@ -30,6 +30,7 @@ namespace ConsoLovers.ServerExplorer
       {
          if (sender is ListBoxItem listBoxItem)
          {
+            e.Handled = true;
             var serverViewModel = listBoxItem.DataContext as ServerViewModel;
             serverViewModel?.OpenCommand.Execute(null);
          }

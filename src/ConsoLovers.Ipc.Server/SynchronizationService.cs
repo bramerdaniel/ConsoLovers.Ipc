@@ -59,41 +59,6 @@ internal class SynchronizationService : SynchronizatioService.SynchronizatioServ
 
    #region Public Methods and Operators
 
-   public async Task Synchronize(IAsyncStreamReader<SynchronizeRequest> requestStream, IServerStreamWriter<SynchronizeResponse> responseStream, ServerCallContext context)
-   {
-      await requestStream.MoveNext();
-      var request = requestStream.Current;
-      switch (request.Action)
-      {
-         case SyncRequestAction.EstablishConnection:
-            await EstablishConnectionAsync(request.ClientId, responseStream);
-            break;
-         default:
-            throw new ArgumentOutOfRangeException();
-      }
-
-      await requestStream.MoveNext();
-
-      request = requestStream.Current;
-      switch (request.Action)
-      {
-         case SyncRequestAction.SynchronizationCompleted:
-            logger.Debug($"Synchronization with client {request.ClientId} completed");
-            clientRegistry.NotifyClientConnected(request.ClientId);
-            await responseStream.WriteAsync(new SynchronizeResponse());
-            break;
-         default:
-            throw new ArgumentOutOfRangeException();
-      }
-   }
-
-   private async Task EstablishConnectionAsync(string clientId, IServerStreamWriter<SynchronizeResponse> responseStream)
-   {
-      logger.Debug($"Client {clientId} connected");
-      await responseStream.WriteAsync(new SynchronizeResponse());
-
-   }
-
    #endregion
 
 }
