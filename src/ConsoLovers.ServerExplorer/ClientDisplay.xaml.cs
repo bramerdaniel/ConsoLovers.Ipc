@@ -16,23 +16,18 @@ using System.Windows.Shapes;
 namespace ConsoLovers.ServerExplorer
 {
    /// <summary>
-   /// Interaction logic for MainWindow.xaml
+   /// Interaction logic for ClientDisplay.xaml
    /// </summary>
-   public partial class MainWindow : Window
+   public partial class ClientDisplay : UserControl
    {
-      public MainWindow()
+      public ClientDisplay()
       {
          InitializeComponent();
-         DataContext = new MainViewModel();
       }
 
-      private void OnListItemDoubleClicked(object sender, MouseButtonEventArgs e)
-      {
-         if (sender is ListBoxItem listBoxItem)
-         {
-            var serverViewModel = listBoxItem.DataContext as ServerViewModel;
-            serverViewModel?.OpenCommand.Execute(null);
-         }
-      }
+
+
+
+
    }
 }

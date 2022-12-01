@@ -8,22 +8,95 @@ namespace ConsoLovers.ServerExplorer;
 
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using System.Windows.Threading;
 
+using ConsoLovers.ServerExplorer.Annotations;
 using ConsoLovers.ServerExplorer.Commands;
 
-public class MainViewModel
+public class MainViewModel : INotifyPropertyChanged
 {
+   #region Constants and Fields
+
+   private int selectedIndex;
+
+   private readonly ServerWatcher serverWatcher;
+
+   #endregion
+
    #region Constructors and Destructors
 
    public MainViewModel()
    {
+      var path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+      serverWatcher = new ServerWatcher(path, Dispatcher.CurrentDispatcher);
+      serverWatcher.ServerAdded += OnServerAdded;
+      serverWatcher.Start();
+
       RefreshCommand = new AsyncCommand(Refresh, _ => true);
       CleanCommand = new AsyncCommand(Clean, _ => true);
       Servers = new ObservableCollection<ServerViewModel>();
+      OpenServers = new ObservableCollection<object>();
+      OpenServers.Add(this);
+      Refresh();
+   }
+
+   private void OnServerAdded(object? sender, ServerEventArgs e)
+   {
+      Servers.Add(CreateModel(e.SocketFile));
+   }
+
+   #endregion
+
+   #region Public Events
+
+   public event PropertyChangedEventHandler? PropertyChanged;
+
+   #endregion
+
+   #region Public Properties
+
+   public ICommand CleanCommand { get; }
+
+   public ObservableCollection<object> OpenServers { get; set; }
+
+   public ICommand RefreshCommand { get; set; }
+
+   public int SelectedIndex
+   {
+      get => selectedIndex;
+      set
+      {
+         if (value == selectedIndex)
+            return;
+         selectedIndex = value;
+         RaisePropertyChanged();
+      }
+   }
+
+   public ObservableCollection<ServerViewModel> Servers { get; set; }
+
+   public string Title { get; private set; } = "Servers";
+
+   #endregion
+
+   #region Methods
+
+   [NotifyPropertyChangedInvocator]
+   protected virtual void RaisePropertyChanged([CallerMemberName] string? propertyName = null)
+   {
+      PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+   }
+
+   private void Activate(ServerViewModel serverViewModel)
+   {
+      var indx = OpenServers.IndexOf(serverViewModel);
+      SelectedIndex = indx;
    }
 
    private Task Clean()
@@ -34,27 +107,40 @@ public class MainViewModel
       return Refresh();
    }
 
-   public ICommand CleanCommand { get; }
+   private void Clear()
+   {
+      foreach (var viewModel in Servers)
+         viewModel.OpenRequest -= OnOpenRequested;
+      Servers.Clear();
+   }
 
-   #endregion
+   private ServerViewModel CreateModel(string file)
+   {
+      var viewModel = new ServerViewModel(file);
+      viewModel.OpenRequest += OnOpenRequested;
+      return viewModel;
+   }
 
-   #region Public Properties
+   private void OnOpenRequested(object? sender, EventArgs e)
+   {
+      if (sender is ServerViewModel serverViewModel)
+      {
+         if (!OpenServers.Contains(serverViewModel))
+            OpenServers.Add(serverViewModel);
 
-   public ICommand RefreshCommand { get; set; }
-
-   public ObservableCollection<ServerViewModel> Servers { get; set; }
-
-   #endregion
-
-   #region Methods
+         Activate(serverViewModel);
+      }
+   }
 
    private Task Refresh()
    {
-      Servers.Clear();
+      Clear();
 
       var path = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
       foreach (var file in Directory.EnumerateFiles(path, "*.uds"))
-         Servers.Add(new ServerViewModel(file));
+      {
+         Servers.Add(CreateModel(file));
+      }
 
       return Task.CompletedTask;
    }

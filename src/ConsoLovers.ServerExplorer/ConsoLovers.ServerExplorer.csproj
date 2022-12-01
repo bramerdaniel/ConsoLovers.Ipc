@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ConsoLovers.Ipc.Client\ConsoLovers.Ipc.Client.csproj" />
+    <ProjectReference Include="..\ConsoLovers.Ipc.ProcessMonitoring.Client\ConsoLovers.Ipc.ProcessMonitoring.Client.csproj" />
   </ItemGroup>
 
 </Project>

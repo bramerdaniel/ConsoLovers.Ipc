@@ -1,26 +1,119 @@
 ﻿<Window x:Class="ConsoLovers.ServerExplorer.MainWindow"
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:ConsoLovers.ServerExplorer"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:ConsoLovers.ServerExplorer"
+    mc:Ignorable="d"
+    Title="MainWindow" Height="450" Width="800">
     <DockPanel>
+        <DockPanel.Resources>
+            <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
+            <DataTemplate x:Key="serverTemplate" DataType="local:ServerViewModel">
+                <DockPanel LastChildFill="False">
+                    <Menu DockPanel.Dock="Top">
+                        <MenuItem Header="Progress" Command="{Binding ProgressCommand}"/>
+                        <MenuItem Header="Result" Command="{Binding ResultCommand}"/>
+                    </Menu>
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="5"
+                        Visibility="{Binding ShowProgress, Converter={StaticResource booleanToVisibility}}">
+                        <TextBlock Text="{Binding ProgressText}" DockPanel.Dock="Top"/>
+                        <ProgressBar DockPanel.Dock="Top" Height="20" Value="{Binding Progress}"/>
+                    </DockPanel>
+                    <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="5"
+                        Visibility="{Binding ShowResult, Converter={StaticResource booleanToVisibility}}">
+                        <DockPanel DockPanel.Dock="Top">
+                            <TextBlock Text="ExitCode = " DockPanel.Dock="Left"/>
+                            <TextBlock Text="{Binding ExitCode}"/>
+                        </DockPanel>
+                        <DockPanel DockPanel.Dock="Top">
+                            <TextBlock Text="Result message = " DockPanel.Dock="Left"/>
+                            <TextBlock Text="{Binding ResultMessage}"/>
+                        </DockPanel>
+
+                    </DockPanel>
+
+                    <local:ClientDisplay DockPanel.Dock="Top" Background="Red">
+                        <DockPanel DockPanel.Dock="Top" LastChildFill="False" Margin="5"
+                            Visibility="{Binding ShowResult, Converter={StaticResource booleanToVisibility}}">
+                            <DockPanel DockPanel.Dock="Top">
+                                <TextBlock Text="ExitCode = " DockPanel.Dock="Left"/>
+                                <TextBlock Text="{Binding ExitCode}"/>
+                            </DockPanel>
+                            <DockPanel DockPanel.Dock="Top">
+                                <TextBlock Text="Result message = " DockPanel.Dock="Left"/>
+                                <TextBlock Text="{Binding ResultMessage}"/>
+                            </DockPanel>
+
+                        </DockPanel>
+                    </local:ClientDisplay>
+                </DockPanel>
+            </DataTemplate>
+
+            <DataTemplate x:Key="mainTemplate" DataType="local:MainViewModel">
+                <Grid>
+                    <Grid.Resources>
+                        <Style x:Key="containerStyle" TargetType="ListBoxItem">
+                            <EventSetter Event="MouseDoubleClick" Handler="OnListItemDoubleClicked"/>
+                        </Style>
+                    </Grid.Resources>
+                    <ListBox ItemsSource="{Binding Servers}" ItemContainerStyle="{StaticResource containerStyle}">
+
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="local:ServerViewModel">
+                                <DockPanel>
+                                    <DockPanel.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Open" Command="{Binding OpenCommand}"/>
+                                        </ContextMenu>
+                                    </DockPanel.ContextMenu>
+                                    <TextBlock Text="{Binding ProcessName}" Margin="10,0"/>
+                                    <TextBlock Text="{Binding ProcessId}"/>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+
+            </DataTemplate>
+
+            <local:GenericTemplateSelector x:Key="contentTemplateSelector">
+                <local:GenericTemplateSelector.TemplateDefinitions>
+                    <local:TypeTemplateDefinition Type="{x:Type local:MainViewModel}"
+                        Template="{StaticResource mainTemplate}"/>
+                    <local:TypeTemplateDefinition Type="{x:Type local:ServerViewModel}"
+                        Template="{StaticResource serverTemplate}"/>
+                </local:GenericTemplateSelector.TemplateDefinitions>
+            </local:GenericTemplateSelector>
+        </DockPanel.Resources>
         <Menu DockPanel.Dock="Top">
-            <MenuItem Header="Refresh" Command="{Binding RefreshCommand}"></MenuItem>
-            <MenuItem Header="Clean" Command="{Binding CleanCommand}"></MenuItem>
+            <MenuItem Header="Refresh" Command="{Binding RefreshCommand}"/>
+            <MenuItem Header="Clean" Command="{Binding CleanCommand}"/>
         </Menu>
-        <TabControl>
-            <TabItem Header="Servers">
+        <TabControl ItemsSource="{Binding OpenServers}" SelectedIndex="{ Binding SelectedIndex}"
+            ContentTemplateSelector="{StaticResource contentTemplateSelector}">
+            <TabControl.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding Title}"/>
+                </DataTemplate>
+            </TabControl.ItemTemplate>
+            <!--<TabItem Header="Servers">
                 <ListBox ItemsSource="{Binding Servers}" >
                     <ListBox.ItemTemplate>
                         <DataTemplate DataType="local:ServerViewModel">
-                            <TextBlock Text="{Binding Name}"></TextBlock>
+                            <DockPanel>
+                                <DockPanel.ContextMenu>
+                                    <ContextMenu>
+                                        <MenuItem Header="Open" Command="{Binding OpenCommand}" />
+                                    </ContextMenu>
+                                </DockPanel.ContextMenu>
+                                <TextBlock Text="{Binding ProcessName}" Margin="10,0" />
+                                <TextBlock Text="{Binding ProcessId}"></TextBlock>
+                            </DockPanel>
                         </DataTemplate>
                     </ListBox.ItemTemplate>
                 </ListBox>
-            </TabItem>
+            </TabItem>-->
         </TabControl>
 
     </DockPanel>
