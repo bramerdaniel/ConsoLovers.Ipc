@@ -6,8 +6,6 @@ import "google/protobuf/wrappers.proto";
 
 service SynchronizatioService
 {
-	// rpc Synchronize(stream SynchronizeRequest) returns (stream SynchronizeResponse);
-	
 	rpc EstablishConnection(EstablishConnectionRequest) returns (EstablishConnectionResponse);
 
 	rpc ConfirmConnection(ConfirmConnectionRequest) returns (ConfirmConnectionResponse);

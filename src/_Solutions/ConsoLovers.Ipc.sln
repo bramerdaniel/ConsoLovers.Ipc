@@ -46,9 +46,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Ipc.UnitTests",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoLovers.Ipc.UnitTesting", "..\ConsoLovers.Ipc.UnitTesting\ConsoLovers.Ipc.UnitTesting.csproj", "{3CAC1FF8-B879-470A-8913-D8A76C8C5E2A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfClient", "..\Examples\WpfClient\WpfClient.csproj", "{297DDAB7-F522-4BFA-AC7C-7DEEEFCD4775}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfClient", "..\Examples\WpfClient\WpfClient.csproj", "{297DDAB7-F522-4BFA-AC7C-7DEEEFCD4775}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WpfServer", "..\Examples\WpfServer\WpfServer.csproj", "{46107ECF-A1A5-4B7F-ABAD-3E0D8984326A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoLovers.ServerExplorer", "..\ConsoLovers.ServerExplorer\ConsoLovers.ServerExplorer.csproj", "{3D2B041D-92F1-44CB-ACF5-1636D1D01A73}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -120,6 +122,10 @@ Global
 		{46107ECF-A1A5-4B7F-ABAD-3E0D8984326A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{46107ECF-A1A5-4B7F-ABAD-3E0D8984326A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{46107ECF-A1A5-4B7F-ABAD-3E0D8984326A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3D2B041D-92F1-44CB-ACF5-1636D1D01A73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3D2B041D-92F1-44CB-ACF5-1636D1D01A73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3D2B041D-92F1-44CB-ACF5-1636D1D01A73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3D2B041D-92F1-44CB-ACF5-1636D1D01A73}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
