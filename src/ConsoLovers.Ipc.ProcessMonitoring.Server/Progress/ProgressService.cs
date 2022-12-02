@@ -41,43 +41,44 @@ internal class ProgressService : Grpc.ProgressService.ProgressServiceBase
    public override async Task ProgressChanged(ProgressChangedRequest request, IServerStreamWriter<ProgressChangedResponse> responseStream, ServerCallContext context)
    {
       var tokenSource = CancellationTokenSource.CreateLinkedTokenSource(context.CancellationToken, hostLifetime.ApplicationStopping);
-      if(tokenSource.Token.IsCancellationRequested)
+      if (tokenSource.Token.IsCancellationRequested)
          return;
 
       var cultureInfo = context.GetCulture();
       var clientProgress = progressReporter.CreateClientHandler(cultureInfo);
-      logger.Debug($"Created progress handler for culture {cultureInfo.Name}");
-      
+      logger.Debug($"Progress handler for client {request.ClientName} (culture {cultureInfo.Name}) was created");
+
       try
       {
          while (!tokenSource.IsCancellationRequested)
          {
             var progressInfo = await clientProgress.ReadNextAsync(tokenSource.Token);
             await responseStream.WriteAsync(new ProgressChangedResponse { Progress = progressInfo }, tokenSource.Token);
-            logger.Trace("Progress was reported to client");
+            logger.Trace($"Progress was reported to client {request.ClientName}");
          }
       }
       catch (System.Threading.Channels.ChannelClosedException)
       {
          // This means that there will not longer be progress as the channel for progress reporting was closed
-         logger.Debug("Progress has finished");
+         logger.Debug($"Progress for client {request.ClientName} has finished");
       }
       catch (OperationCanceledException)
       {
-         // call was canceled or console/web application is shutting down
          if (context.CancellationToken.IsCancellationRequested)
          {
-            logger.Debug("Progress was canceled");
+            // The client canceled the call => e.g. by disposing the ipc client
+            logger.Debug($"Progress of {request.ClientName} was canceled by client.");
          }
          else
-         {
-            logger.Debug("Progress was canceled as the server application is shutting down");
+         {  // the ipc server is shutting down e.g. because the server application is shutting down
+            logger.Debug($"Progress for {request.ClientName} was canceled as the server application is shutting down");
             throw new RpcException(new Status(StatusCode.Aborted, "Server was shut down"));
          }
       }
       finally
       {
-         logger.Debug($"Progress handler for culture {cultureInfo.Name} was removed");
+         tokenSource.Dispose();
+         logger.Debug($"Progress handler for client {request.ClientName} was removed");
          progressReporter.RemoveClientHandler(clientProgress);
       }
    }

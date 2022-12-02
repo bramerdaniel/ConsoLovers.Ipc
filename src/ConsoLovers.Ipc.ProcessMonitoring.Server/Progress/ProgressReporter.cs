@@ -7,7 +7,6 @@
 namespace ConsoLovers.Ipc.ProcessMonitoring.Progress;
 using System.Collections.Concurrent;
 using System.Globalization;
-using System.Threading.Channels;
 
 internal class ProgressReporter : IProgressReporter
 {

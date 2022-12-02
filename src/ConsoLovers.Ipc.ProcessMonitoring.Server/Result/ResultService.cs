@@ -71,6 +71,7 @@ internal class ResultService : Grpc.ResultService.ResultServiceBase
          //  now the registered client got the result,
          // or is no longer interested in it. 
          disposable.Dispose();
+         tokenSource.Dispose();
       }
    }
 

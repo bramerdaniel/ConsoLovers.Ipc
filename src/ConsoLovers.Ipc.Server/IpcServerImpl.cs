@@ -67,9 +67,9 @@ internal sealed class IpcServerImpl : IIpcServer
    /// <returns>A task that represents the asynchronous dispose operation.</returns>
    public async ValueTask DisposeAsync()
    {
-      if(disposed)
+      if (disposed)
          return;
-      
+
       disposed = true;
 
       Logger.Debug($"Disposing ipc server '{Name}'");

@@ -82,7 +82,7 @@ public static class ClientExtensions
       if (progressClient == null)
          throw new ArgumentNullException(nameof(progressClient));
       
-      var tokenSource = new CancellationTokenSource(timeoutInMilliseconds);
+      using var tokenSource = new CancellationTokenSource(timeoutInMilliseconds);
       await progressClient.WaitForCompletedAsync(tokenSource.Token);
    }
 
@@ -90,8 +90,8 @@ public static class ClientExtensions
    {
       if (progressClient == null)
          throw new ArgumentNullException(nameof(progressClient));
-      
-      var tokenSource = new CancellationTokenSource(timeout);
+
+      using var tokenSource = new CancellationTokenSource(timeout);
       await progressClient.WaitForCompletedAsync(tokenSource.Token);
    }
 
@@ -109,7 +109,7 @@ public static class ClientExtensions
       if (resultClient == null)
          throw new ArgumentNullException(nameof(resultClient));
 
-      var tokenSource = new CancellationTokenSource(timeoutInMilliseconds);
+      using var tokenSource = new CancellationTokenSource(timeoutInMilliseconds);
       return await resultClient.WaitForResultAsync(tokenSource.Token);
    }
 
@@ -118,7 +118,7 @@ public static class ClientExtensions
       if (resultClient == null)
          throw new ArgumentNullException(nameof(resultClient));
 
-      var tokenSource = new CancellationTokenSource(timeout);
+      using var tokenSource = new CancellationTokenSource(timeout);
       return await resultClient.WaitForResultAsync(tokenSource.Token);
    }
 

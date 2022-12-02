@@ -39,6 +39,7 @@ public class ServerViewModel : IClientLogger, INotifyPropertyChanged
    private string resultMessage;
 
    private CancellationTokenSource? resultTokenSource;
+
    private CancellationTokenSource? progressTokenSource;
 
    private bool showProgress;
@@ -242,8 +243,13 @@ public class ServerViewModel : IClientLogger, INotifyPropertyChanged
          progressClient.ProgressChanged += OnProgressChanged;
          await progressClient.WaitForCompletedAsync(progressTokenSource.Token);
       }
-      catch (OperationCanceledException)
+      catch (OperationCanceledException e)
       {
+         Log(ClientLogLevel.Info, e.Message);
+      }
+      catch (IpcException e)
+      {
+         Log(ClientLogLevel.Info, e.Message);
       }
       finally
       {
@@ -268,8 +274,13 @@ public class ServerViewModel : IClientLogger, INotifyPropertyChanged
          ResultMessage = resultInfo.Message;
          ExitCode = resultInfo.ExitCode;
       }
-      catch (OperationCanceledException)
+      catch (OperationCanceledException e)
       {
+         Log(ClientLogLevel.Info, e.Message);
+      }
+      catch (Exception e)
+      {
+         Log(ClientLogLevel.Info, e.Message);
       }
       finally
       {
@@ -296,6 +307,7 @@ public class ServerViewModel : IClientLogger, INotifyPropertyChanged
          return;
 
       resultTokenSource.Cancel();
+      resultTokenSource.Dispose();
       resultTokenSource = null;
    }
 
@@ -305,6 +317,7 @@ public class ServerViewModel : IClientLogger, INotifyPropertyChanged
          return;
 
       progressTokenSource.Cancel();
+      progressTokenSource.Dispose();
       progressTokenSource = null;
    }
 

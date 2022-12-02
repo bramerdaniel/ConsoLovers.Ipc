@@ -23,8 +23,6 @@ public class SynchronizationClient : ISynchronizationClient, ISynchronizedClient
 
    private readonly SynchronizatioService.SynchronizatioServiceClient connectionService;
 
-   private readonly string id;
-
    private readonly int pollingDelay = 100;
 
 
@@ -38,8 +36,8 @@ public class SynchronizationClient : ISynchronizationClient, ISynchronizedClient
          throw new ArgumentNullException(nameof(channel));
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
-      id = GenerateId();
-      logger.Debug($"SynchronizationClient with name {id} was created");
+      Id = Process.GetCurrentProcess().ProcessName;
+      logger.Debug($"SynchronizationClient for process {Id} was created");
       connectionService = new SynchronizatioService.SynchronizatioServiceClient(channel);
       State = SyncState.NotConnected;
    }
@@ -48,7 +46,7 @@ public class SynchronizationClient : ISynchronizationClient, ISynchronizedClient
 
    #region ISynchronizationClient Members
 
-   public string Id => id;
+   public string Id { get; }
 
    public void OnConnectionEstablished(CancellationToken cancellationToken)
    {
@@ -60,11 +58,6 @@ public class SynchronizationClient : ISynchronizationClient, ISynchronizedClient
 
    public void OnConnectionAborted(CancellationToken cancellationToken)
    {
-   }
-
-   private string GenerateId()
-   {
-      return Process.GetCurrentProcess().ProcessName;
    }
 
    public async Task WaitForServerAsync(CancellationToken cancellationToken)

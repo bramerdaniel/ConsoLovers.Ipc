@@ -15,7 +15,7 @@ public class ServerTextBoxLogger : IServerLogger
 {
    #region Constants and Fields
 
-   private readonly ServerLogLevel level;
+   private readonly ServerLogLevel minLevel;
 
    private readonly TextBox textBox;
 
@@ -26,7 +26,7 @@ public class ServerTextBoxLogger : IServerLogger
    public ServerTextBoxLogger(TextBox textBox, ServerLogLevel level)
    {
       this.textBox = textBox ?? throw new ArgumentNullException(nameof(textBox));
-      this.level = level;
+      minLevel = level;
    }
 
    #endregion
@@ -35,7 +35,7 @@ public class ServerTextBoxLogger : IServerLogger
 
    public bool IsEnabled(ServerLogLevel logLevel)
    {
-      if (level >= logLevel)
+      if (minLevel >= logLevel)
          return true;
       return false;
    }

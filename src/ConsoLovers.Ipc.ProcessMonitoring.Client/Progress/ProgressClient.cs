@@ -114,7 +114,7 @@ public sealed class ProgressClient : ConfigurableClient<ProgressService.Progress
    public void OnConnectionEstablished(CancellationToken cancellationToken)
    {
       State = ClientState.Connected;
-      var progressChangedCall = ServiceClient.ProgressChanged(new ProgressChangedRequest(), CreateLanguageHeader());
+      var progressChangedCall = ServiceClient.ProgressChanged(new ProgressChangedRequest{ ClientName = Id }, CreateLanguageHeader());
       ProgressTask = Task.Run(() => UpdateProgressAsync(progressChangedCall, cancellationToken), cancellationToken);
    }
 
