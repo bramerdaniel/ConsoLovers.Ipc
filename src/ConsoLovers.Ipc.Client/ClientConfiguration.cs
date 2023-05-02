@@ -32,6 +32,8 @@ internal class ClientConfiguration : IClientConfiguration
 
    public string ServerName => channelFactory.ServerName;
 
+   public string SocketFilePath => channelFactory.SocketFilePath;
+
    public CultureInfo? Culture { get; }
 
    public GrpcChannel Channel => channelFactory.Channel;

@@ -30,10 +30,12 @@ public class SynchronizationClient : ISynchronizationClient, ISynchronizedClient
 
    #region Constructors and Destructors
 
-   public SynchronizationClient(GrpcChannel channel, IClientLogger logger)
+   public SynchronizationClient(GrpcChannel channel, IClientLogger logger, string socketPath)
    {
       if (channel == null)
          throw new ArgumentNullException(nameof(channel));
+      SocketFilePath = socketPath ?? throw new ArgumentNullException(nameof(socketPath));
+
       this.logger = logger ?? throw new ArgumentNullException(nameof(logger));
 
       Id = Process.GetCurrentProcess().ProcessName;
@@ -45,6 +47,8 @@ public class SynchronizationClient : ISynchronizationClient, ISynchronizedClient
    #endregion
 
    #region ISynchronizationClient Members
+
+   public string SocketFilePath { get; }
 
    public string Id { get; }
 
@@ -126,7 +130,12 @@ public class SynchronizationClient : ISynchronizationClient, ISynchronizedClient
 
          try
          {
-            
+            if (!SocketFileExists(client))
+            {
+               await Task.Delay(pollingDelay, cancellationToken);
+               continue;
+            }
+
             var connectionRequest = new EstablishConnectionRequest { ClientId = client.Id };
             var response = await connectionService.EstablishConnectionAsync(connectionRequest, null, null, cancellationToken);
 
@@ -145,6 +154,10 @@ public class SynchronizationClient : ISynchronizationClient, ISynchronizedClient
 
    }
 
+   private bool SocketFileExists(ISynchronizedClient client)
+   {
+      return File.Exists(client.SocketFilePath);
+   }
 
    #endregion
 }

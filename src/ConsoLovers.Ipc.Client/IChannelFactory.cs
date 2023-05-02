@@ -19,6 +19,9 @@ public interface IChannelFactory
    /// <summary>Gets the server name.</summary>
    string ServerName { get; }
 
+   /// <summary>Gets the path of the socket file.</summary>
+   string SocketFilePath { get; }
+
    /// <summary>Gets the synchronization client.</summary>
    ISynchronizationClient SynchronizationClient { get; }
 

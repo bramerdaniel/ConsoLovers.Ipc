@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
-// <copyright file="ChannelFactory.cs" company="KUKA Deutschland GmbH">
-//   Copyright (c) KUKA Deutschland GmbH 2006 - 2022
+// <copyright file="ChannelFactory.cs" company="ConsoLovers">
+//    Copyright (c) ConsoLovers  2015 - 2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -18,9 +18,9 @@ internal class ChannelFactory : IChannelFactory
 {
    #region Constants and Fields
 
-   private readonly string socketPath;
-
    private readonly IClientLogger logger;
+
+   private readonly string socketPath;
 
    private GrpcChannel? channel;
 
@@ -44,6 +44,9 @@ internal class ChannelFactory : IChannelFactory
 
    #region IChannelFactory Members
 
+   /// <summary>Gets the path of the socket file.</summary>
+   public string SocketFilePath => socketPath;
+
    /// <summary>Gets the synchronization client.</summary>
    public ISynchronizationClient SynchronizationClient => synchronizationClient ??= CreateSynchronizationClient();
 
@@ -63,11 +66,7 @@ internal class ChannelFactory : IChannelFactory
       var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
       logger.Debug($"Created UnixDomainSocketConnectionFactory for endpoint {socketPath}");
 
-      var socketsHttpHandler = new SocketsHttpHandler
-      {
-         ConnectCallback = connectionFactory.ConnectAsync, 
-         Proxy = new WebProxy()
-      };
+      var socketsHttpHandler = new SocketsHttpHandler { ConnectCallback = connectionFactory.ConnectAsync, Proxy = new WebProxy() };
 
       var grpcChannel = GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions { HttpHandler = socketsHttpHandler });
 
@@ -76,7 +75,7 @@ internal class ChannelFactory : IChannelFactory
 
    private ISynchronizationClient CreateSynchronizationClient()
    {
-      return new SynchronizationClient(Channel, logger);
+      return new SynchronizationClient(Channel, logger, socketPath);
    }
 
    #endregion

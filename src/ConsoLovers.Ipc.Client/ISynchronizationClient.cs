@@ -34,14 +34,3 @@ public interface ISynchronizationClient
 
    #endregion
 }
-
-public interface ISynchronizedClient
-{
-   string Id { get; }
-
-   void OnConnectionEstablished(CancellationToken cancellationToken);
-   
-   void OnConnectionConfirmed(CancellationToken cancellationToken);
-   
-   void OnConnectionAborted(CancellationToken cancellationToken);
-}

@@ -8,11 +8,15 @@ namespace Client;
 
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Net;
+using System.Net.Sockets;
 
 using ConsoLovers.ConsoleToolkit.Core;
 using ConsoLovers.ConsoleToolkit.Core.Builders;
 using ConsoLovers.ConsoleToolkit.Core.Exceptions;
 using ConsoLovers.Ipc;
+
+using Grpc.Net.Client;
 
 using Microsoft.Extensions.DependencyInjection;
 
@@ -29,18 +33,64 @@ public static class Program
 
    #region Public Methods and Operators
 
+   public class UnixDomainSocketConnectionFactory
+   {
+      private readonly EndPoint _endPoint;
+
+      public UnixDomainSocketConnectionFactory(EndPoint endPoint)
+      {
+         _endPoint = endPoint;
+      }
+
+      public async ValueTask<Stream> ConnectAsync(SocketsHttpConnectionContext _,
+         CancellationToken cancellationToken = default)
+      {
+         var socket = new Socket(AddressFamily.Unix, SocketType.Stream, ProtocolType.Unspecified);
+
+         try
+         {
+            await socket.ConnectAsync(_endPoint, cancellationToken).ConfigureAwait(false);
+            return new NetworkStream(socket, true);
+         }
+         catch
+         {
+            socket.Dispose();
+            throw;
+         }
+      }
+   }
+
+
+   public static readonly string SocketPath = "C:\\tmp\\socket.tmp";
+
+   public static GrpcChannel CreateChannel()
+   {
+      var udsEndPoint = new UnixDomainSocketEndPoint(SocketPath);
+      var connectionFactory = new UnixDomainSocketConnectionFactory(udsEndPoint);
+      var socketsHttpHandler = new SocketsHttpHandler
+      {
+         ConnectCallback = connectionFactory.ConnectAsync
+      };
+
+      return GrpcChannel.ForAddress("http://localhost", new GrpcChannelOptions
+      {
+         HttpHandler = socketsHttpHandler
+      });
+   }
    public static async Task Main(string[] args)
    {
+
+
       await GenericMenu(args);
 
-      //try
-      //{
-      //   await ProgressClient();
-      //}
-      //catch (Exception e)
-      //{
-      //   AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
-      //}
+      try
+      {
+         await ProgressClient();
+      }
+      catch (Exception e)
+      {
+         AnsiConsole.WriteException(e, ExceptionFormats.ShortenEverything | ExceptionFormats.ShowLinks);
+      }
 
       Console.WriteLine("Finished");
       Console.ReadLine();
@@ -57,6 +107,7 @@ public static class Program
          .Build();
 
       var progressClient = factory.CreateProgressClient();
+
       progressClient.ProgressChanged += (s, e) => Console.Write(".");
 
       try

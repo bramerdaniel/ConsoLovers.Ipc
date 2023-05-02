@@ -23,6 +23,9 @@ public interface IClientConfiguration
    /// <summary>Gets the server name the channel was created for.</summary>
    public string ServerName { get; }
 
+   /// <summary>Gets the socket file the client wants to use.</summary>
+   string SocketFilePath { get; }
+
    /// <summary>Gets the synchronization client.</summary>
    ISynchronizationClient SynchronizationClient { get; }
 

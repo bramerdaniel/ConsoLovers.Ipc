@@ -45,6 +45,8 @@ public class ConfigurableClient<T> : IConfigurableClient
 
    #region Properties
 
+   public string SocketFilePath => Configuration.SocketFilePath;
+
    /// <summary>Gets the configuration.</summary>
    protected IClientConfiguration Configuration { get; private set; } = null!;
 

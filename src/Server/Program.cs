@@ -36,7 +36,8 @@ internal class Program
    {
       //await Task.Delay(1000);
       var server = IpcServer.CreateServer()
-         .ForCurrentProcess()
+         .ForName("server")
+         //.ForCurrentProcess()
          .RemoveAspNetCoreLogging()
          .AddProgressReporter()
          .AddResultReporter()
