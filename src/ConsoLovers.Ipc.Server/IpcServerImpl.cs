@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="IpcServerImpl.cs" company="ConsoLovers">
-//    Copyright (c) ConsoLovers  2015 - 2022
+//    Copyright (c) ConsoLovers  2015 - 2023
 // </copyright>
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -34,6 +34,8 @@ internal sealed class IpcServerImpl : IIpcServer
       SocketFile = socketFile ?? throw new ArgumentNullException(nameof(socketFile));
       Name = Path.GetFileNameWithoutExtension(socketFile);
       Logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+      EnsureSocketDirectory();
 
       ServerTask = webApplication.RunAsync();
       Logger.Info($"Ipc server was started with name '{Name}'");
@@ -89,18 +91,6 @@ internal sealed class IpcServerImpl : IIpcServer
       Logger.Info($"Ipc server '{Name}' disposed successfully after {stopwatch.ElapsedMilliseconds} ms.");
    }
 
-   private void TryDeleteSocketFile()
-   {
-      try
-      {
-         File.Delete(SocketFile);
-      }
-      catch (Exception exception)
-      {
-         Logger.Warn($"Failed to delete socket file {SocketFile}: {exception.Message}");
-      }
-   }
-
    /// <summary>Gets the name of the server.</summary>
    public string Name { get; }
 
@@ -118,6 +108,31 @@ internal sealed class IpcServerImpl : IIpcServer
 
    /// <summary>Gets the server task.</summary>
    internal Task ServerTask { get; }
+
+   #endregion
+
+   #region Methods
+
+   private void EnsureSocketDirectory()
+   {
+      var directoryName = Path.GetDirectoryName(SocketFile);
+      if (directoryName == null)
+         throw new InvalidOperationException($"Invalid socket file path {SocketFile}");
+
+      Directory.CreateDirectory(directoryName);
+   }
+
+   private void TryDeleteSocketFile()
+   {
+      try
+      {
+         File.Delete(SocketFile);
+      }
+      catch (Exception exception)
+      {
+         Logger.Warn($"Failed to delete socket file {SocketFile}: {exception.Message}");
+      }
+   }
 
    #endregion
 }
